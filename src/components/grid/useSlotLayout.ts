@@ -11,6 +11,7 @@ export interface SlotLayoutController extends SlotLayoutState {
   setCols: (cols: number) => void;
   setMode: (mode: LayoutMode) => void;
   setSlotIndex: (itemIndex: number, slotIndex: number) => void;
+  setSlotVisible: (itemIndex: number, visible: boolean) => void;
   applyLayout: (layout: SlotLayoutState) => void;
   resetLayout: () => void;
 }
@@ -54,7 +55,16 @@ export function useSlotLayout<T extends LayoutItem>(
     setState((previous) => ({
       ...previous,
       entries: previous.entries.map((entry, index) =>
-        index === itemIndex ? { index: slotIndex, visible: slotIndex >= 0 } : entry,
+        index === itemIndex ? { ...entry, index: slotIndex } : entry,
+      ),
+    }));
+  };
+
+  const setSlotVisible = (itemIndex: number, visible: boolean) => {
+    setState((previous) => ({
+      ...previous,
+      entries: previous.entries.map((entry, index) =>
+        index === itemIndex ? { ...entry, visible } : entry,
       ),
     }));
   };
@@ -82,6 +92,7 @@ export function useSlotLayout<T extends LayoutItem>(
     setCols,
     setMode,
     setSlotIndex,
+    setSlotVisible,
     applyLayout,
     resetLayout,
   };

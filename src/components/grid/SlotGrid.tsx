@@ -10,6 +10,7 @@ interface SlotGridProps<T extends LayoutItem> {
   getKey: (item: T) => React.Key;
   renderCard: (item: T, itemIndex: number) => React.ReactNode;
   onSlotIndexChange: (itemIndex: number, slotIndex: number) => void;
+  slotCount: number;
 }
 
 interface SlotIndexInputProps {
@@ -24,7 +25,7 @@ const SlotIndexInput: React.FC<SlotIndexInputProps> = ({ value, max, onChange })
     <input
       type="number"
       min={-1}
-      max={max - 1}
+      max={max}
       value={value}
       className={styles.indexInput}
       onChange={(event) => {
@@ -43,6 +44,7 @@ export function SlotGrid<T extends LayoutItem>({
   getKey,
   renderCard,
   onSlotIndexChange,
+  slotCount,
 }: SlotGridProps<T>) {
   return (
     <CardGrid variant={variant}>
@@ -52,12 +54,12 @@ export function SlotGrid<T extends LayoutItem>({
         return (
           <CardGridItem
             key={getKey(item)}
-            active={entry.visible}
+            active={entry.visible && entry.index >= 0}
             footer={
               mode === 'manual' ? (
                 <SlotIndexInput
                   value={entry.index}
-                  max={999}
+                  max={slotCount - 1}
                   onChange={(slotIndex) => onSlotIndexChange(itemIndex, slotIndex)}
                 />
               ) : null

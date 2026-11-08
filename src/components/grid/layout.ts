@@ -68,5 +68,22 @@ export function entriesToIndices(entries: SlotEntry[]): number[] {
 }
 
 export function indicesToEntries(indices: number[]): SlotEntry[] {
-  return indices.map((index) => ({ index, visible: index >= 0 }));
+  return indices.map((index) => ({ index, visible: true }));
+}
+
+export function fillSlots<T>(
+  items: T[],
+  entries: SlotEntry[],
+  slotCount: number,
+): Array<T | null> {
+  const slots = new Array<T | null>(slotCount).fill(null);
+
+  items.forEach((item, itemIndex) => {
+    const entry = entries[itemIndex];
+    if (!entry?.visible) return;
+    if (entry.index < 0 || entry.index >= slotCount) return;
+    slots[entry.index] = item;
+  });
+
+  return slots;
 }
