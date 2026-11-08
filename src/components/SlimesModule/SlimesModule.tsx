@@ -2,7 +2,7 @@ import React from 'react';
 import { SlimeCard } from '../SlimeCard/SlimeCard';
 import { type SlimeData, type SlimeState } from '../../models/slime';
 import { GridControls } from '../grid/GridControls';
-import { ModulePanel } from '../grid/ModulePanel';
+import { ModulePanel } from '../ui/ModulePanel/ModulePanel';
 import { SlotGrid } from '../grid/SlotGrid';
 import type { SlotLayoutController } from '../grid/useSlotLayout';
 import styles from './SlimesModule.module.css';

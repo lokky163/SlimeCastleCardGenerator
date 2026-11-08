@@ -2,7 +2,7 @@ import React from 'react';
 import { RelicCard } from '../RelicCard';
 import { type RelicData, type RelicState } from '../../models/relic';
 import { GridControls } from '../grid/GridControls';
-import { ModulePanel } from '../grid/ModulePanel';
+import { ModulePanel } from '../ui/ModulePanel/ModulePanel';
 import { SlotGrid } from '../grid/SlotGrid';
 import type { SlotLayoutController } from '../grid/useSlotLayout';
 
