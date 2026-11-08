@@ -1,0 +1,54 @@
+.dialog {
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.text {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.text h3 {
+  margin: 0 0 6px;
+  color: var(--color-accent);
+  font-family: var(--font-title);
+}
+
+.text p {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.imageWrapper {
+  overflow: auto;
+  max-width: 100%;
+  max-height: 65vh;
+}
+
+.imageWrapper img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.closeBtn {
+  margin-top: 16px;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border: 1px solid var(--color-accent-soft);
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.closeBtn:hover {
+  background-color: var(--color-accent-soft);
+}

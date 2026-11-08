@@ -1,0 +1,202 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: var(--color-panel);
+  border-bottom: 2px solid #0f3460;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tabContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tabMenuWrap {
+  position: relative;
+}
+
+.tabBtn {
+  background-color: var(--color-panel-3);
+  border: 1px solid var(--color-border);
+  color: #b0b0c0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+}
+
+.tabBtn:hover {
+  background-color: #3a3a5a;
+  border-color: #6a6a8a;
+}
+
+.dropdownToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrow {
+  display: inline-block;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 0.2s;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+}
+
+.tabMenu {
+  min-width: 180px;
+}
+
+.tabOption {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+}
+
+.tabOption.tabOptionActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+  font-weight: bold;
+}
+
+.btnHelp {
+  color: var(--color-text);
+}
+
+.btnReset {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger-border);
+  color: #ff6b6b;
+  font-weight: bold;
+  box-shadow: 0 0 6px rgba(139, 0, 0, 0.4);
+}
+
+.btnReset:hover {
+  background-color: #b22222;
+  border-color: #ff6347;
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
+}
+
+.nameInput {
+  width: 150px;
+  background-color: var(--color-panel-3);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: var(--font-ui);
+  box-sizing: border-box;
+}
+
+.toolsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pickerBlock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pickerLabel {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+}
+
+.swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatchActive {
+  border: 2px solid var(--color-accent);
+}
+
+.colorInput {
+  width: 32px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.actionBtn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btnImport {
+  background-color: var(--color-panel-3);
+}
+
+.btnImport:hover {
+  background-color: #3a3a5a;
+}
+
+.btnExport {
+  background-color: #1d4ed8;
+  border-color: #3b82f6;
+}
+
+.btnExport:hover {
+  background-color: #2563eb;
+}
+
+.btnPng {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent-soft);
+  color: var(--color-bg);
+}
+
+.btnPng:hover {
+  background-color: var(--color-accent-soft);
+}
+
+.fileInput {
+  display: none;
+}

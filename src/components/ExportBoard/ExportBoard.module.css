@@ -1,0 +1,187 @@
+.board {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-110%, 0);
+  width: max-content;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 15px;
+  font-family: var(--font-title);
+}
+
+.header {
+  border-bottom: 5px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 25px;
+  margin-bottom: 5px;
+  text-align: center;
+  width: 100%;
+}
+
+.playerName {
+  font-size: 60px;
+  font-weight: bold;
+  color: var(--color-accent);
+  letter-spacing: 1px;
+}
+
+.bonus {
+  font-size: 40px;
+  color: var(--color-text);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.accent {
+  color: var(--color-accent);
+  font-weight: bold;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  border-bottom: 5px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+  box-sizing: border-box;
+}
+
+.lastSection {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  gap: 5px;
+}
+
+.equipmentCell {
+  width: 195px;
+  height: 209px;
+  position: relative;
+}
+
+.relicCell {
+  width: 228px;
+  height: 349px;
+  position: relative;
+}
+
+.slimeCell {
+  width: 250px;
+  height: 207px;
+  position: relative;
+}
+
+.emptyCell {
+  background: transparent;
+}
+
+.buffGrid {
+  display: grid;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.buffCard {
+  background: #4e2e19;
+  border: 1px solid #271700;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.buffText {
+  max-width: 180px;
+  text-align: center;
+  font-family: var(--font-title);
+}
+
+.buffTitleLine {
+  color: var(--color-text);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.buffValue {
+  color: var(--color-accent);
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.artifactGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, 350px);
+  justify-content: center;
+}
+
+.artifactCard {
+  height: 450px;
+  width: 350px;
+  background: #4e2e19;
+  border: 1px solid #271700;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.artifactImage {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+}
+
+.artifactStars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin: 4px 0;
+}
+
+.artifactFragments {
+  font-size: 2.5em;
+  color: #b0b0c0;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.artifactLevel {
+  font-size: 2.5rem;
+  color: #fff;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.muted {
+  color: #666;
+}
+
+.grayedOut {
+  filter: grayscale(100%) brightness(55%);
+}
