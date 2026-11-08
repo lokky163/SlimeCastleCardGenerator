@@ -10,6 +10,7 @@ import { BuffExport } from './BuffExport';
 import { EquipmentExport } from './EquipmentExport';
 import { RelicExport } from './RelicExport';
 import { SlimeExport } from './SlimeExport';
+import type { ExportSelection } from './exportSelection';
 import styles from './ExportBoard.module.css';
 
 interface ExportBoardProps {
@@ -25,6 +26,7 @@ interface ExportBoardProps {
   buffs: BuffData[];
   artifacts: ArtifactData[];
   phaseInfo: { phase: number; percent: number };
+  selection: ExportSelection;
 }
 
 export const ExportBoard: React.FC<ExportBoardProps> = ({
@@ -40,20 +42,23 @@ export const ExportBoard: React.FC<ExportBoardProps> = ({
   buffs,
   artifacts,
   phaseInfo,
+  selection,
 }) => (
   <div ref={boardRef} className={styles.board} style={{ backgroundColor: bgColor }}>
-    <div className={styles.header}>
-      <div className={styles.playerName}>{playerName.trim() || 'Ник игрока'}</div>
-      <div className={styles.bonus}>
-        Общий бонус слайма:{' '}
-        <span className={styles.accent}>{totalSlimeBonus.toFixed(2)}</span>
+    {selection.header && (
+      <div className={styles.header}>
+        <div className={styles.playerName}>{playerName.trim() || 'Ник игрока'}</div>
+        <div className={styles.bonus}>
+          Общий бонус слайма:{' '}
+          <span className={styles.accent}>{totalSlimeBonus.toFixed(2)}</span>
+        </div>
       </div>
-    </div>
+    )}
 
-    <EquipmentExport equipment={equipment} />
-    <RelicExport relics={relics} layout={relicLayout} />
-    <SlimeExport slimes={slimes} layout={slimeLayout} />
-    <BuffExport buffs={buffs} phaseInfo={phaseInfo} />
-    <ArtifactExport artifacts={artifacts} />
+    {selection.equipment && <EquipmentExport equipment={equipment} />}
+    {selection.relics && <RelicExport relics={relics} layout={relicLayout} />}
+    {selection.slimes && <SlimeExport slimes={slimes} layout={slimeLayout} />}
+    {selection.buffs && <BuffExport buffs={buffs} phaseInfo={phaseInfo} />}
+    {selection.artifacts && <ArtifactExport artifacts={artifacts} />}
   </div>
 );

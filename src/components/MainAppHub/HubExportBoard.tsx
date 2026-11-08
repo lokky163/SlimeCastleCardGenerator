@@ -1,12 +1,14 @@
 import type { RefObject } from 'react';
 import type { CardProfile } from '../../hooks/useCardProfile';
 import { ExportBoard } from '../ExportBoard/ExportBoard';
+import type { ExportSelection } from '../ExportBoard/exportSelection';
 
 interface HubExportBoardProps {
   profile: CardProfile;
   boardRef: RefObject<HTMLDivElement | null>;
   bgColor: string;
   phaseInfo: { phase: number; percent: number };
+  selection: ExportSelection;
 }
 
 export const HubExportBoard: React.FC<HubExportBoardProps> = ({
@@ -14,6 +16,7 @@ export const HubExportBoard: React.FC<HubExportBoardProps> = ({
   boardRef,
   bgColor,
   phaseInfo,
+  selection,
 }) => (
   <ExportBoard
     boardRef={boardRef}
@@ -28,5 +31,6 @@ export const HubExportBoard: React.FC<HubExportBoardProps> = ({
     buffs={profile.buffs}
     artifacts={profile.artifacts}
     phaseInfo={phaseInfo}
+    selection={selection}
   />
 );
