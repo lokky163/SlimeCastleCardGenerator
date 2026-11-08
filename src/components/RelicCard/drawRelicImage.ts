@@ -1,11 +1,14 @@
 import { getStarImages, type RelicState } from '../../models/relic';
 import { loadImage } from '../../services/ImageComposer';
 
-const WIDTH = 228;
-const HEIGHT = 349;
+export const RELIC_IMAGE_WIDTH = 228;
+export const RELIC_IMAGE_HEIGHT = 349;
 
-export function relicImageKey(name: string, state: RelicState): string {
-  return `relic:${name}:${state}`;
+const WIDTH = RELIC_IMAGE_WIDTH;
+const HEIGHT = RELIC_IMAGE_HEIGHT;
+
+export function relicImageKey(imageUrl: string, state: RelicState): string {
+  return `relic:${imageUrl}:${state}`;
 }
 
 function drawGrayscale(ctx: CanvasRenderingContext2D, image: HTMLImageElement): void {
