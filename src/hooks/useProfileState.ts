@@ -5,6 +5,7 @@ import { EquipmentData, createInitialEquipment } from '../models/equipment';
 import { BuffData, BUFFS } from '../models/buff';
 import { ArtifactData, ARTIFACT_NAMES } from '../models/artifact';
 import { useSlotLayout } from '../components/grid/useSlotLayout';
+import { useSlimeActions } from './useSlimeActions';
 
 export const createRelics = () => RELIC_NAMES.map((name) => new RelicData(name, '0'));
 
@@ -20,6 +21,7 @@ export function useProfileState() {
 
   const [slimes, setSlimes] = useState<SlimeData[]>(createInitialSlimes);
   const slimeLayout = useSlotLayout(slimes, { rows: 5, cols: 6, mode: 'to-end' });
+  const slimeActions = useSlimeActions(setSlimes);
 
   const [equipment, setEquipment] = useState<EquipmentData[]>(createInitialEquipment);
   const [buffs, setBuffs] = useState<BuffData[]>(createBuffs);
@@ -29,14 +31,6 @@ export function useProfileState() {
     (sum, slime) => sum + slime.calculateBonus(),
     0,
   );
-
-  const changeSkin = (targetName: string, nextSkin: number) => {
-    setSlimes((previous) =>
-      previous.map((slime) =>
-        slime.name === targetName ? slime.clone({ _skin: nextSkin }) : slime,
-      ),
-    );
-  };
 
   return {
     playerName,
@@ -54,7 +48,7 @@ export function useProfileState() {
     artifacts,
     setArtifacts,
     totalSlimeBonus,
-    changeSkin,
+    ...slimeActions,
   };
 }
 

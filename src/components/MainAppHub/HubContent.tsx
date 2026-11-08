@@ -33,8 +33,10 @@ export const HubContent: React.FC<HubContentProps> = ({
       return (
         <SlimesModule
           slimes={profile.slimes}
-          setSlimes={profile.setSlimes}
+          totalSlimeBonus={profile.totalSlimeBonus}
           layout={profile.slimeLayout}
+          onChangeState={profile.changeSlimeState}
+          onChangeLevel={profile.changeSlimeLevel}
           onChangeSkin={profile.changeSkin}
         />
       );
