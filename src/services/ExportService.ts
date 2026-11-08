@@ -1,12 +1,16 @@
 import { toPng } from 'html-to-image';
 import { RelicData, type RelicState, RELIC_NAMES } from '../models/relic';
 import { SlimeData, type SlimeState, slimeLists } from '../models/slime';
-import { EquipmentData, type EquipmentGrade } from '../models/equipment';
+import {
+  EquipmentData,
+  type EquipmentGrade,
+  type EquipmentSet,
+  type EquipmentType,
+} from '../models/equipment';
 import { BuffData, type BuffType, BUFFS } from '../models/buff';
 import { type LayoutMode } from '../utils/relicPresets';
 import { type SlotEntry } from '../components/grid/layout';
 import { ArtifactData, type ArtifactState, ARTIFACT_NAMES } from '../models/artifact';
-import { saveAs } from 'file-saver';
 
 export interface IRelicsJsonModule {
   relicsGrid: { rows: number; cols: number };
@@ -76,6 +80,107 @@ function unpackSlot(slotIndex: number | undefined, visible: boolean | undefined)
     index: slotIndex ?? -1,
     visible: visible ?? true,
   };
+}
+
+function resolveEntry(
+  layoutMode: LayoutMode,
+  item: { slotIndex?: number; visible?: boolean } | undefined,
+  autoIndex: number,
+): SlotEntry {
+  if (layoutMode !== 'manual') return { index: autoIndex, visible: true };
+  return item ? unpackSlot(item.slotIndex, item.visible) : { index: -1, visible: true };
+}
+
+function importRelics(module: IRelicsJsonModule | null): IImportedSccData['relics'] {
+  if (!module) return null;
+
+  const { rows, cols } = module.relicsGrid;
+  const layoutMode = module.layoutMode ?? 'default';
+  const relicsList: RelicData[] = [];
+  const entries: SlotEntry[] = [];
+
+  RELIC_NAMES.forEach((defaultName, index) => {
+    const found = module.relicsList.find((item) => item.name === defaultName);
+    relicsList.push(
+      found
+        ? new RelicData(found.name, found.state as RelicState)
+        : new RelicData(defaultName, 'no'),
+    );
+    entries.push(resolveEntry(layoutMode, found, index));
+  });
+
+  return { rows, cols, layoutMode, relicsList, entries };
+}
+
+function importSlimes(module: ISlimesJsonModule | null): IImportedSccData['slimes'] {
+  if (!module) return null;
+
+  const { rows, cols } = module.slimesGrid;
+  const layoutMode = module.layoutMode ?? 'default';
+  const slimesList: SlimeData[] = [];
+  const entries: SlotEntry[] = [];
+  let autoIndex = 0;
+
+  slimeLists.forEach((list) => {
+    list.names.forEach((defaultName) => {
+      const found = module.slimesList.find((item) => item.name === defaultName);
+      slimesList.push(
+        found
+          ? new SlimeData(found.name, found.state as SlimeState, found.level, found.skin)
+          : new SlimeData(defaultName, 'no', 1, 0),
+      );
+      entries.push(resolveEntry(layoutMode, found, autoIndex));
+      autoIndex += 1;
+    });
+  });
+
+  return { rows, cols, layoutMode, slimesList, entries };
+}
+
+function detectEquipmentType(name: string): EquipmentType {
+  const normalized = name.toLowerCase();
+  if (normalized.includes('helmet')) return 'helmet';
+  if (normalized.includes('chestplate')) return 'chestplate';
+  if (normalized.includes('ring')) return 'ring';
+  return 'sword';
+}
+
+function detectEquipmentSet(name: string): EquipmentSet {
+  return name.toLowerCase().includes('astral') ? 'astral' : 'egida';
+}
+
+function importEquipment(module: IEquipmentJsonModule | null): EquipmentData[] | null {
+  if (!module) return null;
+
+  return module.equipmentList.map(
+    (item) =>
+      new EquipmentData(
+        item.name,
+        detectEquipmentType(item.name),
+        detectEquipmentSet(item.name),
+        item.grade as EquipmentGrade,
+      ),
+  );
+}
+
+function importBuffs(module: IBuffsJsonModule | null): BuffData[] | null {
+  if (!module) return null;
+
+  return BUFFS.map((type) => {
+    const found = module.buffsList.find((buff) => buff.name === type);
+    return new BuffData(type as BuffType, found?.value ?? 0);
+  });
+}
+
+function importArtifacts(module: IArtifactsJsonModule | null): ArtifactData[] | null {
+  if (!module) return null;
+
+  return ARTIFACT_NAMES.map((defaultName) => {
+    const found = module.artifactsList.find((artifact) => artifact.name === defaultName);
+    return found
+      ? new ArtifactData(found.name, found.state as ArtifactState, found.level, found.fragments)
+      : new ArtifactData(defaultName, 'no', 1, 0);
+  });
 }
 
 export class ExportService {
@@ -175,187 +280,21 @@ static exportToScc(
   static importFromScc(fileContent: string): IImportedSccData | null {
     try {
       const parsed = JSON.parse(fileContent);
-      if (parsed.fileType !== "slime-card-config") return null;
+      if (parsed.fileType !== 'slime-card-config') return null;
 
-      const playerName = parsed.playerName ?? '';
-      const result: IImportedSccData = { playerName, relics: null, slimes: null, equipment: null, buffs: null, artifacts: null };
-
-      // Релики
-      // 1. ИСПРАВЛЕНИЕ: Разбор модуля РЕЛИКВИЙ слиянием с дефолтным списком
-      const relicsModule = parsed.modules?.relics as IRelicsJsonModule | null;
-      if (relicsModule) {
-        const { rows, cols } = relicsModule.relicsGrid;
-        const layoutMode = relicsModule.layoutMode ?? 'default';
-        
-        const restoredRelics: RelicData[] = [];
-        const restoredEntries: SlotEntry[] = [];
-
-        // Идём строго по нашему эталонному массиву RELIC_NAMES, чтобы ничего не потерять
-        RELIC_NAMES.forEach((defaultName, defaultIdx) => {
-          // Ищем, есть ли данный релик в загруженном файле JSON
-          const foundItem = relicsModule.relicsList.find(item => item.name === defaultName);
-
-          if (foundItem) {
-            // Если релик найден в файле — восстанавливаем его сохранённое состояние
-            restoredRelics.push(new RelicData(foundItem.name, foundItem.state as RelicState));
-            restoredEntries.push(
-              layoutMode === 'manual'
-                ? unpackSlot(foundItem.slotIndex, foundItem.visible)
-                : { index: defaultIdx, visible: true },
-            );
-          } else {
-            // Если релика в файле нет — создаём его в состоянии по умолчанию ('0')
-            restoredRelics.push(new RelicData(defaultName, 'no'));
-            // В автоматических режимах индекс равен его дефолтной позиции, в ручном убираем в скрытые (-1)
-            restoredEntries.push(
-              layoutMode === 'manual'
-                ? { index: -1, visible: true }
-                : { index: defaultIdx, visible: true },
-            );
-          }
-        });
-
-        result.relics = { 
-          rows, 
-          cols, 
-          layoutMode, 
-          relicsList: restoredRelics, 
-          entries: restoredEntries
-        };
-      }
-
-
-      // Слаймы
-      // 2. ИСПРАВЛЕНИЕ: Разбор модуля СЛАЙМОВ слиянием через списки slimeLists
-      const slimesModule = parsed.modules?.slimes as ISlimesJsonModule | null;
-      if (slimesModule) {
-        const { rows, cols } = slimesModule.slimesGrid;
-        const layoutMode = slimesModule.layoutMode ?? 'default';
-        
-        const restoredSlimes: SlimeData[] = [];
-        const restoredEntries: SlotEntry[] = [];
-
-        // Сквозной счетчик для автоматической расстановки дефолтных slotIndex
-        let globalCounter = 0;
-
-        // Идём строго по эталонной структуре списков редкостей
-        slimeLists.forEach((list) => {
-          list.names.forEach((defaultName) => {
-            // Ищем, есть ли данный слайм в загруженном файле JSON
-            const foundItem = slimesModule.slimesList.find(item => item.name === defaultName);
-
-            if (foundItem) {
-              // Если слайм найден — берем его состояние, уровень и скин из файла
-              restoredSlimes.push(
-                new SlimeData(foundItem.name, foundItem.state as SlimeState, foundItem.level, foundItem.skin)
-              );
-              restoredEntries.push(
-                layoutMode === 'manual'
-                  ? unpackSlot(foundItem.slotIndex, foundItem.visible)
-                  : { index: globalCounter, visible: true },
-              );
-            } else {
-              // Если слайма нет в файле — создаем дефолтного (состояние '0', 250 уровень, 0 скин)
-              restoredSlimes.push(
-                new SlimeData(defaultName, 'no', 1, 0)
-              );
-              restoredEntries.push(
-                layoutMode === 'manual'
-                  ? { index: -1, visible: true }
-                  : { index: globalCounter, visible: true },
-              );
-            }
-
-            globalCounter++; // Переходим к следующему сквозному индексу
-          });
-        });
-
-        result.slimes = { 
-          rows, 
-          cols, 
-          layoutMode, 
-          slimesList: restoredSlimes, 
-          entries: restoredEntries
-        };
-      }
-
-      // Снаряжение
-      const equipModule = parsed.modules?.equipment as IEquipmentJsonModule | null;
-      if (equipModule) {
-        result.equipment = equipModule.equipmentList.map(item => {
-          const name = item.name;
-          let type: any = 'sword';
-          if (name.toLowerCase().includes('helmet')) type = 'helmet';
-          if (name.toLowerCase().includes('chestplate')) type = 'chestplate';
-          if (name.toLowerCase().includes('ring')) type = 'ring';
-          
-          let set: any = name.toLowerCase().includes('astral') ? 'astral' : 'egida';
-          return new EquipmentData(item.name, type, set, item.grade as EquipmentGrade);
-        });
-      }
-
-      // УМНОЕ СЛИЯНИЕ ДЛЯ БАФФОВ
-      const buffsModule = parsed.modules?.buffs as IBuffsJsonModule | null;
-      if (buffsModule) {
-        result.buffs = BUFFS.map(defaultType => {
-          const found = buffsModule.buffsList.find(b => b.name === defaultType);
-          return new BuffData(defaultType, found ? found.value : 0);
-        });
-      }
-
-      const artifactsModule = parsed.modules?.artifacts as IArtifactsJsonModule | null;
-      if (artifactsModule) {
-        result.artifacts = ARTIFACT_NAMES.map(defaultName => {
-          const found = artifactsModule.artifactsList.find(art => art.name === defaultName);
-          if (found) {
-            return new ArtifactData(found.name, found.state as ArtifactState, found.level, found.fragments);
-          }
-          return new ArtifactData(defaultName, 'no', 1, 0); // По умолчанию нет артефакта, 1 лвл, 0 осколков
-        });
-      }
-
-      return result;
-    } catch (e) {
+      const modules = parsed.modules ?? {};
+      return {
+        playerName: parsed.playerName ?? '',
+        relics: importRelics(modules.relics ?? null),
+        slimes: importSlimes(modules.slimes ?? null),
+        equipment: importEquipment(modules.equipment ?? null),
+        buffs: importBuffs(modules.buffs ?? null),
+        artifacts: importArtifacts(modules.artifacts ?? null),
+      };
+    } catch {
       return null;
     }
   }
-
-  // private static dataURLtoBlob(dataUrl: string): Blob {
-  //   const arr = dataUrl.split(',');
-  //   // const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
-  //   const bstr = atob(arr[1]);
-  //   let n = bstr.length;
-  //   const u8arr = new Uint8Array(n);
-  //   while (n--) {
-  //     u8arr[n] = bstr.charCodeAt(n);
-  //   }
-  //   // Используем 'application/octet-stream' для iOS/Telegram, чтобы принудительно вызвать скачивание
-  //   return new Blob([u8arr], { type: 'application/octet-stream' });
-  // }
-
-  // static async exportToPng(element: HTMLDivElement | null, fileNamePrefix: string = 'layout'): Promise<void> {
-  //   if (!element) return;
-  //   try {
-  //     const dataUrl = await toPng(element, {
-  //       cacheBust: true,
-  //       pixelRatio: 1, 
-  //       style: {
-  //         left: '0',
-  //         top: '0',
-  //         transform: 'translate(0, 0)',
-  //       }
-  //     });
-
-  //     // 1. Конвертируем Data URL в бинарный Blob
-  //     const blob = this.dataURLtoBlob(dataUrl);
-  //     const fileName = `${fileNamePrefix}-${ExportService.curFormattedDate()}.png`;
-
-  //     // 2. Скачиваем через file-saver, который внутри Telegram WebView сработает корректно
-  //     saveAs(blob, fileName);
-  //   } catch (error) {
-  //     console.error('Ошибка при экспорте в PNG:', error);
-  //   }
-  // }
 
   static async exportToPng(element: HTMLDivElement | null): Promise<string | null> {
     if (!element) return null;
