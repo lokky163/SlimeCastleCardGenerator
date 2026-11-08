@@ -23,16 +23,7 @@ import {
 } from '../models/exportSelection';
 import { RELIC_NAMES, RelicData, type RelicState } from '../models/relic';
 import { SlimeData, slimeLists, type SlimeState } from '../models/slime';
-import {
-  SCC_FILE_TYPE,
-  type GridLayoutJson,
-  type IArtifactsJsonModule,
-  type IBuffsJsonModule,
-  type IEquipmentJsonModule,
-  type IRelicsJsonModule,
-  type ISlimesJsonModule,
-  type SlotJson,
-} from './SccSchema';
+import { SCC_FILE_TYPE, type SlotJson } from './SccSchema';
 
 export interface ImportedModuleLayout {
   rows: number;
@@ -60,65 +51,117 @@ export interface IImportedSccData {
   artifacts: ImportedModule<ArtifactData> | null;
 }
 
+interface NormalizedModule {
+  grid: { rows: number; cols: number };
+  layoutMode: LayoutMode;
+  list: Array<Record<string, unknown>>;
+  autoSize?: boolean;
+  hideEnabled?: boolean;
+}
+
+const LAYOUT_MODE_VALUES: LayoutMode[] = ['default', 'to-end', 'hidden', 'manual'];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {};
+}
+
+function readGrid(value: unknown): { rows: number; cols: number } | null {
+  const { rows, cols } = asRecord(value);
+  if (typeof rows !== 'number' || rows < 1) return null;
+  if (typeof cols !== 'number' || cols < 1) return null;
+  return { rows, cols };
+}
+
+function readLayoutMode(value: unknown, fallback: LayoutMode): LayoutMode {
+  return LAYOUT_MODE_VALUES.includes(value as LayoutMode)
+    ? (value as LayoutMode)
+    : fallback;
+}
+
+function readString(value: unknown, fallback: string): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function readNumber(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+// Схемы 1.0.0 не содержат settings, части grid/layoutMode и autoSize/hideEnabled.
+// Недостающие поля заменяются дефолтами, поэтому старые файлы читаются,
+// а при следующем сохранении записываются уже в формате текущей версии.
+function normalizeModule(
+  value: unknown,
+  gridKey: string,
+  listKey: string,
+  defaults: SlotLayoutBase,
+): NormalizedModule | null {
+  if (!isRecord(value)) return null;
+
+  const rawList = value[listKey];
+  return {
+    grid: readGrid(value[gridKey]) ?? { rows: defaults.rows, cols: defaults.cols },
+    layoutMode: readLayoutMode(value.layoutMode, defaults.mode),
+    list: Array.isArray(rawList) ? rawList.filter(isRecord) : [],
+    autoSize: typeof value.autoSize === 'boolean' ? value.autoSize : undefined,
+    hideEnabled:
+      typeof value.hideEnabled === 'boolean' ? value.hideEnabled : undefined,
+  };
+}
+
+function toSlotJson(item: Record<string, unknown> | undefined): SlotJson {
+  if (!item) return {};
+  return {
+    slotIndex: typeof item.slotIndex === 'number' ? item.slotIndex : undefined,
+    visible: typeof item.visible === 'boolean' ? item.visible : undefined,
+    hidden: item.hidden === true ? true : undefined,
+  };
+}
+
 function buildLayout<T extends LayoutItem>(
   items: T[],
   flags: SlotJson[],
-  grid: { rows: number; cols: number } | undefined,
-  layoutMode: LayoutMode | undefined,
-  settings: GridLayoutJson,
-  defaults: SlotLayoutBase,
+  module: NormalizedModule,
 ): ImportedModuleLayout {
-  const mode = layoutMode ?? defaults.mode;
-  const rows = grid?.rows ?? defaults.rows;
-  const cols = grid?.cols ?? defaults.cols;
+  const { rows, cols } = module.grid;
+  const mode = module.layoutMode;
   const hiddenKeys = items
     .filter((item, index) => flags[index]?.hidden === true)
     .map((item) => item.key);
-  const hideEnabled = settings.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = mode === 'manual' ? false : (settings.autoSize ?? true);
+  const hideEnabled = module.hideEnabled ?? hiddenKeys.length > 0;
+  const autoSize = mode === 'manual' ? false : (module.autoSize ?? true);
 
   const entries =
     mode === 'manual'
-      ? items.map((_, index) => ({
+      ? items.map((item, index) => ({
           index: flags[index]?.slotIndex ?? -1,
           visible: flags[index]?.visible ?? true,
-          hidden: false,
+          hidden: hideEnabled && hiddenKeys.includes(item.key),
         }))
       : calculateSlotEntries(items, mode, [], hiddenKeys, hideEnabled);
 
   return { rows, cols, layoutMode: mode, autoSize, hideEnabled, entries, hiddenKeys };
 }
 
-function importRelics(module: IRelicsJsonModule | null): ImportedModule<RelicData> | null {
+function importRelics(module: NormalizedModule | null): ImportedModule<RelicData> | null {
   if (!module) return null;
 
   const list: RelicData[] = [];
   const flags: SlotJson[] = [];
 
   RELIC_NAMES.forEach((name) => {
-    const found = module.relicsList.find((item) => item.name === name);
-    list.push(
-      found
-        ? new RelicData(found.name, found.state as RelicState)
-        : new RelicData(name, 'no'),
-    );
-    flags.push(found ?? {});
+    const found = module.list.find((item) => item.name === name);
+    list.push(new RelicData(name, readString(found?.state, 'no') as RelicState));
+    flags.push(toSlotJson(found));
   });
 
-  return {
-    list,
-    layout: buildLayout(
-      list,
-      flags,
-      module.relicsGrid,
-      module.layoutMode,
-      module,
-      DEFAULT_LAYOUTS.relics,
-    ),
-  };
+  return { list, layout: buildLayout(list, flags, module) };
 }
 
-function importSlimes(module: ISlimesJsonModule | null): ImportedModule<SlimeData> | null {
+function importSlimes(module: NormalizedModule | null): ImportedModule<SlimeData> | null {
   if (!module) return null;
 
   const list: SlimeData[] = [];
@@ -126,128 +169,111 @@ function importSlimes(module: ISlimesJsonModule | null): ImportedModule<SlimeDat
 
   slimeLists.forEach((group) => {
     group.names.forEach((name) => {
-      const found = module.slimesList.find((item) => item.name === name);
+      const found = module.list.find((item) => item.name === name);
       list.push(
-        found
-          ? new SlimeData(found.name, found.state as SlimeState, found.level, found.skin)
-          : new SlimeData(name, 'no', 1, 0),
+        new SlimeData(
+          name,
+          readString(found?.state, 'no') as SlimeState,
+          readNumber(found?.level, 1),
+          readNumber(found?.skin, 0),
+        ),
       );
-      flags.push(found ?? {});
+      flags.push(toSlotJson(found));
     });
   });
 
-  return {
-    list,
-    layout: buildLayout(
-      list,
-      flags,
-      module.slimesGrid,
-      module.layoutMode,
-      module,
-      DEFAULT_LAYOUTS.slimes,
-    ),
-  };
+  return { list, layout: buildLayout(list, flags, module) };
 }
 
 function importEquipment(
-  module: IEquipmentJsonModule | null,
+  module: NormalizedModule | null,
 ): ImportedModule<EquipmentData> | null {
   if (!module) return null;
 
   const flags: SlotJson[] = [];
   const list = createInitialEquipment().map((defaultItem) => {
-    const found = module.equipmentList.find((item) => item.name === defaultItem.name);
-    flags.push(found ?? {});
-    return found ? defaultItem.clone({ grade: found.grade as EquipmentGrade }) : defaultItem;
+    const found = module.list.find((item) => item.name === defaultItem.name);
+    flags.push(toSlotJson(found));
+    return found
+      ? defaultItem.clone({ grade: readString(found.grade, 'no') as EquipmentGrade })
+      : defaultItem;
   });
 
-  return {
-    list,
-    layout: buildLayout(
-      list,
-      flags,
-      module.equipmentGrid,
-      module.layoutMode,
-      module,
-      DEFAULT_LAYOUTS.equipment,
-    ),
-  };
+  return { list, layout: buildLayout(list, flags, module) };
 }
 
-function importBuffs(module: IBuffsJsonModule | null): ImportedModule<BuffData> | null {
+function importBuffs(module: NormalizedModule | null): ImportedModule<BuffData> | null {
   if (!module) return null;
 
   const flags: SlotJson[] = [];
   const list = BUFFS.map((type) => {
-    const found = module.buffsList.find((buff) => buff.name === type);
-    flags.push(found ?? {});
-    return new BuffData(type as BuffType, found?.value ?? 0);
+    const found = module.list.find((buff) => buff.name === type);
+    flags.push(toSlotJson(found));
+    return new BuffData(type as BuffType, readNumber(found?.value, 0));
   });
 
-  return {
-    list,
-    layout: buildLayout(
-      list,
-      flags,
-      module.buffsGrid,
-      module.layoutMode,
-      module,
-      DEFAULT_LAYOUTS.buffs,
-    ),
-  };
+  return { list, layout: buildLayout(list, flags, module) };
 }
 
 function importArtifacts(
-  module: IArtifactsJsonModule | null,
+  module: NormalizedModule | null,
 ): ImportedModule<ArtifactData> | null {
   if (!module) return null;
 
   const flags: SlotJson[] = [];
   const list = ARTIFACT_NAMES.map((name) => {
-    const found = module.artifactsList.find((artifact) => artifact.name === name);
-    flags.push(found ?? {});
-    return found
-      ? new ArtifactData(
-          found.name,
-          found.state as ArtifactState,
-          found.level,
-          found.fragments,
-        )
-      : new ArtifactData(name, 'no', 1, 0);
+    const found = module.list.find((artifact) => artifact.name === name);
+    flags.push(toSlotJson(found));
+    return new ArtifactData(
+      name,
+      readString(found?.state, 'no') as ArtifactState,
+      readNumber(found?.level, 1),
+      readNumber(found?.fragments, 0),
+    );
   });
 
-  return {
-    list,
-    layout: buildLayout(
-      list,
-      flags,
-      module.artifactsGrid,
-      module.layoutMode,
-      module,
-      DEFAULT_LAYOUTS.artifacts,
-    ),
-  };
+  return { list, layout: buildLayout(list, flags, module) };
 }
 
 export function importScc(fileContent: string): IImportedSccData | null {
   try {
     const parsed = JSON.parse(fileContent);
-    if (parsed.fileType !== SCC_FILE_TYPE) return null;
+    if (!isRecord(parsed) || parsed.fileType !== SCC_FILE_TYPE) return null;
 
-    const modules = parsed.modules ?? {};
-    const settings = parsed.settings ?? {};
+    const modules = asRecord(parsed.modules);
+    const settings = asRecord(parsed.settings);
 
     return {
-      playerName: parsed.playerName ?? '',
+      playerName: readString(parsed.playerName, ''),
       bgColor: typeof settings.bgColor === 'string' ? settings.bgColor : null,
-      exportSelection: settings.exportSelection
-        ? normalizeExportSelection(settings.exportSelection)
+      exportSelection: isRecord(settings.exportSelection)
+        ? normalizeExportSelection(settings.exportSelection as Partial<ExportSelection>)
         : null,
-      relics: importRelics(modules.relics ?? null),
-      slimes: importSlimes(modules.slimes ?? null),
-      equipment: importEquipment(modules.equipment ?? null),
-      buffs: importBuffs(modules.buffs ?? null),
-      artifacts: importArtifacts(modules.artifacts ?? null),
+      relics: importRelics(
+        normalizeModule(modules.relics, 'relicsGrid', 'relicsList', DEFAULT_LAYOUTS.relics),
+      ),
+      slimes: importSlimes(
+        normalizeModule(modules.slimes, 'slimesGrid', 'slimesList', DEFAULT_LAYOUTS.slimes),
+      ),
+      equipment: importEquipment(
+        normalizeModule(
+          modules.equipment,
+          'equipmentGrid',
+          'equipmentList',
+          DEFAULT_LAYOUTS.equipment,
+        ),
+      ),
+      buffs: importBuffs(
+        normalizeModule(modules.buffs, 'buffsGrid', 'buffsList', DEFAULT_LAYOUTS.buffs),
+      ),
+      artifacts: importArtifacts(
+        normalizeModule(
+          modules.artifacts,
+          'artifactsGrid',
+          'artifactsList',
+          DEFAULT_LAYOUTS.artifacts,
+        ),
+      ),
     };
   } catch {
     return null;
