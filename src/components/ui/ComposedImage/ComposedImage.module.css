@@ -1,0 +1,18 @@
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.grayedOut {
+  filter: grayscale(100%);
+}
+
+.placeholder {
+  display: block;
+  width: 100%;
+  background: var(--color-panel);
+  border-radius: var(--radius-sm);
+}
