@@ -10,15 +10,39 @@
   line-height: 1.5;
 }
 
-.phaseTitle {
+.phaseHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 12px;
   margin-bottom: 4px;
+}
+
+.phaseTitle {
+  white-space: nowrap;
+}
+
+.phaseLegend {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #b0b0c0;
+  font-family: var(--font-ui);
+  white-space: nowrap;
 }
 
 .phaseRow {
   display: flex;
   align-items: baseline;
-  flex-wrap: wrap;
-  gap: 2px 12px;
+  flex-wrap: nowrap;
+  gap: 12px;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.phaseRow::-webkit-scrollbar {
+  display: none;
 }
 
 .phaseRow + .phaseRow {
@@ -40,6 +64,7 @@
   color: #b0b0c0;
   margin-top: 0;
   font-weight: normal;
+  white-space: nowrap;
 }
 
 .calculator {

@@ -8,11 +8,10 @@ interface BuffPhaseBannerProps {
 
 interface PhaseRowProps {
   title: string;
-  closeLabel: string;
   progress: PhaseProgress;
 }
 
-const PhaseRow: React.FC<PhaseRowProps> = ({ title, closeLabel, progress }) => (
+const PhaseRow: React.FC<PhaseRowProps> = ({ title, progress }) => (
   <div className={styles.phaseRow}>
     <span className={styles.phaseLabel}>
       {title}:{' '}
@@ -20,10 +19,8 @@ const PhaseRow: React.FC<PhaseRowProps> = ({ title, closeLabel, progress }) => (
     </span>
 
     <span className={styles.remaining}>
-      Осталось пермачей до закрытия {closeLabel} — Мин:{' '}
-      <span className={styles.accent}>{progress.remaining.min}</span> | Средне:{' '}
-      <span className={styles.accent}>{progress.remaining.avg}</span> | Макс:{' '}
-      <span className={styles.accent}>{progress.remaining.max}</span>
+      — {progress.remaining.min} / {progress.remaining.avg} /{' '}
+      {progress.remaining.max}
     </span>
   </div>
 );
@@ -33,9 +30,12 @@ export const BuffPhaseBanner: React.FC<BuffPhaseBannerProps> = ({
   phaseTwo,
 }) => (
   <div className={styles.phase}>
-    <div className={styles.phaseTitle}>Перманентные бафы</div>
+    <div className={styles.phaseHeader}>
+      <span className={styles.phaseTitle}>Перманентные бафы</span>
+      <span className={styles.phaseLegend}>Мин / Средне / Макс</span>
+    </div>
 
-    <PhaseRow title="1 фаза" closeLabel="1 фазы" progress={phaseOne} />
-    <PhaseRow title="2 фаза" closeLabel="2 фазы" progress={phaseTwo} />
+    <PhaseRow title="1 фаза" progress={phaseOne} />
+    <PhaseRow title="2 фаза" progress={phaseTwo} />
   </div>
 );
