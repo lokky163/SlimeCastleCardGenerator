@@ -8,8 +8,9 @@ import { SlimeCard } from '../SlimeCard/SlimeCard';
 import { EquipmentModule } from '../EquipmentModule/EquipmentModule';
 import { EquipmentCard } from '../EquipmentCard/EquipmentCard';
 import { EquipmentData, createInitialEquipment } from '../../models/equipment';
-import { ExportService } from '../../services/ExportService';
-import { calculateRelicIndices, type LayoutMode } from '../../utils/relicPresets';
+import { ExportService, type IImportedSccData } from '../../services/ExportService';
+import { fillSlots } from '../grid/layout';
+import { useSlotLayout } from '../grid/useSlotLayout';
 import { BuffData, BUFFS, BUFF_CONFIG, splitBuffName, BUFF_STATS } from '../../models/buff';
 import { BuffsModule } from '../BuffsModule/BuffsModule'; // (Сам модуль создадим на следующем шаге)
 import { ArtifactData, ARTIFACT_NAMES } from '../../models/artifact';
@@ -41,15 +42,11 @@ export const MainAppHub: React.FC = () => {
 
   // --- СОСТОЯНИЯ МОДУЛЯ РЕЛИКВИЙ ---
   const [relics, setRelics] = useState<RelicData[]>(() =>RELIC_NAMES.map(name => new RelicData(name, '0')));
-  const [relicIndices, setRelicIndices] = useState<number[]>(() =>RELIC_NAMES.map((_, idx) => idx));
-  const [relicGrid, setRelicGrid] = useState({ rows: 3, cols: 6 });
-  const [relicMode, setRelicMode] = useState<LayoutMode>('to-end');
+  const relicLayout = useSlotLayout(relics, { rows: 3, cols: 6, mode: 'to-end' });
 
   // --- СОСТОЯНИЯ МОДУЛЯ СЛАЙМОВ ---
   const [slimes, setSlimes] = useState<SlimeData[]>(() => createInitialSlimes());
-  const [slimeIndices, setSlimeIndices] = useState<number[]>(() => createInitialSlimes().map((_, idx) => idx));
-  const [slimeGrid, setSlimeGrid] = useState({ rows: 5, cols: 6 });
-  const [slimeMode, setSlimeMode] = useState<LayoutMode>('to-end');
+  const slimeLayout = useSlotLayout(slimes, { rows: 5, cols: 6, mode: 'to-end' });
 
   const [buffs, setBuffs] = useState<BuffData[]>(() => 
     BUFFS.map(type => new BuffData(type, 0))
@@ -155,15 +152,6 @@ export const MainAppHub: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    setRelicIndices(calculateRelicIndices(relics, relicMode, relicIndices));
-  }, [relicMode]);
-
-  // Авто-пересчет индексов при изменении локального режима СЛАЙМОВ
-  useEffect(() => {
-    setSlimeIndices(calculateRelicIndices(slimes as any, slimeMode, slimeIndices));
-  }, [slimeMode]);
-
   const LOCAL_STORAGE_KEY = 'slime_card_profile_autosave';
 
   // АВТОСОХРАНЕНИЕ С БАФФАМИ
@@ -173,8 +161,20 @@ export const MainAppHub: React.FC = () => {
     }
 
     try {
-      const relicsJson = ExportService.serializeRelics(relics, relicIndices, relicGrid.rows, relicGrid.cols, relicMode);
-      const slimesJson = ExportService.serializeSlimes(slimes, slimeIndices, slimeGrid.rows, slimeGrid.cols, slimeMode);
+      const relicsJson = ExportService.serializeRelics(
+        relics,
+        relicLayout.entries,
+        relicLayout.rows,
+        relicLayout.cols,
+        relicLayout.mode,
+      );
+      const slimesJson = ExportService.serializeSlimes(
+        slimes,
+        slimeLayout.entries,
+        slimeLayout.rows,
+        slimeLayout.cols,
+        slimeLayout.mode,
+      );
       const equipmentJson = ExportService.serializeEquipment(equipment);
       const buffsJson = ExportService.serializeBuffs(buffs);
       const artifactsJson = ExportService.serializeArtifacts(artifacts); // Новое
@@ -190,116 +190,59 @@ export const MainAppHub: React.FC = () => {
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sccPayload));
     } catch (e) { console.error(e); }
-  }, [playerName, relics, relicIndices, 
-    relicGrid, relicMode, slimes, 
-    slimeIndices, slimeGrid, slimeMode, 
+  }, [playerName, relics,
+    relicLayout.entries, relicLayout.rows, relicLayout.cols, relicLayout.mode, slimes,
+    slimeLayout.entries, slimeLayout.rows, slimeLayout.cols, slimeLayout.mode,
     equipment, buffs, artifacts]); // Добавили artifacts
 
+  // Применение импортированной схемы: общая логика для автозагрузки и файла
+  const applyImportedData = (imported: IImportedSccData) => {
+    setPlayerName(imported.playerName);
+
+    if (imported.relics) {
+      const { rows, cols, layoutMode, relicsList, entries } = imported.relics;
+      setRelics(relicsList);
+      relicLayout.applyLayout({ rows, cols, mode: layoutMode, entries });
+    }
+
+    if (imported.slimes) {
+      const { rows, cols, layoutMode, slimesList, entries } = imported.slimes;
+      setSlimes(slimesList);
+      slimeLayout.applyLayout({ rows, cols, mode: layoutMode, entries });
+    }
+
+    if (imported.equipment) {
+      const defaultEquipment = createInitialEquipment();
+      setEquipment(defaultEquipment.map((defaultItem) => {
+        const savedItem = imported.equipment!.find((item) => item.name === defaultItem.name);
+        return savedItem ? defaultItem.clone({ grade: savedItem.grade }) : defaultItem;
+      }));
+    }
+
+    if (imported.buffs) {
+      setBuffs(imported.buffs);
+    }
+
+    if (imported.artifacts) {
+      setArtifacts(imported.artifacts);
+    }
+  };
+
   // 2. АВТОЗАГРУЗКА: Срабатывает ОДИН РАЗ при монтировании (запуске) приложения
-  // 2. ИСПРАВЛЕНИЕ: Автозагрузка с защитой от потери новых реликов и слаймов
   useEffect(() => {
     try {
       const savedRawData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (!savedRawData) return;
 
       const imported = ExportService.importFromScc(savedRawData);
-      
       if (imported) {
-        setPlayerName(imported.playerName);
-        
-        // Восстанавливаем Релики
-        if (imported.relics) {
-          setRelicGrid({ rows: imported.relics.rows, cols: imported.relics.cols });
-          setRelics(imported.relics.relicsList);
-          
-          /* 
-            ЗАЩИТА ИНДЕКСОВ РЕЛИКОВ:
-            Если в коде появились новые релики, их длина больше, чем сохраненный массив индексов.
-            Дописываем для новых реликов их дефолтные порядковые индексы.
-          */
-          let rIndices = [...imported.relics.slotIndices];
-          if (rIndices.length < imported.relics.relicsList.length) {
-            for (let i = rIndices.length; i < imported.relics.relicsList.length; i++) {
-              rIndices.push(imported.relics.layoutMode === 'manual' ? -1 : i);
-            }
-          }
-          setRelicIndices(rIndices);
-          setRelicMode(imported.relics.layoutMode);
-        }
-        
-        // Восстанавливаем Слаймов
-        if (imported.slimes) {
-          setSlimeGrid({ rows: imported.slimes.rows, cols: imported.slimes.cols });
-          setSlimes(imported.slimes.slimesList);
-          
-          /* 
-            ЗАЩИТА ИНДЕКСОВ СЛАЙМОВ:
-            Точно так же дополняем массив индексов слаймов, если в игру добавились новые сущности.
-          */
-          let sIndices = [...imported.slimes.slotIndices];
-          if (sIndices.length < imported.slimes.slimesList.length) {
-            for (let i = sIndices.length; i < imported.slimes.slimesList.length; i++) {
-              sIndices.push(imported.slimes.layoutMode === 'manual' ? -1 : i);
-            }
-          }
-          setSlimeIndices(sIndices);
-          setSlimeMode(imported.slimes.layoutMode);
-        }
-        
-        // Восстанавливаем Снаряжение
-        if (imported.equipment) {
-          /*
-            ЗАЩИТА СНАРЯЖЕНИЯ:
-            Снаряжение у нас статичное. Если в коде добавились новые шмотки, 
-            мы берем старые грейды из памяти, а новые шмотки оставляем в состоянии 'no'.
-          */
-          const defaultEquip = createInitialEquipment();
-          const mergedEquip = defaultEquip.map(defaultItem => {
-            const savedItem = imported.equipment!.find(item => item.name === defaultItem.name);
-            return savedItem ? defaultItem.clone({ grade: savedItem.grade }) : defaultItem;
-          });
-          setEquipment(mergedEquip);
-        }
-        if (imported.buffs) {
-          setBuffs(imported.buffs);
-        }
-
-        if (imported.artifacts) {
-          const defaultArts = ARTIFACT_NAMES.map(name => new ArtifactData(name, 'no', 1, 0));
-          const mergedArts = defaultArts.map(defArt => {
-            const savedArt = imported.artifacts!.find(art => art.name === defArt.name);
-            return savedArt ? defArt.clone({ state: savedArt.state, level: savedArt.level, fragments: savedArt.fragments }) : defArt;
-          });
-          setArtifacts(mergedArts);
-        }
-
+        applyImportedData(imported);
         console.log("Профиль игрока успешно и безопасно восстановлен из автосохранения!");
       }
     } catch (e) {
       console.error("Не удалось безопасно прочитать состояние из localStorage:", e);
     }
   }, []);
-
-  // Колбэк изменения реликов из подмодуля
-  // Обновленный колбэк изменения реликов: использует relicMode
-  const handleSetRelics = (updater: React.SetStateAction<RelicData[]>) => {
-    setRelics(prev => {
-      const nextRelics = typeof updater === 'function' ? updater(prev) : updater;
-      const nextIndices = calculateRelicIndices(nextRelics, relicMode, relicIndices);
-      setRelicIndices(nextIndices);
-      return nextRelics;
-    });
-  };
-
-  // Обновленный колбэк изменения слаймов: использует slimeMode
-  const handleSetSlimes = (updater: React.SetStateAction<SlimeData[]>) => {
-    setSlimes(prev => {
-      const nextSlimes = typeof updater === 'function' ? updater(prev) : updater;
-      const nextIndices = calculateRelicIndices(nextSlimes as any, slimeMode, slimeIndices);
-      setSlimeIndices(nextIndices);
-      return nextSlimes;
-    });
-  };
 
   // Колбэк циклического изменения скина слайма
   const handleSkinChange = (targetName: string, nextSkin: number) => {
@@ -313,18 +256,23 @@ export const MainAppHub: React.FC = () => {
     );
   };
 
-  // Обработчик изменения режима сетки в шапке
-  // const handleModeChange = (newMode: LayoutMode) => {
-  //   setLayoutMode(newMode);
-  //   setRelicIndices(calculateRelicIndices(relics, newMode, relicIndices));
-  //   setSlimeIndices(calculateRelicIndices(slimes as any, newMode, slimeIndices));
-  // };
-
   // Экспорт схемы конфигурации (.scc)
   // Обновленный экспорт схемы .scc с учетом баффов
   const handleExportConfig = () => {
-    const relicsJson = ExportService.serializeRelics(relics, relicIndices, relicGrid.rows, relicGrid.cols, relicMode);
-    const slimesJson = ExportService.serializeSlimes(slimes, slimeIndices, slimeGrid.rows, slimeGrid.cols, slimeMode);
+    const relicsJson = ExportService.serializeRelics(
+      relics,
+      relicLayout.entries,
+      relicLayout.rows,
+      relicLayout.cols,
+      relicLayout.mode,
+    );
+    const slimesJson = ExportService.serializeSlimes(
+      slimes,
+      slimeLayout.entries,
+      slimeLayout.rows,
+      slimeLayout.cols,
+      slimeLayout.mode,
+    );
     const equipmentJson = ExportService.serializeEquipment(equipment);
     // Добавляем баффы
     const buffsJson = ExportService.serializeBuffs(buffs);
@@ -353,36 +301,7 @@ export const MainAppHub: React.FC = () => {
         const imported = ExportService.importFromScc(content);
         
         if (imported) {
-          setPlayerName(imported.playerName);
-          
-          // Восстанавливаем индивидуальный режим и сетку РЕЛИКВИЙ
-          if (imported.relics) {
-            setRelicGrid({ rows: imported.relics.rows, cols: imported.relics.cols });
-            setRelics(imported.relics.relicsList);
-            setRelicIndices(imported.relics.slotIndices);
-            setRelicMode(imported.relics.layoutMode);
-          }
-          
-          // Восстанавливаем индивидуальный режим и сетку СЛАЙМОВ
-          if (imported.slimes) {
-            setSlimeGrid({ rows: imported.slimes.rows, cols: imported.slimes.cols });
-            setSlimes(imported.slimes.slimesList);
-            setSlimeIndices(imported.slimes.slotIndices);
-            setSlimeMode(imported.slimes.layoutMode);
-          }
-          
-          if (imported.equipment) {
-            setEquipment(imported.equipment);
-          }
-
-          if (imported.buffs) {
-            setBuffs(imported.buffs);
-          }
-
-          if (imported.artifacts) {
-            setArtifacts(imported.artifacts);
-          }
-
+          applyImportedData(imported);
         } else {
           alert("Ошибка при чтении файла");
         }
@@ -441,19 +360,18 @@ export const MainAppHub: React.FC = () => {
   };
 
   // Вспомогательные массивы для рендеринга скрытых HD-сеток «все вместе»
-  const hdRelicSlots = Array(relicGrid.rows * relicGrid.cols).fill(null);
-  relics.forEach((r, i) => { 
-    const idx = relicIndices[i]; 
-    if (idx >= 0 && idx < hdRelicSlots.length) hdRelicSlots[idx] = r; 
-  });
+  const hdRelicSlots = fillSlots(
+    relics,
+    relicLayout.entries,
+    relicLayout.rows * relicLayout.cols,
+  );
+  const hdSlimeSlots = fillSlots(
+    slimes,
+    slimeLayout.entries,
+    slimeLayout.rows * slimeLayout.cols,
+  );
 
-  const hdSlimeSlots = Array(slimeGrid.rows * slimeGrid.cols).fill(null);
-  slimes.forEach((s, i) => { 
-    const idx = slimeIndices[i]; 
-    if (idx >= 0 && idx < hdSlimeSlots.length) hdSlimeSlots[idx] = s; 
-  });
-
-    // Функция полного сброса всех данных приложения до дефолтных значений
+  // Функция полного сброса всех данных приложения до дефолтных значений
   const handleResetAllData = () => {
     const confirmReset = window.confirm("Вы уверены, что хотите полностью сбросить все введённые значения? Если нет, то рекомендуется сначала 'Сохранить схему'");
     if (!confirmReset) return;
@@ -461,23 +379,19 @@ export const MainAppHub: React.FC = () => {
     // 1. Сбрасываем общие данные
     setPlayerName('');
     setBgColor('#9A6E3F');
-    setRelicMode('to-end');
-    setSlimeMode('to-end');
 
-    // 2. Сбрасываем реликвии
+    // 2. Сбрасываем реликвии и слаймов вместе с их сетками
+    relicLayout.resetLayout();
+    slimeLayout.resetLayout();
     setRelics(RELIC_NAMES.map(name => new RelicData(name, '0')));
-    setRelicIndices(RELIC_NAMES.map((_, idx) => idx));
-    setRelicGrid({ rows: 3, cols: 6 });
-
-    // 3. Сбрасываем слаймов
     setSlimes(createInitialSlimes());
-    setSlimeIndices(createInitialSlimes().map((_, idx) => idx));
-    setSlimeGrid({ rows: 5, cols: 6 });
 
-    // 4. Сбрасываем снаряжение
+    // 3. Сбрасываем снаряжение, баффы и артефакты
     setEquipment(createInitialEquipment());
+    setBuffs(BUFFS.map(type => new BuffData(type, 0)));
+    setArtifacts(ARTIFACT_NAMES.map(name => new ArtifactData(name, 'no', 1, 0)));
 
-    // 5. Очищаем автосохранение браузера, чтобы вернуть чистый лист
+    // 4. Очищаем автосохранение браузера, чтобы вернуть чистый лист
     localStorage.removeItem(LOCAL_STORAGE_KEY);
   };
 
@@ -809,26 +723,16 @@ const dropdownRef = useRef<HTMLDivElement>(null);
         {activeTab === 'relics' && (
           <RelicsModule 
             relics={relics}
-            setRelics={handleSetRelics}
-            relicIndices={relicIndices}
-            setRelicIndices={setRelicIndices}
-            gridSettings={relicGrid}
-            setGridSettings={setRelicGrid}
-            layoutMode={relicMode}
-            setLayoutMode={setRelicMode}
+            setRelics={setRelics}
+            layout={relicLayout}
           />
         )}
 
         {activeTab === 'slimes' && (
           <SlimesModule 
             slimes={slimes}
-            setSlimes={handleSetSlimes}
-            slimeIndices={slimeIndices}
-            setSlimeIndices={setSlimeIndices}
-            gridSettings={slimeGrid}
-            setGridSettings={setSlimeGrid}
-            layoutMode={slimeMode}
-            setLayoutMode={setSlimeMode}
+            setSlimes={setSlimes}
+            layout={slimeLayout}
             onChangeSkin={handleSkinChange}
           />
         )}
@@ -960,8 +864,8 @@ const dropdownRef = useRef<HTMLDivElement>(null);
             <div style={{ 
               display: 'grid', 
               gap: '5px', 
-              gridTemplateColumns: `repeat(${relicGrid.cols}, 228px)`, 
-              gridTemplateRows: `repeat(${relicGrid.rows}, 349px)`
+              gridTemplateColumns: `repeat(${relicLayout.cols}, 228px)`, 
+              gridTemplateRows: `repeat(${relicLayout.rows}, 349px)`
             }}>
               {hdRelicSlots.map((slot, idx) => slot ? (
                 <div key={`all-r-${slot.name}`} style={{ width: '228px', height: '349px', position: 'relative' }}>
@@ -979,8 +883,8 @@ const dropdownRef = useRef<HTMLDivElement>(null);
             <div style={{ 
               display: 'grid', 
               gap: '5px', 
-              gridTemplateColumns: `repeat(${slimeGrid.cols}, 250px)`, 
-              gridTemplateRows: `repeat(${slimeGrid.rows}, 207px)`,
+              gridTemplateColumns: `repeat(${slimeLayout.cols}, 250px)`, 
+              gridTemplateRows: `repeat(${slimeLayout.rows}, 207px)`,
               borderBottom: '5px solid rgba(255, 255, 255, 0.2)',
               paddingBottom: '25px',
               marginBottom: '5px',

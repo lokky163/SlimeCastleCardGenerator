@@ -4,19 +4,32 @@ import { SlimeData, type SlimeState, slimeLists } from '../models/slime';
 import { EquipmentData, type EquipmentGrade } from '../models/equipment';
 import { BuffData, type BuffType, BUFFS } from '../models/buff';
 import { type LayoutMode } from '../utils/relicPresets';
+import { type SlotEntry } from '../components/grid/layout';
 import { ArtifactData, type ArtifactState, ARTIFACT_NAMES } from '../models/artifact';
 import { saveAs } from 'file-saver';
 
 export interface IRelicsJsonModule {
   relicsGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
-  relicsList: Array<{ name: string; state: string; slotIndex?: number }>;
+  relicsList: Array<{
+    name: string;
+    state: string;
+    slotIndex?: number;
+    visible?: boolean;
+  }>;
 }
 
 export interface ISlimesJsonModule {
   slimesGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
-  slimesList: Array<{ name: string; state: string; level: number; skin: number; slotIndex?: number }>;
+  slimesList: Array<{
+    name: string;
+    state: string;
+    level: number;
+    skin: number;
+    slotIndex?: number;
+    visible?: boolean;
+  }>;
 }
 
 // Новая структура JSON-модуля Снаряжения
@@ -42,25 +55,47 @@ export interface IArtifactsJsonModule {
 
 export interface IImportedSccData {
   playerName: string;
-  relics: { rows: number; cols: number; layoutMode: LayoutMode; relicsList: RelicData[]; slotIndices: number[] } | null;
-  slimes: { rows: number; cols: number; layoutMode: LayoutMode; slimesList: SlimeData[]; slotIndices: number[] } | null;
+  relics: { rows: number; cols: number; layoutMode: LayoutMode; relicsList: RelicData[]; entries: SlotEntry[] } | null;
+  slimes: { rows: number; cols: number; layoutMode: LayoutMode; slimesList: SlimeData[]; entries: SlotEntry[] } | null;
   equipment: EquipmentData[] | null; // Возвращаем плоский массив снаряжения
   buffs: BuffData[] | null; // Возвращаем плоский проверенный массив баффов
   artifacts: ArtifactData[] | null; // Новый массив в структуре импорта
 }
 
+function packSlot(entry: SlotEntry | undefined, layoutMode: LayoutMode) {
+  if (layoutMode !== 'manual') return {};
+
+  return {
+    slotIndex: entry?.index ?? -1,
+    visible: entry?.visible ?? true,
+  };
+}
+
+function unpackSlot(slotIndex: number | undefined, visible: boolean | undefined): SlotEntry {
+  return {
+    index: slotIndex ?? -1,
+    visible: visible ?? true,
+  };
+}
+
 export class ExportService {
   
-  static serializeRelics(allRelics: RelicData[], slotIndices: number[], rows: number, cols: number, layoutMode: LayoutMode): IRelicsJsonModule {
+  static serializeRelics(allRelics: RelicData[], entries: SlotEntry[], rows: number, cols: number, layoutMode: LayoutMode): IRelicsJsonModule {
     const relicsList = allRelics.map((relic, idx) => ({
-      name: relic.name, state: relic.state, ...(layoutMode === 'manual' ? { slotIndex: slotIndices[idx] ?? -1 } : {})
+      name: relic.name,
+      state: relic.state,
+      ...packSlot(entries[idx], layoutMode),
     }));
     return { relicsGrid: { rows, cols }, layoutMode, relicsList };
   }
 
-  static serializeSlimes(allSlimes: SlimeData[], slotIndices: number[], rows: number, cols: number, layoutMode: LayoutMode): ISlimesJsonModule {
+  static serializeSlimes(allSlimes: SlimeData[], entries: SlotEntry[], rows: number, cols: number, layoutMode: LayoutMode): ISlimesJsonModule {
     const slimesList = allSlimes.map((slime, idx) => ({
-      name: slime.name, state: slime.state, level: slime.level, skin: slime.skin, ...(layoutMode === 'manual' ? { slotIndex: slotIndices[idx] ?? -1 } : {})
+      name: slime.name,
+      state: slime.state,
+      level: slime.level,
+      skin: slime.skin,
+      ...packSlot(entries[idx], layoutMode),
     }));
     return { slimesGrid: { rows, cols }, layoutMode, slimesList };
   }
@@ -153,7 +188,7 @@ static exportToScc(
         const layoutMode = relicsModule.layoutMode ?? 'default';
         
         const restoredRelics: RelicData[] = [];
-        const restoredIndices: number[] = [];
+        const restoredEntries: SlotEntry[] = [];
 
         // Идём строго по нашему эталонному массиву RELIC_NAMES, чтобы ничего не потерять
         RELIC_NAMES.forEach((defaultName, defaultIdx) => {
@@ -163,12 +198,20 @@ static exportToScc(
           if (foundItem) {
             // Если релик найден в файле — восстанавливаем его сохранённое состояние
             restoredRelics.push(new RelicData(foundItem.name, foundItem.state as RelicState));
-            restoredIndices.push(layoutMode === 'manual' ? (foundItem.slotIndex ?? -1) : defaultIdx);
+            restoredEntries.push(
+              layoutMode === 'manual'
+                ? unpackSlot(foundItem.slotIndex, foundItem.visible)
+                : { index: defaultIdx, visible: true },
+            );
           } else {
             // Если релика в файле нет — создаём его в состоянии по умолчанию ('0')
             restoredRelics.push(new RelicData(defaultName, 'no'));
             // В автоматических режимах индекс равен его дефолтной позиции, в ручном убираем в скрытые (-1)
-            restoredIndices.push(layoutMode === 'manual' ? -1 : defaultIdx);
+            restoredEntries.push(
+              layoutMode === 'manual'
+                ? { index: -1, visible: true }
+                : { index: defaultIdx, visible: true },
+            );
           }
         });
 
@@ -177,7 +220,7 @@ static exportToScc(
           cols, 
           layoutMode, 
           relicsList: restoredRelics, 
-          slotIndices: restoredIndices 
+          entries: restoredEntries
         };
       }
 
@@ -190,7 +233,7 @@ static exportToScc(
         const layoutMode = slimesModule.layoutMode ?? 'default';
         
         const restoredSlimes: SlimeData[] = [];
-        const restoredIndices: number[] = [];
+        const restoredEntries: SlotEntry[] = [];
 
         // Сквозной счетчик для автоматической расстановки дефолтных slotIndex
         let globalCounter = 0;
@@ -206,13 +249,21 @@ static exportToScc(
               restoredSlimes.push(
                 new SlimeData(foundItem.name, foundItem.state as SlimeState, foundItem.level, foundItem.skin)
               );
-              restoredIndices.push(layoutMode === 'manual' ? (foundItem.slotIndex ?? -1) : globalCounter);
+              restoredEntries.push(
+                layoutMode === 'manual'
+                  ? unpackSlot(foundItem.slotIndex, foundItem.visible)
+                  : { index: globalCounter, visible: true },
+              );
             } else {
               // Если слайма нет в файле — создаем дефолтного (состояние '0', 250 уровень, 0 скин)
               restoredSlimes.push(
                 new SlimeData(defaultName, 'no', 1, 0)
               );
-              restoredIndices.push(layoutMode === 'manual' ? -1 : globalCounter);
+              restoredEntries.push(
+                layoutMode === 'manual'
+                  ? { index: -1, visible: true }
+                  : { index: globalCounter, visible: true },
+              );
             }
 
             globalCounter++; // Переходим к следующему сквозному индексу
@@ -224,7 +275,7 @@ static exportToScc(
           cols, 
           layoutMode, 
           slimesList: restoredSlimes, 
-          slotIndices: restoredIndices 
+          entries: restoredEntries
         };
       }
 
