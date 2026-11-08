@@ -1,0 +1,75 @@
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-VariableFont_wght.ttf') format('truetype-variations'),
+       url('../assets/fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+:root {
+  --color-bg: #1a1a2e;
+  --color-panel: #16213e;
+  --color-panel-2: #232342;
+  --color-panel-3: #2a2a4a;
+  --color-border: #4a4a6a;
+  --color-border-soft: #2a2a4a;
+  --color-text: #e0e0e0;
+  --color-text-muted: #a0a0b0;
+  --color-accent: #e6a817;
+  --color-accent-soft: #fca311;
+  --color-danger: #8b0000;
+  --color-danger-border: #ff4500;
+
+  --font-ui: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-title: 'Nunito', sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+button:focus,
+input:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(230, 168, 23, 0.4);
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090c10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3748;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment,
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
