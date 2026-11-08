@@ -1,19 +1,77 @@
-import { useRef, useState } from 'react';
-import type { SlimeData, SlimeState } from '../../models/slime';
-import { useComposedImage } from '../../hooks/useComposedImage';
 import { ComposedImage } from '../ui/ComposedImage/ComposedImage';
-import { drawSlimeImage, SLIME_IMAGE_HEIGHT, SLIME_IMAGE_WIDTH, slimeImageKey } from './drawSlimeImage';
+import type { SlimeData } from '../../models/slime';
+import {
+  useSlimeImage,
+  useSlimeInteractions,
+  type SlimeCardHandlers,
+} from './useSlimeCard';
+import { SLIME_IMAGE_HEIGHT, SLIME_IMAGE_WIDTH } from './drawSlimeImage';
 import { SlimeLevelEditor } from './SlimeLevelEditor';
 import { SlimeStateMenu } from './SlimeStateMenu';
 import styles from './SlimeCard.module.css';
 
-interface SlimeCardProps {
+interface SlimeCardProps extends SlimeCardHandlers {
   slime: SlimeData;
   width?: number;
-  onChangeState: (newState: SlimeState) => void;
-  onChangeLevel: (newLevel: number) => void;
-  onChangeSkin?: (newSkin: number) => void;
 }
+
+interface SlimeCardViewProps extends SlimeCardHandlers {
+  slime: SlimeData;
+  width: number;
+  imageSrc: string;
+  cardRef: React.RefObject<HTMLDivElement | null>;
+  isMenuOpen: boolean;
+  isEditingLevel: boolean;
+  onCardClick: React.MouseEventHandler<HTMLDivElement>;
+  onCloseMenu: () => void;
+  onCancelLevelEdit: () => void;
+}
+
+const SlimeCardView: React.FC<SlimeCardViewProps> = ({
+  slime,
+  width,
+  imageSrc,
+  cardRef,
+  isMenuOpen,
+  isEditingLevel,
+  onCardClick,
+  onChangeState,
+  onChangeLevel,
+  onCloseMenu,
+  onCancelLevelEdit,
+}) => (
+  <div
+    ref={cardRef}
+    className={styles.cardContainer}
+    onClick={onCardClick}
+    style={{ width: `${width}px` }}
+  >
+    <ComposedImage
+      src={imageSrc}
+      alt={slime.cleanName}
+      aspectRatio={`${SLIME_IMAGE_WIDTH} / ${SLIME_IMAGE_HEIGHT}`}
+      grayscale={slime.isBlackAndWhite}
+      className={styles.artwork}
+    />
+
+    {isEditingLevel && (
+      <SlimeLevelEditor
+        level={slime.level}
+        onCommit={onChangeLevel}
+        onCancel={onCancelLevelEdit}
+      />
+    )}
+
+    <SlimeStateMenu
+      open={isMenuOpen}
+      onClose={onCloseMenu}
+      anchorRef={cardRef}
+      state={slime.state}
+      cardWidth={width}
+      onChange={onChangeState}
+    />
+  </div>
+);
 
 export const SlimeCard: React.FC<SlimeCardProps> = ({
   slime,
@@ -22,80 +80,26 @@ export const SlimeCard: React.FC<SlimeCardProps> = ({
   onChangeLevel,
   onChangeSkin = () => {},
 }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isEditingLevel, setIsEditingLevel] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const imageSrc = useComposedImage(
-    slimeImageKey(slime, isEditingLevel),
-    SLIME_IMAGE_WIDTH,
-    SLIME_IMAGE_HEIGHT,
-    (ctx) => drawSlimeImage(ctx, slime, isEditingLevel),
-  );
-
-  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isEditingLevel) return;
-
-    const rect = event.currentTarget.getBoundingClientRect();
-    const clickRatio = (event.clientY - rect.top) / rect.height;
-
-    if (clickRatio <= 60 / SLIME_IMAGE_HEIGHT) {
-      if (slime.state === 'no') return;
-      setIsMenuOpen(false);
-      setIsEditingLevel(true);
-      return;
-    }
-
-    if (clickRatio >= 200 / SLIME_IMAGE_HEIGHT) {
-      setIsMenuOpen((open) => !open);
-      return;
-    }
-
-    setIsMenuOpen(false);
-    if (slime.state !== 'no') onChangeSkin(slime.skin);
-  };
-
-  const handleStateChange = (nextState: SlimeState) => {
-    onChangeState(nextState);
-    setIsMenuOpen(false);
-  };
-
-  const handleLevelCommit = (nextLevel: number) => {
-    onChangeLevel(nextLevel);
-    setIsEditingLevel(false);
-  };
+  const interactions = useSlimeInteractions(slime, {
+    onChangeState,
+    onChangeLevel,
+    onChangeSkin,
+  });
+  const imageSrc = useSlimeImage(slime, interactions.isEditingLevel);
 
   return (
-    <div
-      ref={cardRef}
-      className={styles.cardContainer}
-      onClick={handleCardClick}
-      style={{ width: `${width}px` }}
-    >
-      <ComposedImage
-        src={imageSrc}
-        alt={slime.cleanName}
-        aspectRatio={`${SLIME_IMAGE_WIDTH} / ${SLIME_IMAGE_HEIGHT}`}
-        grayscale={slime.isBlackAndWhite}
-        className={styles.artwork}
-      />
-
-      {isEditingLevel && (
-        <SlimeLevelEditor
-          level={slime.level}
-          onCommit={handleLevelCommit}
-          onCancel={() => setIsEditingLevel(false)}
-        />
-      )}
-
-      <SlimeStateMenu
-        open={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        anchorRef={cardRef}
-        state={slime.state}
-        cardWidth={width}
-        onChange={handleStateChange}
-      />
-    </div>
+    <SlimeCardView
+      slime={slime}
+      width={width}
+      imageSrc={imageSrc}
+      cardRef={interactions.cardRef}
+      isMenuOpen={interactions.isMenuOpen}
+      isEditingLevel={interactions.isEditingLevel}
+      onCardClick={interactions.handleCardClick}
+      onChangeState={interactions.handleStateChange}
+      onChangeLevel={interactions.handleLevelCommit}
+      onCloseMenu={interactions.closeMenu}
+      onCancelLevelEdit={interactions.cancelLevelEdit}
+    />
   );
 };
