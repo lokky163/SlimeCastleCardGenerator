@@ -12,4 +12,11 @@ import react from '@vitejs/plugin-react' // или ваш фреймворк
 export default defineConfig({
   base: '/SlimeCastleCardGenerator/', // ИМЯ ВАШЕГО РЕПОЗИТОРИЯ С КОСЫМИ ЧЕРТАМИ
   plugins: [react()],
+  server: {
+    watch: {
+      // Paint.NET держит эти файлы заблокированными во время сохранения,
+      // и из-за них watcher Vite падает с EBUSY.
+      ignored: ['**/*.pdnSave'],
+    },
+  },
 })
