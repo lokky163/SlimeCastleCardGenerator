@@ -1,18 +1,14 @@
 import { CardGrid, CardGridItem, type CardGridVariant } from './CardGrid';
 import { VisibilityToggle } from './VisibilityToggle';
-import type { LayoutItem, LayoutMode, SlotEntry } from './layout';
+import type { LayoutItem } from './layout';
+import type { SlotLayoutController } from './useSlotLayout';
 import styles from './SlotGrid.module.css';
 
 interface SlotGridProps<T extends LayoutItem> {
   items: T[];
-  entries: SlotEntry[];
-  mode: LayoutMode;
+  layout: SlotLayoutController;
   variant: CardGridVariant;
   renderCard: (item: T, itemIndex: number) => React.ReactNode;
-  onSlotIndexChange: (itemIndex: number, slotIndex: number) => void;
-  onToggleHidden: (key: string) => void;
-  hiddenKeys: string[];
-  slotCount: number;
 }
 
 interface SlotIndexInputProps {
@@ -40,15 +36,13 @@ const SlotIndexInput: React.FC<SlotIndexInputProps> = ({ value, max, onChange })
 
 export function SlotGrid<T extends LayoutItem>({
   items,
-  entries,
-  mode,
+  layout,
   variant,
   renderCard,
-  onSlotIndexChange,
-  onToggleHidden,
-  hiddenKeys,
-  slotCount,
 }: SlotGridProps<T>) {
+  const { entries, mode, hiddenKeys, hideEnabled, rows, cols } = layout;
+  const slotCount = rows * cols;
+
   return (
     <CardGrid variant={variant}>
       {items.map((item, itemIndex) => {
@@ -59,20 +53,20 @@ export function SlotGrid<T extends LayoutItem>({
           <CardGridItem
             key={item.key}
             active={entry.visible && entry.index >= 0}
-            dimmed={mode !== 'manual' && isHidden}
+            dimmed={entry.hidden}
             footer={
               mode === 'manual' ? (
                 <SlotIndexInput
                   value={entry.index}
                   max={slotCount - 1}
-                  onChange={(slotIndex) => onSlotIndexChange(itemIndex, slotIndex)}
+                  onChange={(slotIndex) => layout.setSlotIndex(itemIndex, slotIndex)}
                 />
-              ) : (
+              ) : hideEnabled ? (
                 <VisibilityToggle
                   hidden={isHidden}
-                  onToggle={() => onToggleHidden(item.key)}
+                  onToggle={() => layout.setItemHidden(item.key, !isHidden)}
                 />
-              )
+              ) : undefined
             }
           >
             {renderCard(item, itemIndex)}

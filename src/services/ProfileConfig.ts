@@ -22,12 +22,17 @@ export function createConfigPayload(state: ProfileState): SccPayload {
 }
 
 function isDefaultLayout(layout: SlotLayoutState, defaults: SlotLayoutBase): boolean {
-  return (
-    layout.rows === defaults.rows &&
-    layout.cols === defaults.cols &&
-    layout.mode === defaults.mode &&
-    layout.hiddenKeys.length === 0
-  );
+  if (
+    layout.mode !== defaults.mode ||
+    layout.autoSize !== defaults.autoSize ||
+    layout.hideEnabled !== defaults.hideEnabled ||
+    layout.hiddenKeys.length > 0
+  ) {
+    return false;
+  }
+
+  if (layout.autoSize) return true;
+  return layout.rows === defaults.rows && layout.cols === defaults.cols;
 }
 
 export function isPristineProfile(state: ProfileState): boolean {

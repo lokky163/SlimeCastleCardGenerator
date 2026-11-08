@@ -28,14 +28,19 @@ function useProfileAutosave(state: ProfileState) {
     playerName, bgColor, exportSelection,
     relics, relicLayout.entries, relicLayout.hiddenKeys,
     relicLayout.rows, relicLayout.cols, relicLayout.mode,
+    relicLayout.autoSize, relicLayout.hideEnabled,
     slimes, slimeLayout.entries, slimeLayout.hiddenKeys,
     slimeLayout.rows, slimeLayout.cols, slimeLayout.mode,
+    slimeLayout.autoSize, slimeLayout.hideEnabled,
     equipment, equipmentLayout.entries, equipmentLayout.hiddenKeys,
     equipmentLayout.rows, equipmentLayout.cols, equipmentLayout.mode,
+    equipmentLayout.autoSize, equipmentLayout.hideEnabled,
     buffs, buffLayout.entries, buffLayout.hiddenKeys,
     buffLayout.rows, buffLayout.cols, buffLayout.mode,
+    buffLayout.autoSize, buffLayout.hideEnabled,
     artifacts, artifactLayout.entries, artifactLayout.hiddenKeys,
     artifactLayout.rows, artifactLayout.cols, artifactLayout.mode,
+    artifactLayout.autoSize, artifactLayout.hideEnabled,
   ]);
 }
 

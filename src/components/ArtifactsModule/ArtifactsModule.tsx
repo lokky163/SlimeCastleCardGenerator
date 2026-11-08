@@ -39,24 +39,12 @@ export const ArtifactsModule: React.FC<ArtifactsModuleProps> = ({
 
   return (
     <ModulePanel>
-      <GridControls
-        rows={layout.rows}
-        cols={layout.cols}
-        mode={layout.mode}
-        onRowsChange={layout.setRows}
-        onColsChange={layout.setCols}
-        onModeChange={layout.setMode}
-      />
+      <GridControls layout={layout} />
 
       <SlotGrid
         items={artifacts}
-        entries={layout.entries}
-        mode={layout.mode}
-        slotCount={layout.rows * layout.cols}
+        layout={layout}
         variant="artifact"
-        hiddenKeys={layout.hiddenKeys}
-        onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
-        onSlotIndexChange={layout.setSlotIndex}
         renderCard={(artifact) => (
           <ArtifactCard
             artifact={artifact}

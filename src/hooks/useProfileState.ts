@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { RelicData, RELIC_NAMES } from '../models/relic';
-import { SlimeData, createInitialSlimes } from '../models/slime';
-import { EquipmentData, createInitialEquipment } from '../models/equipment';
+import { createInitialSlimes } from '../models/slime';
+import { createInitialEquipment } from '../models/equipment';
 import { BuffData, BUFFS } from '../models/buff';
 import { ArtifactData, ARTIFACT_NAMES } from '../models/artifact';
 import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import type { ExportSelection } from '../models/exportSelection';
-import { DEFAULT_LAYOUTS } from '../components/grid/layoutDefaults';
+import type { LayoutItem, SlotLayoutBase } from '../components/grid/layout';
+import { DEFAULT_LAYOUTS, MAX_AUTO_COLS } from '../components/grid/layoutDefaults';
 import { useSlotLayout } from '../components/grid/useSlotLayout';
 import { useSlimeActions } from './useSlimeActions';
 
@@ -17,44 +18,57 @@ export const createBuffs = () => BUFFS.map((type) => new BuffData(type, 0));
 export const createArtifacts = () =>
   ARTIFACT_NAMES.map((name) => new ArtifactData(name, 'no', 1, 0));
 
+function useCardModule<T extends LayoutItem>(
+  createItems: () => T[],
+  defaults: SlotLayoutBase,
+  maxCols: number,
+) {
+  const [items, setItems] = useState<T[]>(createItems);
+  const layout = useSlotLayout(items, defaults, maxCols);
+  return { items, setItems, layout };
+}
+
 function useCardModules() {
-  const [relics, setRelics] = useState<RelicData[]>(createRelics);
-  const relicLayout = useSlotLayout(relics, DEFAULT_LAYOUTS.relics);
+  const relics = useCardModule(createRelics, DEFAULT_LAYOUTS.relics, MAX_AUTO_COLS.relics);
+  const slimes = useCardModule(
+    createInitialSlimes,
+    DEFAULT_LAYOUTS.slimes,
+    MAX_AUTO_COLS.slimes,
+  );
+  const equipment = useCardModule(
+    createInitialEquipment,
+    DEFAULT_LAYOUTS.equipment,
+    MAX_AUTO_COLS.equipment,
+  );
+  const buffs = useCardModule(createBuffs, DEFAULT_LAYOUTS.buffs, MAX_AUTO_COLS.buffs);
+  const artifacts = useCardModule(
+    createArtifacts,
+    DEFAULT_LAYOUTS.artifacts,
+    MAX_AUTO_COLS.artifacts,
+  );
+  const slimeActions = useSlimeActions(slimes.setItems);
 
-  const [slimes, setSlimes] = useState<SlimeData[]>(createInitialSlimes);
-  const slimeLayout = useSlotLayout(slimes, DEFAULT_LAYOUTS.slimes);
-  const slimeActions = useSlimeActions(setSlimes);
-
-  const [equipment, setEquipment] = useState<EquipmentData[]>(createInitialEquipment);
-  const equipmentLayout = useSlotLayout(equipment, DEFAULT_LAYOUTS.equipment);
-
-  const [buffs, setBuffs] = useState<BuffData[]>(createBuffs);
-  const buffLayout = useSlotLayout(buffs, DEFAULT_LAYOUTS.buffs);
-
-  const [artifacts, setArtifacts] = useState<ArtifactData[]>(createArtifacts);
-  const artifactLayout = useSlotLayout(artifacts, DEFAULT_LAYOUTS.artifacts);
-
-  const totalSlimeBonus = slimes.reduce(
+  const totalSlimeBonus = slimes.items.reduce(
     (sum, slime) => sum + slime.calculateBonus(),
     0,
   );
 
   return {
-    relics,
-    setRelics,
-    relicLayout,
-    slimes,
-    setSlimes,
-    slimeLayout,
-    equipment,
-    setEquipment,
-    equipmentLayout,
-    buffs,
-    setBuffs,
-    buffLayout,
-    artifacts,
-    setArtifacts,
-    artifactLayout,
+    relics: relics.items,
+    setRelics: relics.setItems,
+    relicLayout: relics.layout,
+    slimes: slimes.items,
+    setSlimes: slimes.setItems,
+    slimeLayout: slimes.layout,
+    equipment: equipment.items,
+    setEquipment: equipment.setItems,
+    equipmentLayout: equipment.layout,
+    buffs: buffs.items,
+    setBuffs: buffs.setItems,
+    buffLayout: buffs.layout,
+    artifacts: artifacts.items,
+    setArtifacts: artifacts.setItems,
+    artifactLayout: artifacts.layout,
     totalSlimeBonus,
     ...slimeActions,
   };

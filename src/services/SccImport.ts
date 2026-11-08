@@ -25,6 +25,7 @@ import { RELIC_NAMES, RelicData, type RelicState } from '../models/relic';
 import { SlimeData, slimeLists, type SlimeState } from '../models/slime';
 import {
   SCC_FILE_TYPE,
+  type GridLayoutJson,
   type IArtifactsJsonModule,
   type IBuffsJsonModule,
   type IEquipmentJsonModule,
@@ -37,6 +38,8 @@ export interface ImportedModuleLayout {
   rows: number;
   cols: number;
   layoutMode: LayoutMode;
+  autoSize: boolean;
+  hideEnabled: boolean;
   entries: SlotEntry[];
   hiddenKeys: string[];
 }
@@ -61,26 +64,29 @@ function buildLayout<T extends LayoutItem>(
   items: T[],
   flags: SlotJson[],
   grid: { rows: number; cols: number } | undefined,
-  mode: LayoutMode | undefined,
+  layoutMode: LayoutMode | undefined,
+  settings: GridLayoutJson,
   defaults: SlotLayoutBase,
 ): ImportedModuleLayout {
+  const mode = layoutMode ?? defaults.mode;
   const rows = grid?.rows ?? defaults.rows;
   const cols = grid?.cols ?? defaults.cols;
-  const layoutMode = mode ?? defaults.mode;
   const hiddenKeys = items
     .filter((item, index) => flags[index]?.hidden === true)
     .map((item) => item.key);
+  const hideEnabled = settings.hideEnabled ?? hiddenKeys.length > 0;
+  const autoSize = mode === 'manual' ? false : (settings.autoSize ?? true);
 
   const entries =
-    layoutMode === 'manual'
+    mode === 'manual'
       ? items.map((_, index) => ({
           index: flags[index]?.slotIndex ?? -1,
           visible: flags[index]?.visible ?? true,
           hidden: false,
         }))
-      : calculateSlotEntries(items, layoutMode, [], hiddenKeys);
+      : calculateSlotEntries(items, mode, [], hiddenKeys, hideEnabled);
 
-  return { rows, cols, layoutMode, entries, hiddenKeys };
+  return { rows, cols, layoutMode: mode, autoSize, hideEnabled, entries, hiddenKeys };
 }
 
 function importRelics(module: IRelicsJsonModule | null): ImportedModule<RelicData> | null {
@@ -106,6 +112,7 @@ function importRelics(module: IRelicsJsonModule | null): ImportedModule<RelicDat
       flags,
       module.relicsGrid,
       module.layoutMode,
+      module,
       DEFAULT_LAYOUTS.relics,
     ),
   };
@@ -136,6 +143,7 @@ function importSlimes(module: ISlimesJsonModule | null): ImportedModule<SlimeDat
       flags,
       module.slimesGrid,
       module.layoutMode,
+      module,
       DEFAULT_LAYOUTS.slimes,
     ),
   };
@@ -160,6 +168,7 @@ function importEquipment(
       flags,
       module.equipmentGrid,
       module.layoutMode,
+      module,
       DEFAULT_LAYOUTS.equipment,
     ),
   };
@@ -182,6 +191,7 @@ function importBuffs(module: IBuffsJsonModule | null): ImportedModule<BuffData> 
       flags,
       module.buffsGrid,
       module.layoutMode,
+      module,
       DEFAULT_LAYOUTS.buffs,
     ),
   };
@@ -213,6 +223,7 @@ function importArtifacts(
       flags,
       module.artifactsGrid,
       module.layoutMode,
+      module,
       DEFAULT_LAYOUTS.artifacts,
     ),
   };

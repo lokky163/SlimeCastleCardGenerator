@@ -36,14 +36,7 @@ export const BuffsModule: React.FC<BuffsModuleProps> = ({
 }) => {
   return (
     <ModulePanel>
-      <GridControls
-        rows={layout.rows}
-        cols={layout.cols}
-        mode={layout.mode}
-        onRowsChange={layout.setRows}
-        onColsChange={layout.setCols}
-        onModeChange={layout.setMode}
-      />
+      <GridControls layout={layout} />
 
       <BuffPhaseBanner
         phase={phaseInfo.phase}
@@ -53,13 +46,8 @@ export const BuffsModule: React.FC<BuffsModuleProps> = ({
 
       <SlotGrid
         items={buffs}
-        entries={layout.entries}
-        mode={layout.mode}
-        slotCount={layout.rows * layout.cols}
+        layout={layout}
         variant="buff"
-        hiddenKeys={layout.hiddenKeys}
-        onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
-        onSlotIndexChange={layout.setSlotIndex}
         renderCard={(buff) => (
           <BuffCard
             buff={buff}

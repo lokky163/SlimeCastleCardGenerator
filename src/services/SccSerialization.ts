@@ -32,10 +32,15 @@ function serializeSlots<T extends LayoutItem, J extends object>(
   });
 }
 
+function serializeLayoutFlags(layout: SlotLayoutState) {
+  return { autoSize: layout.autoSize, hideEnabled: layout.hideEnabled };
+}
+
 function serializeRelics(state: ProfileState): IRelicsJsonModule {
   return {
     relicsGrid: { rows: state.relicLayout.rows, cols: state.relicLayout.cols },
     layoutMode: state.relicLayout.mode,
+    ...serializeLayoutFlags(state.relicLayout),
     relicsList: serializeSlots(state.relics, state.relicLayout, (relic) => ({
       name: relic.name,
       state: relic.state,
@@ -47,6 +52,7 @@ function serializeSlimes(state: ProfileState): ISlimesJsonModule {
   return {
     slimesGrid: { rows: state.slimeLayout.rows, cols: state.slimeLayout.cols },
     layoutMode: state.slimeLayout.mode,
+    ...serializeLayoutFlags(state.slimeLayout),
     slimesList: serializeSlots(state.slimes, state.slimeLayout, (slime) => ({
       name: slime.name,
       state: slime.state,
@@ -60,6 +66,7 @@ function serializeEquipment(state: ProfileState): IEquipmentJsonModule {
   return {
     equipmentGrid: { rows: state.equipmentLayout.rows, cols: state.equipmentLayout.cols },
     layoutMode: state.equipmentLayout.mode,
+    ...serializeLayoutFlags(state.equipmentLayout),
     equipmentList: serializeSlots(state.equipment, state.equipmentLayout, (item) => ({
       name: item.name,
       grade: item.grade,
@@ -71,6 +78,7 @@ function serializeBuffs(state: ProfileState): IBuffsJsonModule {
   return {
     buffsGrid: { rows: state.buffLayout.rows, cols: state.buffLayout.cols },
     layoutMode: state.buffLayout.mode,
+    ...serializeLayoutFlags(state.buffLayout),
     buffsList: serializeSlots(state.buffs, state.buffLayout, (buff) => ({
       name: buff.type,
       value: buff.value,
@@ -85,6 +93,7 @@ function serializeArtifacts(state: ProfileState): IArtifactsJsonModule {
       cols: state.artifactLayout.cols,
     },
     layoutMode: state.artifactLayout.mode,
+    ...serializeLayoutFlags(state.artifactLayout),
     artifactsList: serializeSlots(state.artifacts, state.artifactLayout, (artifact) => ({
       name: artifact.name,
       state: artifact.state,

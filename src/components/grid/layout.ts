@@ -16,6 +16,8 @@ export interface SlotLayoutState {
   rows: number;
   cols: number;
   mode: LayoutMode;
+  autoSize: boolean;
+  hideEnabled: boolean;
   entries: SlotEntry[];
   hiddenKeys: string[];
 }
@@ -76,12 +78,23 @@ export function calculateSlotEntries<T extends LayoutItem>(
   mode: LayoutMode,
   current: SlotEntry[],
   hiddenKeys: string[] = [],
+  hideEnabled = true,
 ): SlotEntry[] {
   if (mode === 'manual' && current.length === items.length) return current;
 
-  const hiddenSet = new Set(hiddenKeys);
+  const hiddenSet = new Set(hideEnabled ? hiddenKeys : []);
   const ordered = orderItems(items, mode, hiddenSet);
   return buildEntries(items, ordered, mode, hiddenSet);
+}
+
+export function calculateAutoSize(
+  entries: SlotEntry[],
+  maxCols: number,
+): { rows: number; cols: number } {
+  const shown = entries.filter((entry) => entry.visible && entry.index >= 0).length;
+  const total = Math.max(1, shown);
+  const cols = Math.min(Math.max(1, maxCols), total);
+  return { rows: Math.ceil(total / cols), cols };
 }
 
 export interface FilledSlot<T> {

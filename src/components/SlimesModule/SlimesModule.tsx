@@ -25,14 +25,7 @@ export const SlimesModule: React.FC<SlimesModuleProps> = ({
   onChangeSkin,
 }) => (
   <ModulePanel>
-    <GridControls
-      rows={layout.rows}
-      cols={layout.cols}
-      mode={layout.mode}
-      onRowsChange={layout.setRows}
-      onColsChange={layout.setCols}
-      onModeChange={layout.setMode}
-    >
+    <GridControls layout={layout}>
       <div className={styles.bonus}>
         Общий бонус слайма: {totalSlimeBonus.toFixed(2)}
       </div>
@@ -40,13 +33,8 @@ export const SlimesModule: React.FC<SlimesModuleProps> = ({
 
     <SlotGrid
       items={slimes}
-      entries={layout.entries}
-      mode={layout.mode}
-      slotCount={layout.rows * layout.cols}
+      layout={layout}
       variant="slime"
-      hiddenKeys={layout.hiddenKeys}
-      onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
-      onSlotIndexChange={layout.setSlotIndex}
       renderCard={(slime) => (
         <SlimeCard
           slime={slime}

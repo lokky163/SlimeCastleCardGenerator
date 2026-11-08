@@ -1,28 +1,29 @@
 import type { LayoutMode } from './layout';
 import { LAYOUT_MODES } from './layout';
+import type { SlotLayoutController } from './useSlotLayout';
 import { CounterLabel } from '../CounterLabel';
+import { GridToggle } from './GridToggle';
 import styles from './GridControls.module.css';
 
 interface GridControlsProps {
-  rows: number;
-  cols: number;
-  mode: LayoutMode;
-  onRowsChange: (rows: number) => void;
-  onColsChange: (cols: number) => void;
-  onModeChange: (mode: LayoutMode) => void;
+  layout: SlotLayoutController;
   children?: React.ReactNode;
 }
 
-export const GridControls: React.FC<GridControlsProps> = ({
+interface ManualSizeCountersProps {
+  rows: number;
+  cols: number;
+  onRowsChange: (rows: number) => void;
+  onColsChange: (cols: number) => void;
+}
+
+const ManualSizeCounters: React.FC<ManualSizeCountersProps> = ({
   rows,
   cols,
-  mode,
   onRowsChange,
   onColsChange,
-  onModeChange,
-  children,
 }) => (
-  <div className={styles.controls}>
+  <>
     <CounterLabel
       label="Строк на изображении"
       min={1}
@@ -37,21 +38,62 @@ export const GridControls: React.FC<GridControlsProps> = ({
       value={cols}
       onChange={onColsChange}
     />
+  </>
+);
 
-    <label className={styles.modeBlock}>
-      <span className={styles.modeLabel}>Режим сетки:</span>
-      <select
-        className={styles.modeSelect}
-        value={mode}
-        onChange={(event) => onModeChange(event.target.value as LayoutMode)}
-      >
-        {LAYOUT_MODES.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+interface LayoutModeSelectProps {
+  mode: LayoutMode;
+  onModeChange: (mode: LayoutMode) => void;
+}
+
+const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange }) => (
+  <label className={styles.modeBlock}>
+    <span className={styles.modeLabel}>Режим сетки:</span>
+    <select
+      className={styles.modeSelect}
+      value={mode}
+      onChange={(event) => onModeChange(event.target.value as LayoutMode)}
+    >
+      {LAYOUT_MODES.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  </label>
+);
+
+export const GridControls: React.FC<GridControlsProps> = ({ layout, children }) => (
+  <div className={styles.controls}>
+    <GridToggle
+      label="Размер сетки"
+      checked={layout.autoSize}
+      onLabel="Автоматический"
+      offLabel="Ручной"
+      disabled={layout.mode === 'manual'}
+      onChange={layout.setAutoSize}
+    />
+
+    {!layout.autoSize && (
+      <ManualSizeCounters
+        rows={layout.rows}
+        cols={layout.cols}
+        onRowsChange={layout.setRows}
+        onColsChange={layout.setCols}
+      />
+    )}
+
+    <LayoutModeSelect mode={layout.mode} onModeChange={layout.setMode} />
+
+    {layout.mode !== 'manual' && (
+      <GridToggle
+        label="Скрытие карточек"
+        checked={layout.hideEnabled}
+        onLabel="Убрать скрытие"
+        offLabel="Добавить скрытие"
+        onChange={layout.setHideEnabled}
+      />
+    )}
 
     {children}
   </div>

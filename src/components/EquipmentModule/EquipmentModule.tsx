@@ -27,24 +27,12 @@ export const EquipmentModule: React.FC<EquipmentModuleProps> = ({
 
   return (
     <ModulePanel>
-      <GridControls
-        rows={layout.rows}
-        cols={layout.cols}
-        mode={layout.mode}
-        onRowsChange={layout.setRows}
-        onColsChange={layout.setCols}
-        onModeChange={layout.setMode}
-      />
+      <GridControls layout={layout} />
 
       <SlotGrid
         items={equipment}
-        entries={layout.entries}
-        mode={layout.mode}
-        slotCount={layout.rows * layout.cols}
+        layout={layout}
         variant="equipment"
-        hiddenKeys={layout.hiddenKeys}
-        onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
-        onSlotIndexChange={layout.setSlotIndex}
         renderCard={(item) => (
           <EquipmentCard
             equipment={item}

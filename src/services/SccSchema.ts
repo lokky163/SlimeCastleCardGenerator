@@ -20,13 +20,18 @@ export interface SlotJson {
   hidden?: boolean;
 }
 
-export interface IRelicsJsonModule {
+export interface GridLayoutJson {
+  autoSize?: boolean;
+  hideEnabled?: boolean;
+}
+
+export interface IRelicsJsonModule extends GridLayoutJson {
   relicsGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
   relicsList: Array<{ name: string; state: string } & SlotJson>;
 }
 
-export interface ISlimesJsonModule {
+export interface ISlimesJsonModule extends GridLayoutJson {
   slimesGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
   slimesList: Array<{
@@ -37,19 +42,19 @@ export interface ISlimesJsonModule {
   } & SlotJson>;
 }
 
-export interface IEquipmentJsonModule {
+export interface IEquipmentJsonModule extends GridLayoutJson {
   equipmentGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
   equipmentList: Array<{ name: string; grade: string } & SlotJson>;
 }
 
-export interface IBuffsJsonModule {
+export interface IBuffsJsonModule extends GridLayoutJson {
   buffsGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
   buffsList: Array<{ name: string; value: number } & SlotJson>;
 }
 
-export interface IArtifactsJsonModule {
+export interface IArtifactsJsonModule extends GridLayoutJson {
   artifactsGrid: { rows: number; cols: number };
   layoutMode: LayoutMode;
   artifactsList: Array<{
