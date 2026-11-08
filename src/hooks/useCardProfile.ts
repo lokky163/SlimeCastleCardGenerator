@@ -213,3 +213,5 @@ export function useCardProfile() {
     resetProfile,
   };
 }
+
+export type CardProfile = ReturnType<typeof useCardProfile>;
