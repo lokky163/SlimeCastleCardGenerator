@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import type { CardProfile } from '../../hooks/useCardProfile';
-import type { ExportSelection } from '../ExportBoard/exportSelection';
+import type { ExportSelection } from '../../models/exportSelection';
 import { ExportBoard } from '../ExportBoard/ExportBoard';
 
 interface HubExportBoardProps {

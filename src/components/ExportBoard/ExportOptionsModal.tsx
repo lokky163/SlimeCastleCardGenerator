@@ -1,11 +1,8 @@
+import type { ExportSettings } from '../../hooks/useExportSettings';
+import { EXPORT_OPTIONS, type ExportOption } from '../../models/exportSelection';
 import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
 import modalStyles from '../ui/Modal/Modal.module.css';
-import {
-  EXPORT_OPTIONS,
-  type ExportOption,
-  type ExportSettings,
-} from './exportSelection';
 import styles from './ExportOptionsModal.module.css';
 
 interface ExportOptionsModalProps {

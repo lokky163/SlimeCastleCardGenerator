@@ -1,7 +1,13 @@
-import { type IImportedSccData, ExportService } from '../services/ExportService';
-import { createConfigPayload, PROFILE_STORAGE_KEY } from '../services/ProfileConfig';
+import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import { createInitialEquipment } from '../models/equipment';
 import { createInitialSlimes } from '../models/slime';
+import type { SlotLayoutState } from '../components/grid/layout';
+import { ExportService } from '../services/ExportService';
+import { createConfigPayload, PROFILE_STORAGE_KEY } from '../services/ProfileConfig';
+import {
+  type IImportedSccData,
+  type ImportedModuleLayout,
+} from '../services/SccImport';
 import {
   createArtifacts,
   createBuffs,
@@ -9,48 +15,49 @@ import {
   type ProfileState,
 } from './useProfileState';
 
+function toSlotLayout(layout: ImportedModuleLayout): SlotLayoutState {
+  return {
+    rows: layout.rows,
+    cols: layout.cols,
+    mode: layout.layoutMode,
+    entries: layout.entries,
+    hiddenKeys: layout.hiddenKeys,
+  };
+}
+
 export function applyImportedData(imported: IImportedSccData, state: ProfileState) {
   state.setPlayerName(imported.playerName);
+  if (imported.bgColor) state.setBgColor(imported.bgColor);
+  if (imported.exportSelection) state.setExportSelection(imported.exportSelection);
 
   if (imported.relics) {
-    const { rows, cols, layoutMode, relicsList, entries } = imported.relics;
-    state.setRelics(relicsList);
-    state.relicLayout.applyLayout({ rows, cols, mode: layoutMode, entries });
+    state.setRelics(imported.relics.list);
+    state.relicLayout.applyLayout(toSlotLayout(imported.relics.layout));
   }
 
   if (imported.slimes) {
-    const { rows, cols, layoutMode, slimesList, entries } = imported.slimes;
-    state.setSlimes(slimesList);
-    state.slimeLayout.applyLayout({ rows, cols, mode: layoutMode, entries });
+    state.setSlimes(imported.slimes.list);
+    state.slimeLayout.applyLayout(toSlotLayout(imported.slimes.layout));
   }
 
   if (imported.equipment) {
-    const savedItems = imported.equipment;
-    const defaults = createInitialEquipment();
-    state.setEquipment(
-      defaults.map((defaultItem) => {
-        const saved = savedItems.find((item) => item.name === defaultItem.name);
-        return saved ? defaultItem.clone({ grade: saved.grade }) : defaultItem;
-      }),
-    );
+    state.setEquipment(imported.equipment.list);
+    state.equipmentLayout.applyLayout(toSlotLayout(imported.equipment.layout));
   }
 
-  if (imported.buffs) state.setBuffs(imported.buffs);
-  if (imported.artifacts) state.setArtifacts(imported.artifacts);
+  if (imported.buffs) {
+    state.setBuffs(imported.buffs.list);
+    state.buffLayout.applyLayout(toSlotLayout(imported.buffs.layout));
+  }
+
+  if (imported.artifacts) {
+    state.setArtifacts(imported.artifacts.list);
+    state.artifactLayout.applyLayout(toSlotLayout(imported.artifacts.layout));
+  }
 }
 
 function saveConfig(state: ProfileState) {
-  const { modules } = createConfigPayload(state);
-
-  ExportService.exportToScc(
-    state.playerName,
-    ['relics', 'slimes', 'equipment', 'buffs', 'artifacts'],
-    modules.relics,
-    modules.slimes,
-    modules.equipment,
-    modules.buffs,
-    modules.artifacts,
-  );
+  ExportService.exportToScc(createConfigPayload(state));
 }
 
 function readConfigFile(
@@ -88,8 +95,13 @@ function resetProfile(state: ProfileState) {
   if (!confirmReset) return;
 
   state.setPlayerName('');
+  state.setBgColor(DEFAULT_CARD_SETTINGS.bgColor);
+  state.setExportSelection(DEFAULT_CARD_SETTINGS.exportSelection);
   state.relicLayout.resetLayout();
   state.slimeLayout.resetLayout();
+  state.equipmentLayout.resetLayout();
+  state.buffLayout.resetLayout();
+  state.artifactLayout.resetLayout();
   state.setRelics(createRelics());
   state.setSlimes(createInitialSlimes());
   state.setEquipment(createInitialEquipment());

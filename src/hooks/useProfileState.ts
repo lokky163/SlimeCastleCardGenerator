@@ -4,6 +4,8 @@ import { SlimeData, createInitialSlimes } from '../models/slime';
 import { EquipmentData, createInitialEquipment } from '../models/equipment';
 import { BuffData, BUFFS } from '../models/buff';
 import { ArtifactData, ARTIFACT_NAMES } from '../models/artifact';
+import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
+import type { ExportSelection } from '../models/exportSelection';
 import { DEFAULT_LAYOUTS } from '../components/grid/layoutDefaults';
 import { useSlotLayout } from '../components/grid/useSlotLayout';
 import { useSlimeActions } from './useSlimeActions';
@@ -60,11 +62,18 @@ function useCardModules() {
 
 export function useProfileState() {
   const [playerName, setPlayerName] = useState('');
+  const [bgColor, setBgColor] = useState(DEFAULT_CARD_SETTINGS.bgColor);
+  const [exportSelection, setExportSelection] =
+    useState<ExportSelection>(DEFAULT_CARD_SETTINGS.exportSelection);
   const modules = useCardModules();
 
   return {
     playerName,
     setPlayerName,
+    bgColor,
+    setBgColor,
+    exportSelection,
+    setExportSelection,
     ...modules,
   };
 }

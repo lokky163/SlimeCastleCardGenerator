@@ -13,17 +13,6 @@ export interface ExportOption {
   label: string;
 }
 
-export interface ExportSettings {
-  selection: ExportSelection;
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-  toggle: (key: ExportElement) => void;
-  selectAll: () => void;
-  clearAll: () => void;
-  exportImage: () => void;
-}
-
 export const EXPORT_OPTIONS: ExportOption[] = [
   { key: 'header', label: 'Шапка (ник и общий бонус)' },
   { key: 'equipment', label: 'Снаряжение' },
@@ -51,4 +40,19 @@ export function createExportSelection(value: boolean): ExportSelection {
     buffs: value,
     artifacts: value,
   };
+}
+
+export function normalizeExportSelection(
+  value: Partial<ExportSelection> | null | undefined,
+): ExportSelection {
+  return {
+    ...DEFAULT_EXPORT_SELECTION,
+    ...(value ?? {}),
+  };
+}
+
+export function isDefaultExportSelection(selection: ExportSelection): boolean {
+  return (Object.keys(DEFAULT_EXPORT_SELECTION) as ExportElement[]).every(
+    (key) => selection[key] === DEFAULT_EXPORT_SELECTION[key],
+  );
 }

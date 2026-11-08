@@ -1,0 +1,105 @@
+import type { LayoutItem, SlotLayoutState } from '../components/grid/layout';
+import type { ProfileState } from '../hooks/useProfileState';
+import type {
+  IBuffsJsonModule,
+  IEquipmentJsonModule,
+  IRelicsJsonModule,
+  ISlimesJsonModule,
+  IArtifactsJsonModule,
+  SccModules,
+  SlotJson,
+} from './SccSchema';
+
+function serializeSlots<T extends LayoutItem, J extends object>(
+  items: T[],
+  layout: SlotLayoutState,
+  toJson: (item: T) => J,
+): Array<J & SlotJson> {
+  const hiddenKeys = new Set(layout.hiddenKeys);
+
+  return items.map((item, index) => {
+    const entry = layout.entries[index];
+    const slot =
+      layout.mode === 'manual'
+        ? { slotIndex: entry?.index ?? -1, visible: entry?.visible ?? true }
+        : {};
+
+    return {
+      ...toJson(item),
+      ...slot,
+      ...(hiddenKeys.has(item.key) ? { hidden: true } : {}),
+    };
+  });
+}
+
+function serializeRelics(state: ProfileState): IRelicsJsonModule {
+  return {
+    relicsGrid: { rows: state.relicLayout.rows, cols: state.relicLayout.cols },
+    layoutMode: state.relicLayout.mode,
+    relicsList: serializeSlots(state.relics, state.relicLayout, (relic) => ({
+      name: relic.name,
+      state: relic.state,
+    })),
+  };
+}
+
+function serializeSlimes(state: ProfileState): ISlimesJsonModule {
+  return {
+    slimesGrid: { rows: state.slimeLayout.rows, cols: state.slimeLayout.cols },
+    layoutMode: state.slimeLayout.mode,
+    slimesList: serializeSlots(state.slimes, state.slimeLayout, (slime) => ({
+      name: slime.name,
+      state: slime.state,
+      level: slime.level,
+      skin: slime.skin,
+    })),
+  };
+}
+
+function serializeEquipment(state: ProfileState): IEquipmentJsonModule {
+  return {
+    equipmentGrid: { rows: state.equipmentLayout.rows, cols: state.equipmentLayout.cols },
+    layoutMode: state.equipmentLayout.mode,
+    equipmentList: serializeSlots(state.equipment, state.equipmentLayout, (item) => ({
+      name: item.name,
+      grade: item.grade,
+    })),
+  };
+}
+
+function serializeBuffs(state: ProfileState): IBuffsJsonModule {
+  return {
+    buffsGrid: { rows: state.buffLayout.rows, cols: state.buffLayout.cols },
+    layoutMode: state.buffLayout.mode,
+    buffsList: serializeSlots(state.buffs, state.buffLayout, (buff) => ({
+      name: buff.type,
+      value: buff.value,
+    })),
+  };
+}
+
+function serializeArtifacts(state: ProfileState): IArtifactsJsonModule {
+  return {
+    artifactsGrid: {
+      rows: state.artifactLayout.rows,
+      cols: state.artifactLayout.cols,
+    },
+    layoutMode: state.artifactLayout.mode,
+    artifactsList: serializeSlots(state.artifacts, state.artifactLayout, (artifact) => ({
+      name: artifact.name,
+      state: artifact.state,
+      level: artifact.level,
+      fragments: artifact.fragments,
+    })),
+  };
+}
+
+export function serializeModules(state: ProfileState): SccModules {
+  return {
+    relics: serializeRelics(state),
+    slimes: serializeSlimes(state),
+    equipment: serializeEquipment(state),
+    buffs: serializeBuffs(state),
+    artifacts: serializeArtifacts(state),
+  };
+}

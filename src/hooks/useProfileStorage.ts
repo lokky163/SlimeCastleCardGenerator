@@ -9,7 +9,12 @@ import { applyImportedData } from './useProfileTransfer';
 import type { ProfileState } from './useProfileState';
 
 function useProfileAutosave(state: ProfileState) {
-  const { playerName, relics, relicLayout, slimes, slimeLayout, equipment, buffs, artifacts } = state;
+  const {
+    playerName, bgColor, exportSelection,
+    relics, relicLayout, slimes, slimeLayout,
+    equipment, equipmentLayout, buffs, buffLayout,
+    artifacts, artifactLayout,
+  } = state;
 
   useEffect(() => {
     if (isPristineProfile(state)) return;
@@ -20,20 +25,17 @@ function useProfileAutosave(state: ProfileState) {
       console.error(error);
     }
   }, [
-    playerName,
-    relics,
-    relicLayout.entries,
-    relicLayout.rows,
-    relicLayout.cols,
-    relicLayout.mode,
-    slimes,
-    slimeLayout.entries,
-    slimeLayout.rows,
-    slimeLayout.cols,
-    slimeLayout.mode,
-    equipment,
-    buffs,
-    artifacts,
+    playerName, bgColor, exportSelection,
+    relics, relicLayout.entries, relicLayout.hiddenKeys,
+    relicLayout.rows, relicLayout.cols, relicLayout.mode,
+    slimes, slimeLayout.entries, slimeLayout.hiddenKeys,
+    slimeLayout.rows, slimeLayout.cols, slimeLayout.mode,
+    equipment, equipmentLayout.entries, equipmentLayout.hiddenKeys,
+    equipmentLayout.rows, equipmentLayout.cols, equipmentLayout.mode,
+    buffs, buffLayout.entries, buffLayout.hiddenKeys,
+    buffLayout.rows, buffLayout.cols, buffLayout.mode,
+    artifacts, artifactLayout.entries, artifactLayout.hiddenKeys,
+    artifactLayout.rows, artifactLayout.cols, artifactLayout.mode,
   ]);
 }
 

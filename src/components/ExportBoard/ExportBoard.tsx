@@ -4,7 +4,7 @@ import type { BuffData } from '../../models/buff';
 import type { EquipmentData } from '../../models/equipment';
 import type { RelicData } from '../../models/relic';
 import type { SlimeData } from '../../models/slime';
-import type { ExportSelection } from './exportSelection';
+import type { ExportSelection } from '../../models/exportSelection';
 import type { SlotLayoutState } from '../grid/layout';
 import { ArtifactExport } from './ArtifactExport';
 import { BuffExport } from './BuffExport';

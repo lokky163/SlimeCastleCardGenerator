@@ -12,31 +12,48 @@ import { useShareLayout } from '../../hooks/useShareLayout';
 import { calculateRemainingThrows, getActivePhaseInfo } from '../../utils/buffProgress';
 import styles from './MainAppHub.module.css';
 
+function useHubController() {
+  const profile = useCardProfile();
+  const boardRef = useRef<HTMLDivElement>(null);
+  const { previewImage, closePreview, shareLayout } = useShareLayout(
+    boardRef,
+    profile.playerName,
+  );
+  const exportSettings = useExportSettings(
+    profile.exportSelection,
+    profile.setExportSelection,
+    shareLayout,
+  );
+
+  return {
+    profile,
+    boardRef,
+    previewImage,
+    closePreview,
+    exportSettings,
+    phaseInfo: getActivePhaseInfo(profile.buffs),
+    remainingThrows: calculateRemainingThrows(profile.buffs),
+  };
+}
+
 export const MainAppHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>('equipment');
-  const [bgColor, setBgColor] = useState('#9A6E3F');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-
-  const profile = useCardProfile();
-  const allModulesHdRef = useRef<HTMLDivElement>(null);
-  const { previewImage, closePreview, shareLayout } = useShareLayout(allModulesHdRef, profile.playerName);
-  const exportSettings = useExportSettings(shareLayout);
-
-  const phaseInfo = getActivePhaseInfo(profile.buffs);
-  const remainingThrows = calculateRemainingThrows(profile.buffs);
+  const hub = useHubController();
+  const { profile, exportSettings, phaseInfo, remainingThrows } = hub;
 
   return (
     <div className={styles.hubContainer}>
-      <ImagePreviewModal image={previewImage} onClose={closePreview} />
+      <ImagePreviewModal image={hub.previewImage} onClose={hub.closePreview} />
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
 
       <HubHeader
         activeTab={activeTab}
         profile={profile}
-        bgColor={bgColor}
+        bgColor={profile.bgColor}
         onTabChange={setActiveTab}
-        onBgColorChange={setBgColor}
+        onBgColorChange={profile.setBgColor}
         onOpenHelp={() => setIsHelpOpen(true)}
         onExportImage={exportSettings.open}
       />
@@ -52,8 +69,8 @@ export const MainAppHub: React.FC = () => {
 
       <HubExportBoard
         profile={profile}
-        boardRef={allModulesHdRef}
-        bgColor={bgColor}
+        boardRef={hub.boardRef}
+        bgColor={profile.bgColor}
         phaseInfo={phaseInfo}
         selection={exportSettings.selection}
       />

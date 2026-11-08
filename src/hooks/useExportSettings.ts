@@ -1,14 +1,26 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import {
-  DEFAULT_EXPORT_SELECTION,
   createExportSelection,
   type ExportElement,
   type ExportSelection,
-  type ExportSettings,
-} from '../components/ExportBoard/exportSelection';
+} from '../models/exportSelection';
 
-export function useExportSettings(onExport: () => void): ExportSettings {
-  const [selection, setSelection] = useState<ExportSelection>(DEFAULT_EXPORT_SELECTION);
+export interface ExportSettings {
+  selection: ExportSelection;
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  toggle: (key: ExportElement) => void;
+  selectAll: () => void;
+  clearAll: () => void;
+  exportImage: () => void;
+}
+
+export function useExportSettings(
+  selection: ExportSelection,
+  setSelection: Dispatch<SetStateAction<ExportSelection>>,
+  onExport: () => void,
+): ExportSettings {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = (key: ExportElement) => {
@@ -21,7 +33,7 @@ export function useExportSettings(onExport: () => void): ExportSettings {
     open: () => setIsOpen(true),
     close: () => setIsOpen(false),
     toggle,
-    selectAll: () => setSelection(DEFAULT_EXPORT_SELECTION),
+    selectAll: () => setSelection(createExportSelection(true)),
     clearAll: () => setSelection(createExportSelection(false)),
     exportImage: () => {
       setIsOpen(false);
