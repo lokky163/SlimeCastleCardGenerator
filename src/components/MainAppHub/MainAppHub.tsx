@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { ExportBoard } from '../ExportBoard/ExportBoard';
 import { HubContent } from './HubContent';
+import { HubExportBoard } from './HubExportBoard';
 import { HubHeader } from './HubHeader';
 import { HelpModal } from './HelpModal';
 import { ImagePreviewModal } from './ImagePreviewModal';
@@ -32,15 +32,11 @@ export const MainAppHub: React.FC = () => {
 
       <HubHeader
         activeTab={activeTab}
-        playerName={profile.playerName}
+        profile={profile}
         bgColor={bgColor}
         onTabChange={setActiveTab}
-        onPlayerNameChange={profile.setPlayerName}
         onBgColorChange={setBgColor}
         onOpenHelp={() => setIsHelpOpen(true)}
-        onReset={profile.resetProfile}
-        onImportFile={profile.importConfigFile}
-        onExportConfig={profile.exportConfig}
         onExportImage={shareLayout}
       />
 
@@ -53,18 +49,10 @@ export const MainAppHub: React.FC = () => {
         />
       </main>
 
-      <ExportBoard
+      <HubExportBoard
+        profile={profile}
         boardRef={allModulesHdRef}
-        playerName={profile.playerName}
         bgColor={bgColor}
-        totalSlimeBonus={profile.totalSlimeBonus}
-        equipment={profile.equipment}
-        relics={profile.relics}
-        relicLayout={profile.relicLayout}
-        slimes={profile.slimes}
-        slimeLayout={profile.slimeLayout}
-        buffs={profile.buffs}
-        artifacts={profile.artifacts}
         phaseInfo={phaseInfo}
       />
     </div>

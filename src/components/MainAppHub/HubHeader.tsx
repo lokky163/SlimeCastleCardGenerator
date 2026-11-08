@@ -1,4 +1,5 @@
 import { cx } from '../../utils/classNames';
+import type { CardProfile } from '../../hooks/useCardProfile';
 import { HeaderActions } from './HeaderActions';
 import { TabMenu } from './TabMenu';
 import type { AppTab } from './tabs';
@@ -6,29 +7,21 @@ import styles from './HubHeader.module.css';
 
 interface HubHeaderProps {
   activeTab: AppTab;
-  playerName: string;
+  profile: CardProfile;
   bgColor: string;
   onTabChange: (tab: AppTab) => void;
-  onPlayerNameChange: (name: string) => void;
   onBgColorChange: (color: string) => void;
   onOpenHelp: () => void;
-  onReset: () => void;
-  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onExportConfig: () => void;
   onExportImage: () => void;
 }
 
 export const HubHeader: React.FC<HubHeaderProps> = ({
   activeTab,
-  playerName,
+  profile,
   bgColor,
   onTabChange,
-  onPlayerNameChange,
   onBgColorChange,
   onOpenHelp,
-  onReset,
-  onImportFile,
-  onExportConfig,
   onExportImage,
 }) => (
   <header className={styles.header}>
@@ -42,13 +35,13 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
 
         <input
           type="text"
-          value={playerName}
-          onChange={(event) => onPlayerNameChange(event.target.value)}
+          value={profile.playerName}
+          onChange={(event) => profile.setPlayerName(event.target.value)}
           placeholder="Ник игрока"
           className={styles.nameInput}
         />
 
-        <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onReset}>
+        <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={profile.resetProfile}>
           Сбросить
         </button>
       </div>
@@ -57,8 +50,8 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
     <HeaderActions
       bgColor={bgColor}
       onBgColorChange={onBgColorChange}
-      onImportFile={onImportFile}
-      onExportConfig={onExportConfig}
+      onImportFile={profile.importConfigFile}
+      onExportConfig={profile.exportConfig}
       onExportImage={onExportImage}
     />
   </header>
