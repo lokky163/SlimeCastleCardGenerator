@@ -1,5 +1,7 @@
 import { toPng } from 'html-to-image';
 import { importScc, type IImportedSccData } from './SccImport';
+import { createProfilesFile, parseProfilesFile } from './ProfilesSerialization';
+import type { SccProfile } from './ProfilesSchema';
 import { SCC_MODULES, type SccPayload } from './SccSchema';
 
 export class ExportService {
@@ -17,6 +19,17 @@ export class ExportService {
     return `${year}.${month}.${day}-${hours}.${minutes}.${seconds}`;
   }
 
+  private static downloadJson(payload: unknown, filename: string): void {
+    const jsonString = JSON.stringify(payload, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   static exportToScc(payload: SccPayload): void {
     const document: SccPayload = {
       ...payload,
@@ -24,18 +37,25 @@ export class ExportService {
       exportedModules: [...SCC_MODULES],
     };
 
-    const jsonString = JSON.stringify(document, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = window.document.createElement('a');
-    link.href = url;
-    link.download = `${payload.playerName}-${ExportService.curFormattedDate()}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    ExportService.downloadJson(
+      document,
+      `${payload.playerName}-${ExportService.curFormattedDate()}.json`,
+    );
+  }
+
+  static exportProfiles(profiles: SccProfile[]): void {
+    ExportService.downloadJson(
+      createProfilesFile(profiles),
+      `slime-profiles-${ExportService.curFormattedDate()}.json`,
+    );
   }
 
   static importFromScc(fileContent: string): IImportedSccData | null {
     return importScc(fileContent);
+  }
+
+  static importProfiles(fileContent: string): SccProfile[] | null {
+    return parseProfilesFile(fileContent);
   }
 
   static async exportToPng(element: HTMLDivElement | null): Promise<string | null> {

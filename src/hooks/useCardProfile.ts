@@ -1,15 +1,16 @@
 import { useProfileState } from './useProfileState';
-import { useProfileStorage } from './useProfileStorage';
 import { useProfileTransfer } from './useProfileTransfer';
+import { useProfiles } from './useProfiles';
 
 export function useCardProfile() {
   const state = useProfileState();
   const transfer = useProfileTransfer(state);
-  useProfileStorage(state);
+  const profiles = useProfiles(state);
 
   return {
     ...state,
     ...transfer,
+    ...profiles,
   };
 }
 

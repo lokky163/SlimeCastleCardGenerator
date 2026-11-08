@@ -235,46 +235,49 @@ function importArtifacts(
   return { list, layout: buildLayout(list, flags, module) };
 }
 
+export function parseSccObject(parsed: unknown): IImportedSccData | null {
+  if (!isRecord(parsed) || parsed.fileType !== SCC_FILE_TYPE) return null;
+
+  const modules = asRecord(parsed.modules);
+  const settings = asRecord(parsed.settings);
+
+  return {
+    playerName: readString(parsed.playerName, ''),
+    bgColor: typeof settings.bgColor === 'string' ? settings.bgColor : null,
+    exportSelection: isRecord(settings.exportSelection)
+      ? normalizeExportSelection(settings.exportSelection as Partial<ExportSelection>)
+      : null,
+    relics: importRelics(
+      normalizeModule(modules.relics, 'relicsGrid', 'relicsList', DEFAULT_LAYOUTS.relics),
+    ),
+    slimes: importSlimes(
+      normalizeModule(modules.slimes, 'slimesGrid', 'slimesList', DEFAULT_LAYOUTS.slimes),
+    ),
+    equipment: importEquipment(
+      normalizeModule(
+        modules.equipment,
+        'equipmentGrid',
+        'equipmentList',
+        DEFAULT_LAYOUTS.equipment,
+      ),
+    ),
+    buffs: importBuffs(
+      normalizeModule(modules.buffs, 'buffsGrid', 'buffsList', DEFAULT_LAYOUTS.buffs),
+    ),
+    artifacts: importArtifacts(
+      normalizeModule(
+        modules.artifacts,
+        'artifactsGrid',
+        'artifactsList',
+        DEFAULT_LAYOUTS.artifacts,
+      ),
+    ),
+  };
+}
+
 export function importScc(fileContent: string): IImportedSccData | null {
   try {
-    const parsed = JSON.parse(fileContent);
-    if (!isRecord(parsed) || parsed.fileType !== SCC_FILE_TYPE) return null;
-
-    const modules = asRecord(parsed.modules);
-    const settings = asRecord(parsed.settings);
-
-    return {
-      playerName: readString(parsed.playerName, ''),
-      bgColor: typeof settings.bgColor === 'string' ? settings.bgColor : null,
-      exportSelection: isRecord(settings.exportSelection)
-        ? normalizeExportSelection(settings.exportSelection as Partial<ExportSelection>)
-        : null,
-      relics: importRelics(
-        normalizeModule(modules.relics, 'relicsGrid', 'relicsList', DEFAULT_LAYOUTS.relics),
-      ),
-      slimes: importSlimes(
-        normalizeModule(modules.slimes, 'slimesGrid', 'slimesList', DEFAULT_LAYOUTS.slimes),
-      ),
-      equipment: importEquipment(
-        normalizeModule(
-          modules.equipment,
-          'equipmentGrid',
-          'equipmentList',
-          DEFAULT_LAYOUTS.equipment,
-        ),
-      ),
-      buffs: importBuffs(
-        normalizeModule(modules.buffs, 'buffsGrid', 'buffsList', DEFAULT_LAYOUTS.buffs),
-      ),
-      artifacts: importArtifacts(
-        normalizeModule(
-          modules.artifacts,
-          'artifactsGrid',
-          'artifactsList',
-          DEFAULT_LAYOUTS.artifacts,
-        ),
-      ),
-    };
+    return parseSccObject(JSON.parse(fileContent));
   } catch {
     return null;
   }

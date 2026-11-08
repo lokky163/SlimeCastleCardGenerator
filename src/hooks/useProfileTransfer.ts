@@ -3,17 +3,20 @@ import { createInitialEquipment } from '../models/equipment';
 import { createInitialSlimes } from '../models/slime';
 import type { SlotLayoutState } from '../components/grid/layout';
 import { ExportService } from '../services/ExportService';
-import { createConfigPayload, PROFILE_STORAGE_KEY } from '../services/ProfileConfig';
+import { createConfigPayload } from '../services/ProfileConfig';
+import type { SccProfile } from '../services/ProfilesSchema';
 import {
+  parseSccObject,
   type IImportedSccData,
   type ImportedModuleLayout,
 } from '../services/SccImport';
+import { SCC_FILE_TYPE, SCC_VERSION } from '../services/SccSchema';
 import {
   createArtifacts,
   createBuffs,
   createRelics,
-  type ProfileState,
-} from './useProfileState';
+} from '../services/profileDefaults';
+import type { ProfileState } from './useProfileState';
 
 function toSlotLayout(layout: ImportedModuleLayout): SlotLayoutState {
   return {
@@ -56,6 +59,21 @@ export function applyImportedData(imported: IImportedSccData, state: ProfileStat
     state.setArtifacts(imported.artifacts.list);
     state.artifactLayout.applyLayout(toSlotLayout(imported.artifacts.layout));
   }
+}
+
+export function applyProfilePayload(
+  profile: SccProfile,
+  state: ProfileState,
+): boolean {
+  const imported = parseSccObject({
+    fileType: SCC_FILE_TYPE,
+    version: SCC_VERSION,
+    ...profile,
+  });
+  if (!imported) return false;
+
+  applyImportedData(imported, state);
+  return true;
 }
 
 function saveConfig(state: ProfileState) {
@@ -109,7 +127,6 @@ function resetProfile(state: ProfileState) {
   state.setEquipment(createInitialEquipment());
   state.setBuffs(createBuffs());
   state.setArtifacts(createArtifacts());
-  localStorage.removeItem(PROFILE_STORAGE_KEY);
 }
 
 export function useProfileTransfer(state: ProfileState) {

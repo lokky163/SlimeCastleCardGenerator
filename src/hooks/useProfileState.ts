@@ -1,22 +1,13 @@
 import { useState } from 'react';
-import { RelicData, RELIC_NAMES } from '../models/relic';
 import { createInitialSlimes } from '../models/slime';
 import { createInitialEquipment } from '../models/equipment';
-import { BuffData, BUFFS } from '../models/buff';
-import { ArtifactData, ARTIFACT_NAMES } from '../models/artifact';
 import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import type { ExportSelection } from '../models/exportSelection';
 import type { LayoutItem, SlotLayoutBase } from '../components/grid/layout';
 import { DEFAULT_LAYOUTS, MAX_AUTO_COLS } from '../components/grid/layoutDefaults';
 import { useSlotLayout } from '../components/grid/useSlotLayout';
+import { createArtifacts, createBuffs, createRelics } from '../services/profileDefaults';
 import { useSlimeActions } from './useSlimeActions';
-
-export const createRelics = () => RELIC_NAMES.map((name) => new RelicData(name, '0'));
-
-export const createBuffs = () => BUFFS.map((type) => new BuffData(type, 0));
-
-export const createArtifacts = () =>
-  ARTIFACT_NAMES.map((name) => new ArtifactData(name, 'no', 1, 0));
 
 function useCardModule<T extends LayoutItem>(
   createItems: () => T[],

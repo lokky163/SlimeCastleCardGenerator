@@ -1,5 +1,9 @@
 import type { LayoutItem, SlotLayoutState } from '../components/grid/layout';
-import type { ProfileState } from '../hooks/useProfileState';
+import type { ArtifactData } from '../models/artifact';
+import type { BuffData } from '../models/buff';
+import type { EquipmentData } from '../models/equipment';
+import type { RelicData } from '../models/relic';
+import type { SlimeData } from '../models/slime';
 import type {
   IBuffsJsonModule,
   IEquipmentJsonModule,
@@ -9,6 +13,19 @@ import type {
   SccModules,
   SlotJson,
 } from './SccSchema';
+
+export interface ProfileSerializationSource {
+  relics: RelicData[];
+  relicLayout: SlotLayoutState;
+  slimes: SlimeData[];
+  slimeLayout: SlotLayoutState;
+  equipment: EquipmentData[];
+  equipmentLayout: SlotLayoutState;
+  buffs: BuffData[];
+  buffLayout: SlotLayoutState;
+  artifacts: ArtifactData[];
+  artifactLayout: SlotLayoutState;
+}
 
 function serializeSlots<T extends LayoutItem, J extends object>(
   items: T[],
@@ -36,7 +53,7 @@ function serializeLayoutFlags(layout: SlotLayoutState) {
   return { autoSize: layout.autoSize, hideEnabled: layout.hideEnabled };
 }
 
-function serializeRelics(state: ProfileState): IRelicsJsonModule {
+function serializeRelics(state: ProfileSerializationSource): IRelicsJsonModule {
   return {
     relicsGrid: { rows: state.relicLayout.rows, cols: state.relicLayout.cols },
     layoutMode: state.relicLayout.mode,
@@ -48,7 +65,7 @@ function serializeRelics(state: ProfileState): IRelicsJsonModule {
   };
 }
 
-function serializeSlimes(state: ProfileState): ISlimesJsonModule {
+function serializeSlimes(state: ProfileSerializationSource): ISlimesJsonModule {
   return {
     slimesGrid: { rows: state.slimeLayout.rows, cols: state.slimeLayout.cols },
     layoutMode: state.slimeLayout.mode,
@@ -62,7 +79,7 @@ function serializeSlimes(state: ProfileState): ISlimesJsonModule {
   };
 }
 
-function serializeEquipment(state: ProfileState): IEquipmentJsonModule {
+function serializeEquipment(state: ProfileSerializationSource): IEquipmentJsonModule {
   return {
     equipmentGrid: { rows: state.equipmentLayout.rows, cols: state.equipmentLayout.cols },
     layoutMode: state.equipmentLayout.mode,
@@ -74,7 +91,7 @@ function serializeEquipment(state: ProfileState): IEquipmentJsonModule {
   };
 }
 
-function serializeBuffs(state: ProfileState): IBuffsJsonModule {
+function serializeBuffs(state: ProfileSerializationSource): IBuffsJsonModule {
   return {
     buffsGrid: { rows: state.buffLayout.rows, cols: state.buffLayout.cols },
     layoutMode: state.buffLayout.mode,
@@ -86,7 +103,7 @@ function serializeBuffs(state: ProfileState): IBuffsJsonModule {
   };
 }
 
-function serializeArtifacts(state: ProfileState): IArtifactsJsonModule {
+function serializeArtifacts(state: ProfileSerializationSource): IArtifactsJsonModule {
   return {
     artifactsGrid: {
       rows: state.artifactLayout.rows,
@@ -103,7 +120,7 @@ function serializeArtifacts(state: ProfileState): IArtifactsJsonModule {
   };
 }
 
-export function serializeModules(state: ProfileState): SccModules {
+export function serializeModules(state: ProfileSerializationSource): SccModules {
   return {
     relics: serializeRelics(state),
     slimes: serializeSlimes(state),
