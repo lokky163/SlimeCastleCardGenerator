@@ -14,6 +14,36 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profilesBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.profilesBtnOpen {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.burgerIcon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 18px;
+}
+
+.burgerIcon span {
+  display: block;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
 }
 
 .tabContainer {

@@ -10,8 +10,10 @@ interface HubHeaderProps {
   activeTab: AppTab;
   profile: CardProfile;
   bgColor: string;
+  isProfilesOpen: boolean;
   onTabChange: (tab: AppTab) => void;
   onBgColorChange: (color: string) => void;
+  onToggleProfiles: () => void;
   onOpenHelp: () => void;
   onExportImage: () => void;
 }
@@ -19,7 +21,9 @@ interface HubHeaderProps {
 interface HeaderControlsProps {
   activeTab: AppTab;
   profile: CardProfile;
+  isProfilesOpen: boolean;
   onTabChange: (tab: AppTab) => void;
+  onToggleProfiles: () => void;
   onOpenHelp: () => void;
 }
 
@@ -92,10 +96,28 @@ function useHeaderCollapse() {
 const HeaderControls: React.FC<HeaderControlsProps> = ({
   activeTab,
   profile,
+  isProfilesOpen,
   onTabChange,
+  onToggleProfiles,
   onOpenHelp,
 }) => (
   <div className={styles.leftGroup}>
+    <button
+      type="button"
+      className={cx(styles.tabBtn, styles.profilesBtn, isProfilesOpen && styles.profilesBtnOpen)}
+      aria-label={isProfilesOpen ? 'Закрыть меню профилей' : 'Открыть меню профилей'}
+      aria-expanded={isProfilesOpen}
+      aria-controls="profiles-drawer"
+      title="Профили"
+      onClick={onToggleProfiles}
+    >
+      <span className={styles.burgerIcon} aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </span>
+    </button>
+
     <div className={styles.tabContainer}>
       <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
 
@@ -122,8 +144,10 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
   activeTab,
   profile,
   bgColor,
+  isProfilesOpen,
   onTabChange,
   onBgColorChange,
+  onToggleProfiles,
   onOpenHelp,
   onExportImage,
 }) => {
@@ -138,7 +162,9 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
       <HeaderControls
         activeTab={activeTab}
         profile={profile}
+        isProfilesOpen={isProfilesOpen}
         onTabChange={onTabChange}
+        onToggleProfiles={onToggleProfiles}
         onOpenHelp={onOpenHelp}
       />
 

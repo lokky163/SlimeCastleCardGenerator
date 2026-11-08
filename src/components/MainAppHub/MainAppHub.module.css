@@ -9,8 +9,16 @@
   font-family: var(--font-ui);
 }
 
+.workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .mainContent {
   flex: 1;
+  min-width: 0;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -18,4 +26,10 @@
   overflow: auto;
   overflow-x: hidden;
   min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .workspaceProfilesOpen .mainContent {
+    display: none;
+  }
 }

@@ -5,15 +5,21 @@ import { HubExportBoard } from './HubExportBoard';
 import { HubHeader } from './HubHeader';
 import { HelpModal } from './HelpModal';
 import { ImagePreviewModal } from './ImagePreviewModal';
+import { DeleteProfileModal } from './DeleteProfileModal';
+import { ProfilesDrawer } from './ProfilesDrawer';
 import type { AppTab } from './tabs';
-import { useCardProfile } from '../../hooks/useCardProfile';
+import { useCardProfile, type CardProfile } from '../../hooks/useCardProfile';
 import { useExportSettings } from '../../hooks/useExportSettings';
 import { useShareLayout } from '../../hooks/useShareLayout';
 import {
   DEFAULT_DROP_CHANCE,
   type DropChanceSelection,
 } from '../../utils/buffDrops';
-import { getBuffsProgress } from '../../utils/buffProgress';
+import {
+  getBuffsProgress,
+  type BuffsProgress,
+} from '../../utils/buffProgress';
+import { cx } from '../../utils/classNames';
 import styles from './MainAppHub.module.css';
 
 function useHubController() {
@@ -45,45 +51,132 @@ function useHubController() {
   };
 }
 
+function profileLabel(profile: CardProfile, index: number): string {
+  const name = profile.profiles[index]?.playerName.trim();
+  return name ? `Профиль ${index + 1} (${name})` : `Профиль ${index + 1}`;
+}
+
+function useProfileMenu(profile: CardProfile) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+
+  const closeOnMobile = () => {
+    if (window.matchMedia('(max-width: 768px)').matches) setIsOpen(false);
+  };
+
+  const selectProfile = (index: number) => {
+    profile.selectProfile(index);
+    closeOnMobile();
+  };
+
+  const addProfile = () => {
+    profile.addProfile();
+    closeOnMobile();
+  };
+
+  const confirmDelete = () => {
+    if (deleteTarget !== null) profile.deleteProfile(deleteTarget);
+    setDeleteTarget(null);
+  };
+
+  return {
+    isOpen,
+    toggle: () => setIsOpen((open) => !open),
+    deleteTarget,
+    requestDelete: setDeleteTarget,
+    cancelDelete: () => setDeleteTarget(null),
+    confirmDelete,
+    selectProfile,
+    addProfile,
+    deleteLabel:
+      deleteTarget === null ? '' : profileLabel(profile, deleteTarget),
+  };
+}
+
+interface HubWorkspaceProps {
+  activeTab: AppTab;
+  profile: CardProfile;
+  buffsProgress: BuffsProgress;
+  dropChance: DropChanceSelection;
+  onDropChanceChange: (chance: DropChanceSelection) => void;
+  menu: ReturnType<typeof useProfileMenu>;
+}
+
+const HubWorkspace: React.FC<HubWorkspaceProps> = ({
+  activeTab,
+  profile,
+  buffsProgress,
+  dropChance,
+  onDropChanceChange,
+  menu,
+}) => (
+  <div
+    className={cx(
+      styles.workspace,
+      menu.isOpen && styles.workspaceProfilesOpen,
+    )}
+  >
+    <ProfilesDrawer
+      open={menu.isOpen}
+      profiles={profile.profiles}
+      activeProfileIndex={profile.activeProfileIndex}
+      notice={profile.profilesNotice}
+      onSelect={menu.selectProfile}
+      onAdd={menu.addProfile}
+      onRequestDelete={menu.requestDelete}
+      onExportAll={profile.exportAllProfiles}
+      onImportAllFile={profile.importAllProfilesFile}
+    />
+
+    <main className={styles.mainContent}>
+      <HubContent
+        activeTab={activeTab}
+        profile={profile}
+        buffsProgress={buffsProgress}
+        dropChance={dropChance}
+        onDropChanceChange={onDropChanceChange}
+      />
+    </main>
+  </div>
+);
+
 export const MainAppHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>('equipment');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const hub = useHubController();
-  const {
-    profile,
-    exportSettings,
-    phaseInfo,
-    buffsProgress,
-    dropChance,
-    setDropChance,
-  } = hub;
+  const { profile, exportSettings, phaseInfo, buffsProgress, dropChance, setDropChance } = hub;
+  const menu = useProfileMenu(profile);
 
   return (
     <div className={styles.hubContainer}>
       <ImagePreviewModal image={hub.previewImage} onClose={hub.closePreview} />
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
-
+      <DeleteProfileModal
+        open={menu.deleteTarget !== null}
+        label={menu.deleteLabel}
+        onCancel={menu.cancelDelete}
+        onConfirm={menu.confirmDelete}
+      />
       <HubHeader
         activeTab={activeTab}
         profile={profile}
         bgColor={profile.bgColor}
+        isProfilesOpen={menu.isOpen}
         onTabChange={setActiveTab}
         onBgColorChange={profile.setBgColor}
+        onToggleProfiles={menu.toggle}
         onOpenHelp={() => setIsHelpOpen(true)}
         onExportImage={exportSettings.open}
       />
-
-      <main className={styles.mainContent}>
-        <HubContent
-          activeTab={activeTab}
-          profile={profile}
-          buffsProgress={buffsProgress}
-          dropChance={dropChance}
-          onDropChanceChange={setDropChance}
-        />
-      </main>
-
+      <HubWorkspace
+        activeTab={activeTab}
+        profile={profile}
+        buffsProgress={buffsProgress}
+        dropChance={dropChance}
+        onDropChanceChange={setDropChance}
+        menu={menu}
+      />
       <HubExportBoard
         profile={profile}
         boardRef={hub.boardRef}
