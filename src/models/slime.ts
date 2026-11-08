@@ -102,7 +102,6 @@ export const SLIME_SKINS = [
   'Auralis-1',
   'Agnaros-1',
   'Monilia-1',
-  'Monilia-1',
   'Panpan-1',
   'Aelwenya-1',
   'Taranis-1',
