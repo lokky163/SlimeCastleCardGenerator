@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode, type RefObject } from 'react';
+import { useRef, type ReactNode, type RefObject } from 'react';
 import { cx } from '../../../utils/classNames';
+import { useAutoScrollToSelected, useDismissOnOutside } from './usePopupMenuEffects';
 import styles from './PopupMenu.module.css';
 
 export type PopupPlacement = 'card' | 'dropdown';
@@ -23,38 +24,8 @@ export const PopupMenu: React.FC<PopupMenuProps> = ({
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    if (!open || !menuRef.current) return;
-
-    const menu = menuRef.current;
-    const selected = menu.querySelector<HTMLElement>('[data-selected="true"]');
-    if (!selected) return;
-
-    menu.scrollTop = selected.offsetTop - menu.clientHeight / 2 + selected.clientHeight / 2;
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target)) return;
-      if (anchorRef?.current?.contains(target)) return;
-      onClose();
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open, onClose, anchorRef]);
+  useAutoScrollToSelected(menuRef, open);
+  useDismissOnOutside(open, onClose, menuRef, anchorRef);
 
   if (!open) return null;
 
