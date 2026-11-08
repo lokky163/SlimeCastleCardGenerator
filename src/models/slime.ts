@@ -120,6 +120,38 @@ export const SLIME_ASSETS = {
   SSS: { bg: SSSTextBackGround, starBottom: SSSStarBottom },
 };
 
+const STATE_PROGRESS: SlimeState[] = [
+  '0', '1y', '2y', '3y', '4y', '5y', '1r', '2r', '3r', '4r', '5r',
+];
+
+const RARITY_STAR_STEPS: Record<SlimeRarity, number[]> = {
+  B: [1.0, 1.5, 2.0, 2.5, 3.0],
+  A: [2.0, 2.5, 3.0, 3.5, 4.0],
+  S: [4.0, 5.0, 6.0, 7.0, 8.0],
+  SS: [8.0, 10.0, 12.0, 14.0, 16.0],
+  SSS: [12.0, 15.0, 18.0, 21.0, 24.0],
+};
+
+const MAX_LEVEL_BONUSES: Record<SlimeRarity, number> = {
+  B: 2.5,
+  A: 2.5,
+  S: 5.0,
+  SS: 10.0,
+  SSS: 20.0,
+};
+
+function calculateStarBonus(rarity: SlimeRarity, state: SlimeState): number {
+  const completedCheckpoints = Math.floor(STATE_PROGRESS.indexOf(state) / 2);
+  const steps = RARITY_STAR_STEPS[rarity];
+  let bonus = 0;
+
+  for (let index = 0; index < completedCheckpoints; index += 1) {
+    bonus += steps[index];
+  }
+
+  return bonus;
+}
+
 export class SlimeData {
   public _name: string;
   public _rarity: SlimeRarity;
@@ -294,54 +326,11 @@ export class SlimeData {
 
 
   public calculateBonus(): number {
-    if (this.state === 'no')
-      return 0;
+    if (this.state === 'no') return 0;
 
-    // Сначала создаем строгий массив состояний для вычисления индекса прогресса.
-    // Индекс элемента в этом массиве будет равен количеству пройденных шагов.
-    const STATE_PROGRESS: SlimeState[] = [
-      '0', '1y',  '2y', '3y', '4y', '5y', '1r', '2r', '3r', '4r', '5r'
-    ];
+    const starBonus = calculateStarBonus(this.rarity, this.state);
+    const levelBonus = (this.level / 250) * MAX_LEVEL_BONUSES[this.rarity];
 
-    // Матрица шагов для расчета накопительного бонуса звезд.
-    // Каждый массив содержит 5 последовательных прибавок для конкретной редкости.
-    const RARITY_STAR_STEPS: Record<string, number[]> = {
-      'B':   [1.0,  1.5,  2.0,  2.5,  3.0 ],
-      'A':   [2.0,  2.5,  3.0,  3.5,  4.0 ],
-      'S':   [4.0,  5.0,  6.0,  7.0,  8.0 ],
-      'SS':  [8.0,  10.0, 12.0, 14.0, 16.0],
-      'SSS': [12.0, 15.0, 18.0, 21.0, 24.0]
-    };
-
-    // Константы для бонуса максимального уровня
-    const MAX_LEVEL_BONUSES: Record<string, number> = {
-      'B': 2.5, 'A': 2.5, 'S': 5.0, 'SS': 10.0, 'SSS': 20.0
-    };
-
-    // Находим числовой индекс текущего состояния (от 0 до 10). Состояние 'no' приравниваем к '0'
-    const stateIndex = STATE_PROGRESS.indexOf(this.state);
-    
-    // Рассчитываем, сколько полных чекпоинтов преодолено (каждые 2 индекса = 1 чекпоинт).
-    // '0' и '1y' дадут 0. '2y' и '3y' дадут 1. '4y' и '5y' дадут 2, и так далее.
-    const completedCheckpoints = Math.floor(stateIndex / 2);
-
-    // 1. НАКОПИТЕЛЬНЫЙ РАСЧЕТ БОНУСА ЗА ЗВЕЗДЫ
-    let starBonus = 0;
-    const steps = RARITY_STAR_STEPS[this.rarity];
-
-    if (steps) {
-      // Суммируем шаги из матрицы вплоть до текущего достигнутого чекпоинта
-      for (let i = 0; i < completedCheckpoints; i++) {
-        starBonus += steps[i];
-      }
-    }
-
-    // 2. РАСЧЕТ БОНУСА ЗА УРОВЕНЬ
-    const maxLevelBonus = MAX_LEVEL_BONUSES[this.rarity] || 0;
-    const levelBonus = (this.level / 250) * maxLevelBonus;
-
-    // console.log(this.name + ":" + "rarity = " + this.rarity + ", star = " + starBonus + ", level = " + levelBonus)
-    // Итоговый бонус
     return starBonus + levelBonus;
   }
 
