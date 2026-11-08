@@ -1,18 +1,22 @@
 import React from 'react';
 import { type BuffData, type BuffType } from '../../models/buff';
+import type { DropChanceSelection } from '../../utils/buffDrops';
+import type { BuffsProgress } from '../../utils/buffProgress';
 import { GridControls } from '../grid/GridControls';
 import { SlotGrid } from '../grid/SlotGrid';
 import type { SlotLayoutController } from '../grid/useSlotLayout';
 import { ModulePanel } from '../ui/ModulePanel/ModulePanel';
 import { BuffCard } from './BuffCard';
+import { BuffDropCalculator } from './BuffDropCalculator';
 import { BuffPhaseBanner } from './BuffPhaseBanner';
 
 interface BuffsModuleProps {
   buffs: BuffData[];
   setBuffs: React.Dispatch<React.SetStateAction<BuffData[]>>;
   layout: SlotLayoutController;
-  phaseInfo: { phase: number; percent: number };
-  remainingThrows: { min: number; avg: number; max: number };
+  progress: BuffsProgress;
+  dropChance: DropChanceSelection;
+  onDropChanceChange: (chance: DropChanceSelection) => void;
 }
 
 function changeBuffValue(
@@ -31,17 +35,24 @@ export const BuffsModule: React.FC<BuffsModuleProps> = ({
   buffs,
   setBuffs,
   layout,
-  phaseInfo,
-  remainingThrows,
+  progress,
+  dropChance,
+  onDropChanceChange,
 }) => {
   return (
     <ModulePanel>
       <GridControls layout={layout} />
 
       <BuffPhaseBanner
-        phase={phaseInfo.phase}
-        percent={phaseInfo.percent}
-        remainingThrows={remainingThrows}
+        phaseOne={progress.phaseOne}
+        phaseTwo={progress.phaseTwo}
+      />
+
+      <BuffDropCalculator
+        phaseOne={progress.phaseOne.remaining}
+        phaseTwo={progress.phaseTwo.remaining}
+        chance={dropChance}
+        onChanceChange={onDropChanceChange}
       />
 
       <SlotGrid

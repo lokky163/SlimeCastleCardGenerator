@@ -10,6 +10,16 @@
   line-height: 1.5;
 }
 
+.phaseTitle {
+  margin-bottom: 4px;
+}
+
+.phaseRow + .phaseRow {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 52, 96, 0.7);
+}
+
 .accent {
   color: var(--color-accent);
 }
@@ -19,4 +29,93 @@
   color: #b0b0c0;
   margin-top: 6px;
   font-weight: normal;
+}
+
+.calculator {
+  background: var(--color-panel);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  border: 1px dashed #0f3460;
+  font-size: 0.95rem;
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chanceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.calculatorLabel {
+  color: #b0b0c0;
+}
+
+.chanceButtons {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.chanceBtn {
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel-3);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.chanceBtn:hover {
+  border-color: var(--color-accent);
+}
+
+.chanceBtnActive {
+  border-color: var(--color-accent);
+  background: var(--color-panel);
+  color: var(--color-accent);
+}
+
+.customChance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #b0b0c0;
+}
+
+.chanceInput {
+  width: 72px;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel-3);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.chanceInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.multiplier {
+  color: #fff;
+}
+
+.hint {
+  color: #b0b0c0;
+  font-size: 0.85rem;
+}
+
+.dropCosts {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: #b0b0c0;
+  font-size: 0.95rem;
 }

@@ -9,12 +9,18 @@ import type { AppTab } from './tabs';
 import { useCardProfile } from '../../hooks/useCardProfile';
 import { useExportSettings } from '../../hooks/useExportSettings';
 import { useShareLayout } from '../../hooks/useShareLayout';
-import { calculateRemainingThrows, getActivePhaseInfo } from '../../utils/buffProgress';
+import {
+  DEFAULT_DROP_CHANCE,
+  type DropChanceSelection,
+} from '../../utils/buffDrops';
+import { getBuffsProgress } from '../../utils/buffProgress';
 import styles from './MainAppHub.module.css';
 
 function useHubController() {
   const profile = useCardProfile();
   const boardRef = useRef<HTMLDivElement>(null);
+  const [dropChance, setDropChance] =
+    useState<DropChanceSelection>(DEFAULT_DROP_CHANCE);
   const { previewImage, closePreview, shareLayout } = useShareLayout(
     boardRef,
     profile.playerName,
@@ -24,6 +30,7 @@ function useHubController() {
     profile.setExportSelection,
     shareLayout,
   );
+  const buffsProgress = getBuffsProgress(profile.buffs);
 
   return {
     profile,
@@ -31,8 +38,10 @@ function useHubController() {
     previewImage,
     closePreview,
     exportSettings,
-    phaseInfo: getActivePhaseInfo(profile.buffs),
-    remainingThrows: calculateRemainingThrows(profile.buffs),
+    phaseInfo: buffsProgress.active,
+    buffsProgress,
+    dropChance,
+    setDropChance,
   };
 }
 
@@ -40,7 +49,14 @@ export const MainAppHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>('equipment');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const hub = useHubController();
-  const { profile, exportSettings, phaseInfo, remainingThrows } = hub;
+  const {
+    profile,
+    exportSettings,
+    phaseInfo,
+    buffsProgress,
+    dropChance,
+    setDropChance,
+  } = hub;
 
   return (
     <div className={styles.hubContainer}>
@@ -62,8 +78,9 @@ export const MainAppHub: React.FC = () => {
         <HubContent
           activeTab={activeTab}
           profile={profile}
-          phaseInfo={phaseInfo}
-          remainingThrows={remainingThrows}
+          buffsProgress={buffsProgress}
+          dropChance={dropChance}
+          onDropChanceChange={setDropChance}
         />
       </main>
 

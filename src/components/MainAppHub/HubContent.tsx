@@ -4,13 +4,16 @@ import { EquipmentModule } from '../EquipmentModule/EquipmentModule';
 import { BuffsModule } from '../BuffsModule/BuffsModule';
 import { ArtifactsModule } from '../ArtifactsModule/ArtifactsModule';
 import type { CardProfile } from '../../hooks/useCardProfile';
+import type { DropChanceSelection } from '../../utils/buffDrops';
+import type { BuffsProgress } from '../../utils/buffProgress';
 import type { AppTab } from './tabs';
 
 interface HubContentProps {
   activeTab: AppTab;
   profile: CardProfile;
-  phaseInfo: { phase: number; percent: number };
-  remainingThrows: { min: number; avg: number; max: number };
+  buffsProgress: BuffsProgress;
+  dropChance: DropChanceSelection;
+  onDropChanceChange: (chance: DropChanceSelection) => void;
 }
 
 interface TabProps {
@@ -18,8 +21,9 @@ interface TabProps {
 }
 
 interface BuffsTabProps extends TabProps {
-  phaseInfo: { phase: number; percent: number };
-  remainingThrows: { min: number; avg: number; max: number };
+  progress: BuffsProgress;
+  dropChance: DropChanceSelection;
+  onDropChanceChange: (chance: DropChanceSelection) => void;
 }
 
 const RelicsTab: React.FC<TabProps> = ({ profile }) => (
@@ -59,23 +63,26 @@ const EquipmentTab: React.FC<TabProps> = ({ profile }) => (
 
 const BuffsTab: React.FC<BuffsTabProps> = ({
   profile,
-  phaseInfo,
-  remainingThrows,
+  progress,
+  dropChance,
+  onDropChanceChange,
 }) => (
   <BuffsModule
     buffs={profile.buffs}
     setBuffs={profile.setBuffs}
     layout={profile.buffLayout}
-    phaseInfo={phaseInfo}
-    remainingThrows={remainingThrows}
+    progress={progress}
+    dropChance={dropChance}
+    onDropChanceChange={onDropChanceChange}
   />
 );
 
 export const HubContent: React.FC<HubContentProps> = ({
   activeTab,
   profile,
-  phaseInfo,
-  remainingThrows,
+  buffsProgress,
+  dropChance,
+  onDropChanceChange,
 }) => {
   switch (activeTab) {
     case 'relics':
@@ -86,8 +93,9 @@ export const HubContent: React.FC<HubContentProps> = ({
       return (
         <BuffsTab
           profile={profile}
-          phaseInfo={phaseInfo}
-          remainingThrows={remainingThrows}
+          progress={buffsProgress}
+          dropChance={dropChance}
+          onDropChanceChange={onDropChanceChange}
         />
       );
     case 'artifacts':

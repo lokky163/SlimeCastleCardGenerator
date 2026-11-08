@@ -1,8 +1,32 @@
 import { BUFF_STATS, type BuffData } from '../models/buff';
 
+export type BuffPhase = 1 | 2;
+
+export interface RemainingPermabuffs {
+  min: number;
+  avg: number;
+  max: number;
+}
+
+export interface PhaseProgress {
+  percent: number;
+  remaining: RemainingPermabuffs;
+}
+
+export interface BuffsProgress {
+  active: { phase: BuffPhase; percent: number };
+  phaseOne: PhaseProgress;
+  phaseTwo: PhaseProgress;
+}
+
 const PHASE_TWO_TYPES = new Set(['ATK', 'HP', 'CritRes']);
 
+const ZERO_REMAINING: RemainingPermabuffs = { min: 0, avg: 0, max: 0 };
+
 const isPhaseTwoType = (buff: BuffData) => PHASE_TWO_TYPES.has(buff.type);
+
+const isPhaseType = (buff: BuffData, phase: BuffPhase) =>
+  (phase === 2) === isPhaseTwoType(buff);
 
 export function isPhaseOneComplete(buffs: BuffData[]): boolean {
   return buffs
@@ -16,10 +40,8 @@ function averagePercentage(buffs: BuffData[]): number {
   return total / buffs.length;
 }
 
-export function getActivePhaseInfo(buffs: BuffData[]): { phase: number; percent: number } {
-  const phase = isPhaseOneComplete(buffs) ? 2 : 1;
-  const phaseBuffs = buffs.filter((buff) => (phase === 2) === isPhaseTwoType(buff));
-  return { phase, percent: averagePercentage(phaseBuffs) };
+export function getPhasePercent(buffs: BuffData[], phase: BuffPhase): number {
+  return averagePercentage(buffs.filter((buff) => isPhaseType(buff, phase)));
 }
 
 function getRemainingSteps(buff: BuffData) {
@@ -34,18 +56,21 @@ function getRemainingSteps(buff: BuffData) {
   };
 }
 
-export function calculateRemainingThrows(
+function calculatePhaseRemaining(
   buffs: BuffData[],
-): { min: number; avg: number; max: number } {
-  const phaseOneDone = isPhaseOneComplete(buffs);
-  const isTarget = (buff: BuffData) => phaseOneDone === isPhaseTwoType(buff);
+  phase: BuffPhase,
+  countCompanions: boolean,
+): RemainingPermabuffs {
+  const targets = buffs.filter(
+    (buff) => isPhaseType(buff, phase) && buff.percentage < 100,
+  );
+  if (targets.length === 0) return ZERO_REMAINING;
 
-  const targets = buffs.filter((buff) => isTarget(buff) && buff.percentage < 100);
-  const companions = phaseOneDone
-    ? []
-    : buffs.filter((buff) => isPhaseTwoType(buff) && buff.percentage < 100);
-
-  if (targets.length === 0) return { min: 0, avg: 0, max: 0 };
+  const companions = countCompanions
+    ? buffs.filter(
+        (buff) => !isPhaseType(buff, phase) && buff.percentage < 100,
+      )
+    : [];
 
   const sums = targets.reduce(
     (total, buff) => {
@@ -67,3 +92,23 @@ export function calculateRemainingThrows(
     max: Math.ceil(sums.max * poolModifier),
   };
 }
+
+export function getBuffsProgress(buffs: BuffData[]): BuffsProgress {
+  const activePhase: BuffPhase = isPhaseOneComplete(buffs) ? 2 : 1;
+
+  return {
+    active: {
+      phase: activePhase,
+      percent: getPhasePercent(buffs, activePhase),
+    },
+    phaseOne: {
+      percent: getPhasePercent(buffs, 1),
+      remaining: calculatePhaseRemaining(buffs, 1, true),
+    },
+    phaseTwo: {
+      percent: getPhasePercent(buffs, 2),
+      remaining: calculatePhaseRemaining(buffs, 2, false),
+    },
+  };
+}
+
