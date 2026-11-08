@@ -1,7 +1,7 @@
 import { cx } from '../../utils/classNames';
 import styles from './CardGrid.module.css';
 
-export type CardGridVariant = 'relic' | 'slime' | 'equipment' | 'artifact';
+export type CardGridVariant = 'relic' | 'slime' | 'equipment' | 'artifact' | 'buff';
 
 interface CardGridProps {
   variant: CardGridVariant;

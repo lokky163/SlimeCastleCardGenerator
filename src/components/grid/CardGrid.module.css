@@ -25,6 +25,10 @@
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
+.buff {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
 @media (max-width: 700px) {
   .equipment {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

@@ -23,7 +23,6 @@ export const MainAppHub: React.FC = () => {
 
   const profile = useCardProfile();
   const equipmentHdRef = useRef<HTMLDivElement>(null);
-  const buffsHdRef = useRef<HTMLDivElement>(null);
   const allModulesHdRef = useRef<HTMLDivElement>(null);
 
   const phaseInfo = getActivePhaseInfo(profile.buffs);
@@ -93,8 +92,6 @@ export const MainAppHub: React.FC = () => {
           <BuffsModule
             buffs={profile.buffs}
             setBuffs={profile.setBuffs}
-            bgColor={bgColor}
-            hdRef={buffsHdRef}
             phaseInfo={phaseInfo}
             remainingThrows={remainingThrows}
           />

@@ -88,7 +88,6 @@ export class BuffData {
   }
 
   public get imageUrl(): string {
-    console.log(`../assets/buffs/${this.type}.png`);
     return new URL(`../assets/buffs/${this.type}.png`, import.meta.url).href;
   }
 

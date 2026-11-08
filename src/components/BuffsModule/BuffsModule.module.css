@@ -1,0 +1,22 @@
+.phase {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #fff;
+  background: var(--color-panel);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  border: 1px dashed #0f3460;
+  font-family: var(--font-title);
+  line-height: 1.5;
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.remaining {
+  font-size: 0.9rem;
+  color: #b0b0c0;
+  margin-top: 6px;
+  font-weight: normal;
+}
