@@ -1,4 +1,6 @@
+import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
+import modalStyles from '../ui/Modal/Modal.module.css';
 import styles from './ImagePreviewModal.module.css';
 
 interface ImagePreviewModalProps {
@@ -19,7 +21,11 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ image, onC
       {image && <img src={image} alt="Layout Preview" />}
     </div>
 
-    <button type="button" className={styles.closeBtn} onClick={onClose}>
+    <button
+      type="button"
+      className={cx(modalStyles.actionBtn, modalStyles.primaryBtn, styles.closeBtn)}
+      onClick={onClose}
+    >
       Закрыть
     </button>
   </Modal>

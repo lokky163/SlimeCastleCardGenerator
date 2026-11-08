@@ -1,4 +1,6 @@
+import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
+import modalStyles from '../ui/Modal/Modal.module.css';
 import styles from './HelpModal.module.css';
 
 interface HelpModalProps {
@@ -76,7 +78,11 @@ export const HelpModal: React.FC<HelpModalProps> = ({ open, onClose }) => (
       <HelpContent />
     </div>
 
-    <button type="button" className={styles.closeBtn} onClick={onClose}>
+    <button
+      type="button"
+      className={cx(modalStyles.actionBtn, modalStyles.primaryBtn, styles.closeBtn)}
+      onClick={onClose}
+    >
       Закрыть
     </button>
   </Modal>

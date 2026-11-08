@@ -17,3 +17,38 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   box-sizing: border-box;
 }
+
+.actionBtn {
+  padding: 8px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primaryBtn {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent-soft);
+  color: var(--color-bg);
+}
+
+.primaryBtn:hover {
+  background-color: var(--color-accent-soft);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  background-color: var(--color-panel-3);
+  color: var(--color-text);
+}
+
+.secondaryBtn:hover {
+  background-color: #3a3a5a;
+}
