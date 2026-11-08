@@ -136,13 +136,13 @@
 .btnReset {
   background-color: var(--color-danger);
   border-color: var(--color-danger-border);
-  color: #ff6b6b;
+  color: #ff3232;
   font-weight: 600;
   box-shadow: 0 0 6px rgba(139, 0, 0, 0.4);
 }
 
 .btnReset:hover {
-  background-color: #b22222;
+  background-color: #831919;
   border-color: #ff6347;
   box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
 }

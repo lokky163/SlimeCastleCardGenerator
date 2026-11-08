@@ -31,8 +31,8 @@ export const BuffPhaseBanner: React.FC<BuffPhaseBannerProps> = ({
 }) => (
   <div className={styles.phase}>
     <div className={styles.phaseHeader}>
-      <span className={styles.phaseTitle}>Перманентные бафы</span>
-      <span className={styles.phaseLegend}>Мин / Средне / Макс</span>
+      {/* <span className={styles.phaseTitle}>Перманентные бафы</span> */}
+      <span className={styles.phaseLegend}>Осталось выбить пермачей: Мин / Средне / Макс</span>
     </div>
 
     <PhaseRow title="1 фаза" progress={phaseOne} />

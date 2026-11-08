@@ -24,13 +24,13 @@ export interface EditorGridConfig {
 export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
   equipment: {
     minWidth: 120,
-    maxWidth: 360,
+    maxWidth: 230,
     minHeight: 130,
-    maxHeight: 390,
+    maxHeight: 230,
     minPerRow: 2,
     maxPerRow: 4,
     baseWidth: 150,
-    heightRatio: 209 / 195,
+    heightRatio: 209 / 207,
   },
   slime: {
     minWidth: 100,
@@ -38,7 +38,7 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     minHeight: 85,
     maxHeight: 270,
     minPerRow: 2,
-    maxPerRow: 5,
+    maxPerRow: 6,
     baseWidth: 130,
     heightRatio: 276 / 333,
   },
