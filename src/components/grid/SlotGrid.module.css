@@ -1,0 +1,24 @@
+.manualInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.indexInput {
+  width: 44px;
+  background: var(--color-panel-3);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.indexInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
