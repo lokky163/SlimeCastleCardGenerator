@@ -14,17 +14,17 @@ interface PhaseRowProps {
 
 const PhaseRow: React.FC<PhaseRowProps> = ({ title, closeLabel, progress }) => (
   <div className={styles.phaseRow}>
-    <div>
+    <span className={styles.phaseLabel}>
       {title}:{' '}
       <span className={styles.accent}>{progress.percent.toFixed(2)}%</span>
-    </div>
+    </span>
 
-    <div className={styles.remaining}>
+    <span className={styles.remaining}>
       Осталось пермачей до закрытия {closeLabel} — Мин:{' '}
       <span className={styles.accent}>{progress.remaining.min}</span> | Средне:{' '}
       <span className={styles.accent}>{progress.remaining.avg}</span> | Макс:{' '}
       <span className={styles.accent}>{progress.remaining.max}</span>
-    </div>
+    </span>
   </div>
 );
 

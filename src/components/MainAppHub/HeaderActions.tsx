@@ -9,10 +9,18 @@ interface HeaderActionsProps {
   onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onExportConfig: () => void;
   onExportImage: () => void;
+  isCollapsed: boolean;
+  showCollapseToggle: boolean;
+  onToggleCollapsed: () => void;
 }
 
 interface ImportConfigButtonProps {
   onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+interface CollapseButtonProps {
+  isCollapsed: boolean;
+  onToggle: () => void;
 }
 
 const ImportConfigButton: React.FC<ImportConfigButtonProps> = ({ onImportFile }) => {
@@ -43,12 +51,39 @@ const ImportConfigButton: React.FC<ImportConfigButtonProps> = ({ onImportFile })
   );
 };
 
+const CollapseButton: React.FC<CollapseButtonProps> = ({ isCollapsed, onToggle }) => {
+  const label = isCollapsed
+    ? 'Развернуть верхнюю панель'
+    : 'Свернуть верхнюю панель';
+
+  return (
+    <button
+      type="button"
+      className={cx(styles.actionBtn, styles.collapseBtn)}
+      aria-expanded={!isCollapsed}
+      aria-label={label}
+      title={label}
+      onClick={onToggle}
+    >
+      <span
+        className={cx(
+          styles.collapseIcon,
+          isCollapsed && styles.collapseIconDown,
+        )}
+      />
+    </button>
+  );
+};
+
 export const HeaderActions: React.FC<HeaderActionsProps> = ({
   bgColor,
   onBgColorChange,
   onImportFile,
   onExportConfig,
   onExportImage,
+  isCollapsed,
+  showCollapseToggle,
+  onToggleCollapsed,
 }) => (
   <div className={styles.toolsContainer}>
     <BgColorPicker value={bgColor} onChange={onBgColorChange} />
@@ -63,12 +98,18 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
       Сохранить схему
     </button>
 
-    <button
-      type="button"
-      className={cx(styles.actionBtn, styles.btnPng)}
-      onClick={onExportImage}
-    >
-      Сохранить изображение
-    </button>
+    <div className={styles.pngActions}>
+      <button
+        type="button"
+        className={cx(styles.actionBtn, styles.btnPng)}
+        onClick={onExportImage}
+      >
+        Сохранить изображение
+      </button>
+
+      {showCollapseToggle && (
+        <CollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapsed} />
+      )}
+    </div>
   </div>
 );

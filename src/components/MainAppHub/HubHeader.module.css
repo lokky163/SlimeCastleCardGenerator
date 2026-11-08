@@ -30,11 +30,12 @@
 .tabBtn {
   background-color: var(--color-panel-3);
   border: 1px solid var(--color-border);
-  color: #b0b0c0;
+  color: var(--color-text);
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 600;
   transition: background 0.2s, border-color 0.2s;
   white-space: nowrap;
   font-family: var(--font-ui);
@@ -67,16 +68,26 @@
   min-width: 180px;
 }
 
-.tabOption {
+.tabMenu .tabOption {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text);
   font-family: var(--font-ui);
   font-size: 0.95rem;
+  font-weight: 600;
+  padding: 8px 10px;
 }
 
-.tabOption.tabOptionActive {
+.tabMenu .tabOption:hover {
+  background: var(--color-panel-3);
+  border-color: var(--color-border);
+}
+
+.tabMenu .tabOption.tabOptionActive {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg);
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .btnHelp {
@@ -87,7 +98,7 @@
   background-color: var(--color-danger);
   border-color: var(--color-danger-border);
   color: #ff6b6b;
-  font-weight: bold;
+  font-weight: 600;
   box-shadow: 0 0 6px rgba(139, 0, 0, 0.4);
 }
 
@@ -105,8 +116,14 @@
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 0.95rem;
+  font-weight: 600;
   font-family: var(--font-ui);
   box-sizing: border-box;
+}
+
+.nameInput::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 400;
 }
 
 .toolsContainer {
@@ -123,9 +140,10 @@
 }
 
 .pickerLabel {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  color: var(--color-text);
   font-family: var(--font-ui);
+  font-weight: 600;
 }
 
 .swatches {
@@ -162,8 +180,8 @@
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: bold;
+  font-size: 0.95rem;
+  font-weight: 600;
   border: 1px solid var(--color-border);
   color: var(--color-text);
   font-family: var(--font-ui);
@@ -197,6 +215,56 @@
   background-color: var(--color-accent-soft);
 }
 
+.pngActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .fileInput {
   display: none;
+}
+
+.headerCollapsed {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.headerCollapsed .tabMenuWrap,
+.headerCollapsed .btnHelp,
+.headerCollapsed .btnReset,
+.headerCollapsed .pickerBlock,
+.headerCollapsed .btnImport,
+.headerCollapsed .btnExport,
+.headerCollapsed .btnPng {
+  display: none;
+}
+
+.collapseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background-color: var(--color-panel-3);
+}
+
+.collapseBtn:hover {
+  background-color: #3a3a5a;
+}
+
+.collapseIcon {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 6px solid currentColor;
+  transition: transform 0.2s;
+}
+
+.collapseIconDown {
+  transform: rotate(180deg);
 }

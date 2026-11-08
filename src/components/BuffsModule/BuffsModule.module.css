@@ -14,10 +14,21 @@
   margin-bottom: 4px;
 }
 
+.phaseRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+
 .phaseRow + .phaseRow {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid rgba(15, 52, 96, 0.7);
+}
+
+.phaseLabel {
+  white-space: nowrap;
 }
 
 .accent {
@@ -27,7 +38,7 @@
 .remaining {
   font-size: 0.9rem;
   color: #b0b0c0;
-  margin-top: 6px;
+  margin-top: 0;
   font-weight: normal;
 }
 

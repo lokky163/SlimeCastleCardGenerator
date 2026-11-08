@@ -36,6 +36,6 @@
   min-width: 100%;
   max-height: 320px;
   padding: 4px;
-  background: #1e1b4b;
-  border-color: #3b3775;
+  background: var(--color-panel);
+  border-color: var(--color-border);
 }
