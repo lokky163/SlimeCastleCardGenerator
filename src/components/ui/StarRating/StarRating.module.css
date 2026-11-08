@@ -1,0 +1,14 @@
+.row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--star-gap, 3px);
+  line-height: 0;
+}
+
+.star {
+  width: var(--star-size, 16px);
+  height: var(--star-size, 16px);
+  display: block;
+  object-fit: contain;
+}

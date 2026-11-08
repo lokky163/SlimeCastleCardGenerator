@@ -1,0 +1,41 @@
+.menu {
+  box-sizing: border-box;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #444;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.menu::-webkit-scrollbar {
+  display: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 83.333%;
+  max-height: 60%;
+  padding: 4%;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-height: 320px;
+  padding: 4px;
+  background: #1e1b4b;
+  border-color: #3b3775;
+}

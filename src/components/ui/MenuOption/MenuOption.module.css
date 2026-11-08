@@ -1,0 +1,33 @@
+.option {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #3d3d3d;
+  border-radius: var(--radius-sm);
+  background: #2a2a2a;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.option:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.center {
+  justify-content: center;
+}
+
+.start {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.selected {
+  background: #3a3a3a;
+  border-color: #555;
+}
