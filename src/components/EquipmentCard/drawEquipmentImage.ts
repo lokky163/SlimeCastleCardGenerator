@@ -1,8 +1,11 @@
 import type { EquipmentData } from '../../models/equipment';
 import { loadImage } from '../../services/ImageComposer';
 
-const WIDTH = 195;
-const HEIGHT = 209;
+export const EQUIPMENT_IMAGE_WIDTH = 195;
+export const EQUIPMENT_IMAGE_HEIGHT = 209;
+
+const WIDTH = EQUIPMENT_IMAGE_WIDTH;
+const HEIGHT = EQUIPMENT_IMAGE_HEIGHT;
 
 export function equipmentImageKey(equipment: EquipmentData): string {
   return ['equipment', equipment.name, equipment.grade, equipment.set, equipment.type].join(':');
