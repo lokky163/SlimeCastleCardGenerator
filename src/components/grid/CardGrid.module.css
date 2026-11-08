@@ -25,6 +25,11 @@
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
+.artifact .item,
+.equipment .item {
+  border-color: var(--color-accent);
+}
+
 .buff {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
