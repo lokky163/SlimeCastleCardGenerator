@@ -8,8 +8,7 @@ import {
   type EquipmentType,
 } from '../models/equipment';
 import { BuffData, type BuffType, BUFFS } from '../models/buff';
-import { type LayoutMode } from '../utils/relicPresets';
-import { type SlotEntry } from '../components/grid/layout';
+import { type LayoutMode, type SlotEntry } from '../components/grid/layout';
 import { ArtifactData, type ArtifactState, ARTIFACT_NAMES } from '../models/artifact';
 
 export interface IRelicsJsonModule {
