@@ -26,7 +26,8 @@
 }
 
 .artifact .item,
-.equipment .item {
+.equipment .item,
+.buff .item {
   border-color: var(--color-accent);
 }
 
