@@ -1,7 +1,14 @@
 // Ограничение всех возможных состояний звёзд артефакта
+import starYellow from '../assets/artifacts/yellow.png';
+
 export type ArtifactState = 'no' | '0' | '1y' | '2y' | '3y' | '4y' | '5y';
 
 export const ALL_ARTIFACT_STATES: ArtifactState[] = ['no', '0', '1y', '2y', '3y', '4y', '5y'];
+
+export function getArtifactStarImages(state: ArtifactState): string[] {
+  if (state === 'no' || state === '0') return [];
+  return Array<string>(parseInt(state, 10)).fill(starYellow);
+}
 
 // ЭТАЛОННЫЙ МАССИВ НАЗВАНИЙ АРТЕФАКТОВ (Сюда добавляйте новые файлы картинок .png без пробелов)
 export const ARTIFACT_NAMES = [

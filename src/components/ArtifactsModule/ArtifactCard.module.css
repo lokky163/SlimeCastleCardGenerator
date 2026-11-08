@@ -1,0 +1,120 @@
+.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.grayedOut {
+  filter: grayscale(100%) brightness(55%);
+}
+
+.name {
+  font: 700 0.85rem var(--font-title);
+  color: #fff;
+  margin-bottom: 4px;
+  min-height: 20px;
+}
+
+.starsArea {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.starsButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noStars {
+  font: 700 0.85rem var(--font-title);
+  color: #666;
+}
+
+.zeroStars {
+  font: 700 0.85rem var(--font-title);
+  color: var(--color-accent);
+}
+
+.fragmentsRow {
+  width: 100%;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input {
+  width: 100%;
+  background: var(--color-panel-3);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  text-align: center;
+  font: 700 0.9rem var(--font-ui);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+}
+
+.fragmentsValue {
+  color: var(--color-accent);
+}
+
+.separator {
+  color: #888;
+  font-weight: bold;
+}
+
+.limit {
+  background: #111122;
+  border-color: #222233;
+  color: #888999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 27px;
+}
+
+.levelRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.levelLabel {
+  font: 700 0.85rem var(--font-title);
+  color: #aaa;
+}
+
+.levelLabelDisabled {
+  color: #555;
+}
+
+.disabled {
+  background: #28284d;
+  border-color: #222233;
+  color: #555566;
+  cursor: not-allowed;
+}

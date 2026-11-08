@@ -24,7 +24,6 @@ export const MainAppHub: React.FC = () => {
   const profile = useCardProfile();
   const equipmentHdRef = useRef<HTMLDivElement>(null);
   const buffsHdRef = useRef<HTMLDivElement>(null);
-  const artifactsHdRef = useRef<HTMLDivElement>(null);
   const allModulesHdRef = useRef<HTMLDivElement>(null);
 
   const phaseInfo = getActivePhaseInfo(profile.buffs);
@@ -105,8 +104,6 @@ export const MainAppHub: React.FC = () => {
           <ArtifactsModule
             artifacts={profile.artifacts}
             setArtifacts={profile.setArtifacts}
-            bgColor={bgColor}
-            hdRef={artifactsHdRef}
           />
         )}
       </main>
