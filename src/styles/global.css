@@ -36,9 +36,9 @@ body {
   overflow: hidden;
 }
 
-button:focus,
-input:focus,
-select:focus {
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px rgba(230, 168, 23, 0.4);
 }
