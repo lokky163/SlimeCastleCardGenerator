@@ -11,13 +11,11 @@ interface HeaderActionsProps {
   onExportImage: () => void;
 }
 
-export const HeaderActions: React.FC<HeaderActionsProps> = ({
-  bgColor,
-  onBgColorChange,
-  onImportFile,
-  onExportConfig,
-  onExportImage,
-}) => {
+interface ImportConfigButtonProps {
+  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const ImportConfigButton: React.FC<ImportConfigButtonProps> = ({ onImportFile }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,9 +24,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
   };
 
   return (
-    <div className={styles.toolsContainer}>
-      <BgColorPicker value={bgColor} onChange={onBgColorChange} />
-
+    <>
       <button
         type="button"
         className={cx(styles.actionBtn, styles.btnImport)}
@@ -43,22 +39,36 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         accept=".json"
         className={styles.fileInput}
       />
-
-      <button
-        type="button"
-        className={cx(styles.actionBtn, styles.btnExport)}
-        onClick={onExportConfig}
-      >
-        Сохранить схему
-      </button>
-
-      <button
-        type="button"
-        className={cx(styles.actionBtn, styles.btnPng)}
-        onClick={onExportImage}
-      >
-        Сохранить изображение
-      </button>
-    </div>
+    </>
   );
 };
+
+export const HeaderActions: React.FC<HeaderActionsProps> = ({
+  bgColor,
+  onBgColorChange,
+  onImportFile,
+  onExportConfig,
+  onExportImage,
+}) => (
+  <div className={styles.toolsContainer}>
+    <BgColorPicker value={bgColor} onChange={onBgColorChange} />
+
+    <ImportConfigButton onImportFile={onImportFile} />
+
+    <button
+      type="button"
+      className={cx(styles.actionBtn, styles.btnExport)}
+      onClick={onExportConfig}
+    >
+      Сохранить схему
+    </button>
+
+    <button
+      type="button"
+      className={cx(styles.actionBtn, styles.btnPng)}
+      onClick={onExportImage}
+    >
+      Сохранить изображение
+    </button>
+  </div>
+);
