@@ -38,7 +38,7 @@ const ImportConfigButton: React.FC<ImportConfigButtonProps> = ({ onImportFile })
         className={cx(styles.actionBtn, styles.btnImport)}
         onClick={() => fileInputRef.current?.click()}
       >
-        Загрузить схему
+        Загрузить профиль
       </button>
       <input
         type="file"
@@ -98,7 +98,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         className={cx(styles.actionBtn, styles.btnExport)}
         onClick={onExportConfig}
       >
-        Сохранить схему
+        Сохранить профиль
       </button>
 
       <div className={styles.pngActions}>

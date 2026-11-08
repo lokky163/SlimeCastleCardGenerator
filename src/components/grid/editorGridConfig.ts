@@ -48,7 +48,7 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     minHeight: 150,
     maxHeight: 500,
     minPerRow: 2,
-    maxPerRow: 5,
+    maxPerRow: 6,
     baseWidth: 130,
     heightRatio: 349 / 228,
   },

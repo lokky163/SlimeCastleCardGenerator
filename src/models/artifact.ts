@@ -12,18 +12,39 @@ export function getArtifactStarImages(state: ArtifactState): string[] {
 
 // ЭТАЛОННЫЙ МАССИВ НАЗВАНИЙ АРТЕФАКТОВ (Сюда добавляйте новые файлы картинок .png без пробелов)
 export const ARTIFACT_NAMES = [
+  'Aelwenya',
   'Fenicis',
-  'Agnaros',
+  'Noxraith',
   'Panpan',
+  'Taranis',
+  'Agnaros',
+
+  'Auralis',
+  'Chloris',
+  'Feyria',
+  'Haku',
+  'Lunax',
+  'Maggie',
+  'Neprus',
+  'Silas',
   'Solax',
+  'Sylvia',
+  'Vinomera',
   'Vulcayen',
   'Wynne',
+  'Yolanda',
+
   'Special',
   'Fire',
   'Water',
   'Earth',
   'Wind',
-  'EpicWater',
+
+  'Epic Special',
+  'Epic Fire',
+  'Epic Water',
+  'Epic Earth',
+  'Epic Wind',
 ];
 
 export class ArtifactData {

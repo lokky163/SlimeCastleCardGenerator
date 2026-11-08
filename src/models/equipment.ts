@@ -4,7 +4,7 @@ export type EquipmentGrade =
   | 'fantasy' | 'fantasy1' | 'fantasy2';
 
 export type EquipmentType = 'sword' | 'helmet' | 'chestplate' | 'ring';
-export type EquipmentSet = 'astral' | 'egida';
+export type EquipmentSet = 'astral' | 'egida' | 'abyss';
 
 const EQUIPMENT_TYPE_ORDER: EquipmentType[] = ['sword', 'helmet', 'chestplate', 'ring'];
 
@@ -99,6 +99,12 @@ export function createInitialEquipment(): EquipmentData[] {
   types.forEach((type) => {
     const formatName = `Egida${type.charAt(0).toUpperCase() + type.slice(1)}`;
     items.push(new EquipmentData(formatName, type, 'egida', 'no'));
+  });
+
+  // Сет Abyss (номера 5-8)
+  types.forEach((type) => {
+    const formatName = `Abyss${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    items.push(new EquipmentData(formatName, type, 'abyss', 'no'));
   });
 
   return items;
