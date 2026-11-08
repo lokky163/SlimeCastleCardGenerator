@@ -1,8 +1,11 @@
 import { SLIME_ASSETS, type SlimeData, type SlimeState } from '../../models/slime';
 import { loadCardFont, loadImage } from '../../services/ImageComposer';
 
-const WIDTH = 333;
-const HEIGHT = 276;
+export const SLIME_IMAGE_WIDTH = 333;
+export const SLIME_IMAGE_HEIGHT = 276;
+
+const WIDTH = SLIME_IMAGE_WIDTH;
+const HEIGHT = SLIME_IMAGE_HEIGHT;
 
 export function slimeImageKey(slime: SlimeData, hideLevel: boolean): string {
   return [

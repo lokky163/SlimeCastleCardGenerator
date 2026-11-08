@@ -1,0 +1,8 @@
+.noText {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #aaa;
+  font-size: clamp(8px, 4cqi, 14px);
+}
