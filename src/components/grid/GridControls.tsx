@@ -48,7 +48,7 @@ interface LayoutModeSelectProps {
 
 const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange }) => (
   <label className={styles.modeBlock}>
-    <span className={styles.modeLabel}>Режим сетки:</span>
+    <span className={styles.modeLabel}>Отсутствующие:</span>
     <select
       className={styles.modeSelect}
       value={mode}

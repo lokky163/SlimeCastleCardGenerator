@@ -91,10 +91,6 @@
   background: transparent;
 }
 
-.hiddenCard {
-  filter: brightness(0.5);
-}
-
 .buffCell {
   width: 220px;
   height: 170px;

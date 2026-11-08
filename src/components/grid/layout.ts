@@ -29,8 +29,8 @@ export type SlotLayoutBase = Omit<SlotLayoutState, 'entries' | 'hiddenKeys'> & {
 export type SlotLayoutInput = SlotLayoutBase & { entries: SlotEntry[] };
 
 export const LAYOUT_MODES: Array<{ value: LayoutMode; label: string }> = [
-  { value: 'to-end', label: 'В конец' },
   { value: 'default', label: 'На месте' },
+  { value: 'to-end', label: 'В конец' },
   { value: 'hidden', label: 'Не показывать' },
   { value: 'manual', label: 'Ручные индексы' },
 ];
@@ -46,9 +46,11 @@ function buildEntries<T extends LayoutItem>(
 
   ordered.forEach((item) => {
     const hidden = hiddenKeys.has(item.key);
-    const visible = mode !== 'hidden' || (!item.isAbsent && !hidden);
+    const visible = mode !== 'hidden' || !item.isAbsent;
+    const occupiesSlot = (visible && !hidden) || mode === 'default';
+
     entries[items.indexOf(item)] = {
-      index: visible ? slot++ : -1,
+      index: occupiesSlot ? slot++ : -1,
       visible,
       hidden,
     };
@@ -91,15 +93,14 @@ export function calculateAutoSize(
   entries: SlotEntry[],
   maxCols: number,
 ): { rows: number; cols: number } {
-  const shown = entries.filter((entry) => entry.visible && entry.index >= 0).length;
-  const total = Math.max(1, shown);
+  const occupied = entries.filter((entry) => entry.index >= 0).length;
+  const total = Math.max(1, occupied);
   const cols = Math.min(Math.max(1, maxCols), total);
   return { rows: Math.ceil(total / cols), cols };
 }
 
 export interface FilledSlot<T> {
   item: T;
-  hidden: boolean;
 }
 
 export function fillSlots<T>(
@@ -111,9 +112,9 @@ export function fillSlots<T>(
 
   items.forEach((item, itemIndex) => {
     const entry = entries[itemIndex];
-    if (!entry?.visible) return;
+    if (!entry?.visible || entry.hidden) return;
     if (entry.index < 0 || entry.index >= slotCount) return;
-    slots[entry.index] = { item, hidden: entry.hidden };
+    slots[entry.index] = { item };
   });
 
   return slots;

@@ -52,7 +52,7 @@ export function SlotGrid<T extends LayoutItem>({
         return (
           <CardGridItem
             key={item.key}
-            active={entry.visible && entry.index >= 0}
+            active={entry.visible && !entry.hidden && entry.index >= 0}
             dimmed={entry.hidden}
             footer={
               mode === 'manual' ? (

@@ -33,10 +33,7 @@ export function ExportSlotGrid<T extends LayoutItem>({
     >
       {slots.map((slot, index) =>
         slot ? (
-          <div
-            key={`export-${slot.item.key}`}
-            className={cx(cellClassName, slot.hidden && styles.hiddenCard)}
-          >
+          <div key={`export-${slot.item.key}`} className={cellClassName}>
             {renderItem(slot.item)}
           </div>
         ) : (
