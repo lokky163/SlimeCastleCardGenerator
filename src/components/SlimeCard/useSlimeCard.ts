@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import type { SlimeData, SlimeState } from '../../models/slime';
 import { useComposedImage } from '../../hooks/useComposedImage';
 import {
@@ -33,6 +33,31 @@ function getClickZone(
   return 'skin';
 }
 
+function applyClickZone(
+  zone: ClickZone,
+  slime: SlimeData,
+  handlers: SlimeCardHandlers,
+  setMenuOpen: Dispatch<SetStateAction<boolean>>,
+  setEditingLevel: Dispatch<SetStateAction<boolean>>,
+): void {
+  if (zone === 'level') {
+    if (slime.state === 'no') return;
+    setMenuOpen(false);
+    setEditingLevel(true);
+    return;
+  }
+
+  if (zone === 'menu') {
+    setMenuOpen((open) => !open);
+    return;
+  }
+
+  if (zone === 'skin') {
+    setMenuOpen(false);
+    if (slime.state !== 'no') handlers.onChangeSkin?.(slime.skin);
+  }
+}
+
 export function useSlimeImage(slime: SlimeData, isEditingLevel: boolean): string {
   return useComposedImage(
     slimeImageKey(slime, isEditingLevel),
@@ -52,23 +77,7 @@ export function useSlimeInteractions(
 
   const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const zone = getClickZone(event, isEditingLevel);
-
-    if (zone === 'level') {
-      if (slime.state === 'no') return;
-      setIsMenuOpen(false);
-      setIsEditingLevel(true);
-      return;
-    }
-
-    if (zone === 'menu') {
-      setIsMenuOpen((open) => !open);
-      return;
-    }
-
-    if (zone === 'skin') {
-      setIsMenuOpen(false);
-      if (slime.state !== 'no') handlers.onChangeSkin?.(slime.skin);
-    }
+    applyClickZone(zone, slime, handlers, setIsMenuOpen, setIsEditingLevel);
   };
 
   const handleStateChange = (nextState: SlimeState) => {
