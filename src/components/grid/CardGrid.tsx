@@ -5,12 +5,30 @@ export type CardGridVariant = 'relic' | 'slime' | 'equipment' | 'artifact' | 'bu
 
 interface CardGridProps {
   variant: CardGridVariant;
+  columns?: number;
+  gridRef?: React.RefObject<HTMLDivElement | null>;
   className?: string;
   children: React.ReactNode;
 }
 
-export const CardGrid: React.FC<CardGridProps> = ({ variant, className, children }) => (
-  <div className={cx(styles.grid, styles[variant], className)}>{children}</div>
+export const CardGrid: React.FC<CardGridProps> = ({
+  variant,
+  columns,
+  gridRef,
+  className,
+  children,
+}) => (
+  <div
+    ref={gridRef}
+    className={cx(styles.grid, styles[variant], className)}
+    style={
+      columns
+        ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
+        : undefined
+    }
+  >
+    {children}
+  </div>
 );
 
 interface CardGridItemProps {

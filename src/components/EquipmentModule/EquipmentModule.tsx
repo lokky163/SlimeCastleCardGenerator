@@ -33,10 +33,10 @@ export const EquipmentModule: React.FC<EquipmentModuleProps> = ({
         items={equipment}
         layout={layout}
         variant="equipment"
-        renderCard={(item) => (
+        renderCard={(item, _itemIndex, width) => (
           <EquipmentCard
             equipment={item}
-            width={150}
+            width={width}
             onChangeGrade={(grade) => handleGradeChange(item.name, grade)}
           />
         )}

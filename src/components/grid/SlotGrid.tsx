@@ -1,4 +1,7 @@
 import { CardGrid, CardGridItem, type CardGridVariant } from './CardGrid';
+import { EDITOR_GRID_CONFIG } from './editorGridConfig';
+import { ScaledCard } from './ScaledCard';
+import { useEditorGrid } from './useEditorGrid';
 import { VisibilityToggle } from './VisibilityToggle';
 import type { LayoutItem } from './layout';
 import type { SlotLayoutController } from './useSlotLayout';
@@ -8,7 +11,7 @@ interface SlotGridProps<T extends LayoutItem> {
   items: T[];
   layout: SlotLayoutController;
   variant: CardGridVariant;
-  renderCard: (item: T, itemIndex: number) => React.ReactNode;
+  renderCard: (item: T, itemIndex: number, baseWidth: number) => React.ReactNode;
 }
 
 interface SlotIndexInputProps {
@@ -42,9 +45,11 @@ export function SlotGrid<T extends LayoutItem>({
 }: SlotGridProps<T>) {
   const { entries, mode, hiddenKeys, hideEnabled, rows, cols } = layout;
   const slotCount = rows * cols;
+  const config = EDITOR_GRID_CONFIG[variant];
+  const { gridRef, columns, cardWidth } = useEditorGrid(variant, items.length);
 
   return (
-    <CardGrid variant={variant}>
+    <CardGrid variant={variant} columns={columns} gridRef={gridRef}>
       {items.map((item, itemIndex) => {
         const entry = entries[itemIndex] ?? { index: -1, visible: false, hidden: false };
         const isHidden = hiddenKeys.includes(item.key);
@@ -69,7 +74,9 @@ export function SlotGrid<T extends LayoutItem>({
               ) : undefined
             }
           >
-            {renderCard(item, itemIndex)}
+            <ScaledCard width={cardWidth} baseWidth={config.baseWidth}>
+              {renderCard(item, itemIndex, config.baseWidth)}
+            </ScaledCard>
           </CardGridItem>
         );
       })}

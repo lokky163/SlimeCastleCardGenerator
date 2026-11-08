@@ -35,10 +35,10 @@ export const SlimesModule: React.FC<SlimesModuleProps> = ({
       items={slimes}
       layout={layout}
       variant="slime"
-      renderCard={(slime) => (
+      renderCard={(slime, _itemIndex, width) => (
         <SlimeCard
           slime={slime}
-          width={130}
+          width={width}
           onChangeState={(state) => onChangeState(slime.name, state)}
           onChangeLevel={(level) => onChangeLevel(slime.name, level)}
           onChangeSkin={() => onChangeSkin(slime.name, slime.nextSkin())}

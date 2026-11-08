@@ -1,0 +1,8 @@
+.frame {
+  position: relative;
+  flex: none;
+}
+
+.content {
+  transform-origin: top left;
+}
