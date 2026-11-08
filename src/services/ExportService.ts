@@ -1,4 +1,4 @@
-import { toPng } from 'html-to-image';
+﻿import { toPng } from 'html-to-image';
 import { RelicData, type RelicState, RELIC_NAMES } from '../models/relic';
 import { SlimeData, type SlimeState, slimeLists } from '../models/slime';
 import {
@@ -35,7 +35,7 @@ export interface ISlimesJsonModule {
   }>;
 }
 
-// Новая структура JSON-модуля Снаряжения
+// ╨¥╨╛╨▓╨░╤Å ╤ü╤é╤Ç╤â╨║╤é╤â╤Ç╨░ JSON-╨╝╨╛╨┤╤â╨╗╤Å ╨í╨╜╨░╤Ç╤Å╨╢╨╡╨╜╨╕╤Å
 export interface IEquipmentJsonModule {
   equipmentList: Array<{
     name: string;
@@ -60,9 +60,9 @@ export interface IImportedSccData {
   playerName: string;
   relics: { rows: number; cols: number; layoutMode: LayoutMode; relicsList: RelicData[]; entries: SlotEntry[] } | null;
   slimes: { rows: number; cols: number; layoutMode: LayoutMode; slimesList: SlimeData[]; entries: SlotEntry[] } | null;
-  equipment: EquipmentData[] | null; // Возвращаем плоский массив снаряжения
-  buffs: BuffData[] | null; // Возвращаем плоский проверенный массив баффов
-  artifacts: ArtifactData[] | null; // Новый массив в структуре импорта
+  equipment: EquipmentData[] | null; // ╨Æ╨╛╨╖╨▓╤Ç╨░╤ë╨░╨╡╨╝ ╨┐╨╗╨╛╤ü╨║╨╕╨╣ ╨╝╨░╤ü╤ü╨╕╨▓ ╤ü╨╜╨░╤Ç╤Å╨╢╨╡╨╜╨╕╤Å
+  buffs: BuffData[] | null; // ╨Æ╨╛╨╖╨▓╤Ç╨░╤ë╨░╨╡╨╝ ╨┐╨╗╨╛╤ü╨║╨╕╨╣ ╨┐╤Ç╨╛╨▓╨╡╤Ç╨╡╨╜╨╜╤ï╨╣ ╨╝╨░╤ü╤ü╨╕╨▓ ╨▒╨░╤ä╤ä╨╛╨▓
+  artifacts: ArtifactData[] | null; // ╨¥╨╛╨▓╤ï╨╣ ╨╝╨░╤ü╤ü╨╕╨▓ ╨▓ ╤ü╤é╤Ç╤â╨║╤é╤â╤Ç╨╡ ╨╕╨╝╨┐╨╛╤Ç╤é╨░
 }
 
 function packSlot(entry: SlotEntry | undefined, layoutMode: LayoutMode) {
@@ -78,6 +78,7 @@ function unpackSlot(slotIndex: number | undefined, visible: boolean | undefined)
   return {
     index: slotIndex ?? -1,
     visible: visible ?? true,
+    hidden: false,
   };
 }
 
@@ -86,8 +87,10 @@ function resolveEntry(
   item: { slotIndex?: number; visible?: boolean } | undefined,
   autoIndex: number,
 ): SlotEntry {
-  if (layoutMode !== 'manual') return { index: autoIndex, visible: true };
-  return item ? unpackSlot(item.slotIndex, item.visible) : { index: -1, visible: true };
+  if (layoutMode !== 'manual') return { index: autoIndex, visible: true, hidden: false };
+  return item
+    ? unpackSlot(item.slotIndex, item.visible)
+    : { index: -1, visible: true, hidden: false };
 }
 
 function importRelics(module: IRelicsJsonModule | null): IImportedSccData['relics'] {
@@ -228,17 +231,17 @@ export class ExportService {
   static curFormattedDate() {
     const now = new Date();
     
-    // Функция для добавления ведущего нуля (например: 9 -> "09")
+    // ╨ñ╤â╨╜╨║╤å╨╕╤Å ╨┤╨╗╤Å ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╕╤Å ╨▓╨╡╨┤╤â╤ë╨╡╨│╨╛ ╨╜╤â╨╗╤Å (╨╜╨░╨┐╤Ç╨╕╨╝╨╡╤Ç: 9 -> "09")
     const pad = (num: number) => String(num).padStart(2, '0');
 
     const year = now.getFullYear();
-    const month = pad(now.getMonth() + 1); // Месяцы начинаются с 0
+    const month = pad(now.getMonth() + 1); // ╨£╨╡╤ü╤Å╤å╤ï ╨╜╨░╤ç╨╕╨╜╨░╤Ä╤é╤ü╤Å ╤ü 0
     const day = pad(now.getDate());
     const hours = pad(now.getHours());
     const minutes = pad(now.getMinutes());
     const seconds = pad(now.getSeconds());
 
-    // Формат: "19_15-18.07.2026" — полностью безопасен для файловых систем
+    // ╨ñ╨╛╤Ç╨╝╨░╤é: "19_15-18.07.2026" ΓÇö ╨┐╨╛╨╗╨╜╨╛╤ü╤é╤î╤Ä ╨▒╨╡╨╖╨╛╨┐╨░╤ü╨╡╨╜ ╨┤╨╗╤Å ╤ä╨░╨╣╨╗╨╛╨▓╤ï╤à ╤ü╨╕╤ü╤é╨╡╨╝
     return `${year}.${month}.${day}-${hours}.${minutes}.${seconds}`;
   }
     
@@ -300,13 +303,13 @@ static exportToScc(
     try {
       const dataUrl = await toPng(element, {
         cacheBust: true,
-        pixelRatio: 1, // 2 сделает картинку четкой на Retina-экранах айфонов
+        pixelRatio: 1, // 2 ╤ü╨┤╨╡╨╗╨░╨╡╤é ╨║╨░╤Ç╤é╨╕╨╜╨║╤â ╤ç╨╡╤é╨║╨╛╨╣ ╨╜╨░ Retina-╤ì╨║╤Ç╨░╨╜╨░╤à ╨░╨╣╤ä╨╛╨╜╨╛╨▓
         style: { left: '0', top: '0', transform: 'translate(0, 0)' }
       });
       
-      return dataUrl; // Возвращаем dataUrl (base64) для отображения в React
+      return dataUrl; // ╨Æ╨╛╨╖╨▓╤Ç╨░╤ë╨░╨╡╨╝ dataUrl (base64) ╨┤╨╗╤Å ╨╛╤é╨╛╨▒╤Ç╨░╨╢╨╡╨╜╨╕╤Å ╨▓ React
     } catch (error) {
-      console.error('Ошибка при генерации PNG:', error);
+      console.error('╨₧╤ê╨╕╨▒╨║╨░ ╨┐╤Ç╨╕ ╨│╨╡╨╜╨╡╤Ç╨░╤å╨╕╨╕ PNG:', error);
       return null;
     }
   }

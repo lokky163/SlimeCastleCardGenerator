@@ -39,6 +39,14 @@ export class ArtifactData {
     this.fragments = fragments;
   }
 
+  public get key(): string {
+    return this.name;
+  }
+
+  public get isAbsent(): boolean {
+    return this.state === 'no';
+  }
+
   // Порядковый номер артефакта на основе его позиции в эталонном массиве
   public get order(): number {
     const idx = ARTIFACT_NAMES.indexOf(this.name);

@@ -15,6 +15,7 @@ export const CardGrid: React.FC<CardGridProps> = ({ variant, className, children
 
 interface CardGridItemProps {
   active?: boolean;
+  dimmed?: boolean;
   className?: string;
   footer?: React.ReactNode;
   children: React.ReactNode;
@@ -22,12 +23,13 @@ interface CardGridItemProps {
 
 export const CardGridItem: React.FC<CardGridItemProps> = ({
   active = false,
+  dimmed = false,
   className,
   footer,
   children,
 }) => (
   <div className={cx(styles.item, active && styles.active, className)}>
-    <div className={styles.card}>{children}</div>
+    <div className={cx(styles.card, dimmed && styles.dimmed)}>{children}</div>
     {footer && <div className={styles.footer}>{footer}</div>}
   </div>
 );

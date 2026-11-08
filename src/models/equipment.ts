@@ -6,6 +6,8 @@ export type EquipmentGrade =
 export type EquipmentType = 'sword' | 'helmet' | 'chestplate' | 'ring';
 export type EquipmentSet = 'astral' | 'egida';
 
+const EQUIPMENT_TYPE_ORDER: EquipmentType[] = ['sword', 'helmet', 'chestplate', 'ring'];
+
 export class EquipmentData {
   public name: string;        // Уникальный ID, например "1-AstralSword"
   public type: EquipmentType;  // Тип предмета
@@ -17,6 +19,19 @@ export class EquipmentData {
     this.type = type;
     this.set = set;
     this.grade = grade;
+  }
+
+  public get key(): string {
+    return this.name;
+  }
+
+  public get order(): number {
+    const setOffset = this.set === 'astral' ? 0 : EQUIPMENT_TYPE_ORDER.length;
+    return setOffset + EQUIPMENT_TYPE_ORDER.indexOf(this.type);
+  }
+
+  public get isAbsent(): boolean {
+    return this.grade === 'no';
   }
 
   // 1. Слои: Путь к картинке ФОНА (195x209)

@@ -1,4 +1,5 @@
 import { CardGrid, CardGridItem, type CardGridVariant } from './CardGrid';
+import { VisibilityToggle } from './VisibilityToggle';
 import type { LayoutItem, LayoutMode, SlotEntry } from './layout';
 import styles from './SlotGrid.module.css';
 
@@ -7,9 +8,10 @@ interface SlotGridProps<T extends LayoutItem> {
   entries: SlotEntry[];
   mode: LayoutMode;
   variant: CardGridVariant;
-  getKey: (item: T) => React.Key;
   renderCard: (item: T, itemIndex: number) => React.ReactNode;
   onSlotIndexChange: (itemIndex: number, slotIndex: number) => void;
+  onToggleHidden: (key: string) => void;
+  hiddenKeys: string[];
   slotCount: number;
 }
 
@@ -41,20 +43,23 @@ export function SlotGrid<T extends LayoutItem>({
   entries,
   mode,
   variant,
-  getKey,
   renderCard,
   onSlotIndexChange,
+  onToggleHidden,
+  hiddenKeys,
   slotCount,
 }: SlotGridProps<T>) {
   return (
     <CardGrid variant={variant}>
       {items.map((item, itemIndex) => {
-        const entry = entries[itemIndex] ?? { index: -1, visible: false };
+        const entry = entries[itemIndex] ?? { index: -1, visible: false, hidden: false };
+        const isHidden = hiddenKeys.includes(item.key);
 
         return (
           <CardGridItem
-            key={getKey(item)}
+            key={item.key}
             active={entry.visible && entry.index >= 0}
+            dimmed={mode !== 'manual' && isHidden}
             footer={
               mode === 'manual' ? (
                 <SlotIndexInput
@@ -62,7 +67,12 @@ export function SlotGrid<T extends LayoutItem>({
                   max={slotCount - 1}
                   onChange={(slotIndex) => onSlotIndexChange(itemIndex, slotIndex)}
                 />
-              ) : null
+              ) : (
+                <VisibilityToggle
+                  hidden={isHidden}
+                  onToggle={() => onToggleHidden(item.key)}
+                />
+              )
             }
           >
             {renderCard(item, itemIndex)}

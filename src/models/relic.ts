@@ -53,6 +53,14 @@ export class RelicData {
     return this._name;
   }
 
+  public get key(): string {
+    return this._name;
+  }
+
+  public get isAbsent(): boolean {
+    return this._state === 'no';
+  }
+
   public get state(): RelicState {
     return this._state;
   }

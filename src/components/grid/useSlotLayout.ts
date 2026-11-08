@@ -4,6 +4,8 @@ import {
   type LayoutItem,
   type LayoutMode,
   type SlotEntry,
+  type SlotLayoutBase,
+  type SlotLayoutInput,
   type SlotLayoutState,
 } from './layout';
 
@@ -13,11 +15,10 @@ export interface SlotLayoutController extends SlotLayoutState {
   setMode: (mode: LayoutMode) => void;
   setSlotIndex: (itemIndex: number, slotIndex: number) => void;
   setSlotVisible: (itemIndex: number, visible: boolean) => void;
-  applyLayout: (layout: SlotLayoutState) => void;
+  setItemHidden: (key: string, hidden: boolean) => void;
+  applyLayout: (layout: SlotLayoutInput) => void;
   resetLayout: () => void;
 }
-
-type SlotLayoutBase = Omit<SlotLayoutState, 'entries'>;
 
 type LayoutAction =
   | { type: 'setRows'; rows: number }
@@ -25,12 +26,18 @@ type LayoutAction =
   | { type: 'setMode'; mode: LayoutMode }
   | { type: 'setSlotIndex'; itemIndex: number; slotIndex: number }
   | { type: 'setSlotVisible'; itemIndex: number; visible: boolean }
-  | { type: 'apply'; layout: SlotLayoutState }
+  | { type: 'setItemHidden'; key: string; hidden: boolean }
+  | { type: 'apply'; layout: SlotLayoutInput }
   | { type: 'reset'; initial: SlotLayoutBase }
   | { type: 'sync' };
 
 function createState(initial: SlotLayoutBase, items: LayoutItem[]): SlotLayoutState {
-  return { ...initial, entries: calculateSlotEntries(items, initial.mode, []) };
+  const hiddenKeys = initial.hiddenKeys ?? [];
+  return {
+    ...initial,
+    hiddenKeys,
+    entries: calculateSlotEntries(items, initial.mode, [], hiddenKeys),
+  };
 }
 
 function updateEntry(
@@ -51,21 +58,50 @@ function changeMode(
   mode: LayoutMode,
   items: LayoutItem[],
 ): SlotLayoutState {
-  const entries =
-    mode === 'manual'
-      ? state.entries
-      : calculateSlotEntries(items, mode, state.entries);
+  if (mode === 'manual') {
+    const entries = state.entries.map((entry) => ({ ...entry, hidden: false }));
+    return { ...state, mode, entries };
+  }
 
-  return { ...state, mode, entries };
+  return {
+    ...state,
+    mode,
+    entries: calculateSlotEntries(items, mode, state.entries, state.hiddenKeys),
+  };
 }
 
-function applyState(layout: SlotLayoutState, items: LayoutItem[]): SlotLayoutState {
-  const entries =
-    layout.mode === 'manual'
-      ? layout.entries
-      : calculateSlotEntries(items, layout.mode, layout.entries);
+function applyState(layout: SlotLayoutInput, items: LayoutItem[]): SlotLayoutState {
+  const hiddenKeys = layout.hiddenKeys ?? [];
 
-  return { ...layout, entries };
+  if (layout.mode === 'manual') {
+    const entries = layout.entries.map((entry) => ({ ...entry, hidden: false }));
+    return { ...layout, hiddenKeys, entries };
+  }
+
+  return {
+    ...layout,
+    hiddenKeys,
+    entries: calculateSlotEntries(items, layout.mode, layout.entries, hiddenKeys),
+  };
+}
+
+function changeHidden(
+  state: SlotLayoutState,
+  key: string,
+  hidden: boolean,
+  items: LayoutItem[],
+): SlotLayoutState {
+  const hiddenKeys = hidden
+    ? [...new Set([...state.hiddenKeys, key])]
+    : state.hiddenKeys.filter((itemKey) => itemKey !== key);
+
+  if (state.mode === 'manual') return { ...state, hiddenKeys };
+
+  return {
+    ...state,
+    hiddenKeys,
+    entries: calculateSlotEntries(items, state.mode, state.entries, hiddenKeys),
+  };
 }
 
 function reduceLayout(
@@ -84,6 +120,8 @@ function reduceLayout(
       return updateEntry(state, action.itemIndex, { index: action.slotIndex });
     case 'setSlotVisible':
       return updateEntry(state, action.itemIndex, { visible: action.visible });
+    case 'setItemHidden':
+      return changeHidden(state, action.key, action.hidden, items);
     case 'apply':
       return applyState(action.layout, items);
     case 'reset':
@@ -93,7 +131,12 @@ function reduceLayout(
         ? state
         : {
             ...state,
-            entries: calculateSlotEntries(items, state.mode, state.entries),
+            entries: calculateSlotEntries(
+              items,
+              state.mode,
+              state.entries,
+              state.hiddenKeys,
+            ),
           };
   }
 }
@@ -122,6 +165,7 @@ export function useSlotLayout<T extends LayoutItem>(
       dispatch({ type: 'setSlotIndex', itemIndex, slotIndex }),
     setSlotVisible: (itemIndex, visible) =>
       dispatch({ type: 'setSlotVisible', itemIndex, visible }),
+    setItemHidden: (key, hidden) => dispatch({ type: 'setItemHidden', key, hidden }),
     applyLayout: (layout) => dispatch({ type: 'apply', layout }),
     resetLayout: () => dispatch({ type: 'reset', initial }),
   };

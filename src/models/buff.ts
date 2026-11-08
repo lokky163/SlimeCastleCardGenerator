@@ -75,6 +75,18 @@ export class BuffData {
     this.value = value;
   }
 
+  public get key(): string {
+    return this.type;
+  }
+
+  public get order(): number {
+    return BUFFS.indexOf(this.type);
+  }
+
+  public get isAbsent(): boolean {
+    return false;
+  }
+
   public get cleanName(): string {
     return BUFF_NAMES[this.type];
   }

@@ -45,6 +45,7 @@ const ArtifactsTab: React.FC<TabProps> = ({ profile }) => (
   <ArtifactsModule
     artifacts={profile.artifacts}
     setArtifacts={profile.setArtifacts}
+    layout={profile.artifactLayout}
   />
 );
 
@@ -52,6 +53,7 @@ const EquipmentTab: React.FC<TabProps> = ({ profile }) => (
   <EquipmentModule
     equipment={profile.equipment}
     setEquipment={profile.setEquipment}
+    layout={profile.equipmentLayout}
   />
 );
 
@@ -63,6 +65,7 @@ const BuffsTab: React.FC<BuffsTabProps> = ({
   <BuffsModule
     buffs={profile.buffs}
     setBuffs={profile.setBuffs}
+    layout={profile.buffLayout}
     phaseInfo={phaseInfo}
     remainingThrows={remainingThrows}
   />

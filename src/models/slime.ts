@@ -195,6 +195,8 @@ export class SlimeData {
   
   // Геттеры и сеттеры
   public get name(): string { return this._name; }
+  public get key(): string { return this._name; }
+  public get isAbsent(): boolean { return this._state === 'no'; }
   public get rarity(): SlimeRarity { return this._rarity; }
   
   public get state(): SlimeState { return this._state; }

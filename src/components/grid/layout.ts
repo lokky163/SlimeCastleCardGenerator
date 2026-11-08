@@ -1,13 +1,15 @@
 export type LayoutMode = 'default' | 'to-end' | 'hidden' | 'manual';
 
 export interface LayoutItem {
+  key: string;
   order: number;
-  state: string;
+  isAbsent: boolean;
 }
 
 export interface SlotEntry {
   index: number;
   visible: boolean;
+  hidden: boolean;
 }
 
 export interface SlotLayoutState {
@@ -15,7 +17,14 @@ export interface SlotLayoutState {
   cols: number;
   mode: LayoutMode;
   entries: SlotEntry[];
+  hiddenKeys: string[];
 }
+
+export type SlotLayoutBase = Omit<SlotLayoutState, 'entries' | 'hiddenKeys'> & {
+  hiddenKeys?: string[];
+};
+
+export type SlotLayoutInput = SlotLayoutBase & { entries: SlotEntry[] };
 
 export const LAYOUT_MODES: Array<{ value: LayoutMode; label: string }> = [
   { value: 'to-end', label: 'В конец' },
@@ -27,48 +36,52 @@ export const LAYOUT_MODES: Array<{ value: LayoutMode; label: string }> = [
 function buildEntries<T extends LayoutItem>(
   items: T[],
   ordered: T[],
-  isVisible: (item: T) => boolean,
+  mode: LayoutMode,
+  hiddenKeys: Set<string>,
 ): SlotEntry[] {
   const entries = new Array<SlotEntry>(items.length);
   let slot = 0;
 
   ordered.forEach((item) => {
-    const itemIndex = items.indexOf(item);
-    const visible = isVisible(item);
-    entries[itemIndex] = { index: visible ? slot++ : -1, visible };
+    const hidden = hiddenKeys.has(item.key);
+    const visible = mode !== 'hidden' || (!item.isAbsent && !hidden);
+    entries[items.indexOf(item)] = {
+      index: visible ? slot++ : -1,
+      visible,
+      hidden,
+    };
   });
 
   return entries;
+}
+
+function orderItems<T extends LayoutItem>(
+  items: T[],
+  mode: LayoutMode,
+  hiddenKeys: Set<string>,
+): T[] {
+  const ordered = [...items].sort((a, b) => a.order - b.order);
+
+  if (mode === 'to-end') {
+    const front = ordered.filter((item) => !item.isAbsent && !hiddenKeys.has(item.key));
+    const end = ordered.filter((item) => item.isAbsent || hiddenKeys.has(item.key));
+    return [...front, ...end];
+  }
+
+  return ordered;
 }
 
 export function calculateSlotEntries<T extends LayoutItem>(
   items: T[],
   mode: LayoutMode,
   current: SlotEntry[],
+  hiddenKeys: string[] = [],
 ): SlotEntry[] {
   if (mode === 'manual' && current.length === items.length) return current;
 
-  const ordered = [...items].sort((a, b) => a.order - b.order);
-
-  if (mode === 'hidden') {
-    return buildEntries(items, ordered, (item) => item.state !== 'no');
-  }
-
-  if (mode === 'to-end') {
-    const present = ordered.filter((item) => item.state !== 'no');
-    const absent = ordered.filter((item) => item.state === 'no');
-    return buildEntries(items, [...present, ...absent], () => true);
-  }
-
-  return buildEntries(items, ordered, () => true);
-}
-
-export function entriesToIndices(entries: SlotEntry[]): number[] {
-  return entries.map((entry) => (entry.visible ? entry.index : -1));
-}
-
-export function indicesToEntries(indices: number[]): SlotEntry[] {
-  return indices.map((index) => ({ index, visible: true }));
+  const hiddenSet = new Set(hiddenKeys);
+  const ordered = orderItems(items, mode, hiddenSet);
+  return buildEntries(items, ordered, mode, hiddenSet);
 }
 
 export function fillSlots<T>(

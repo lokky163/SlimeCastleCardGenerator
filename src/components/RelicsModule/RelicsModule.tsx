@@ -42,7 +42,8 @@ export const RelicsModule: React.FC<RelicsModuleProps> = ({
         mode={layout.mode}
         slotCount={layout.rows * layout.cols}
         variant="relic"
-        getKey={(relic) => relic.name}
+        hiddenKeys={layout.hiddenKeys}
+        onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
         onSlotIndexChange={layout.setSlotIndex}
         renderCard={(relic) => (
           <RelicCard

@@ -44,7 +44,8 @@ export const SlimesModule: React.FC<SlimesModuleProps> = ({
       mode={layout.mode}
       slotCount={layout.rows * layout.cols}
       variant="slime"
-      getKey={(slime) => slime.name}
+      hiddenKeys={layout.hiddenKeys}
+      onToggleHidden={(key) => layout.setItemHidden(key, !layout.hiddenKeys.includes(key))}
       onSlotIndexChange={layout.setSlotIndex}
       renderCard={(slime) => (
         <SlimeCard
