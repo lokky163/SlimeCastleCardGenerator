@@ -22,7 +22,6 @@ export const MainAppHub: React.FC = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const profile = useCardProfile();
-  const equipmentHdRef = useRef<HTMLDivElement>(null);
   const allModulesHdRef = useRef<HTMLDivElement>(null);
 
   const phaseInfo = getActivePhaseInfo(profile.buffs);
@@ -83,8 +82,6 @@ export const MainAppHub: React.FC = () => {
           <EquipmentModule
             equipment={profile.equipment}
             setEquipment={profile.setEquipment}
-            bgColor={bgColor}
-            hdRef={equipmentHdRef}
           />
         )}
 
