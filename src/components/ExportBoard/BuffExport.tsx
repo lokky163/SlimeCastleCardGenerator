@@ -1,9 +1,12 @@
 import { BUFF_CONFIG, splitBuffName, type BuffData } from '../../models/buff';
+import type { SlotLayoutState } from '../grid/layout';
 import { ExportSection } from './ExportSection';
+import { ExportSlotGrid } from './ExportSlotGrid';
 import styles from './ExportBoard.module.css';
 
 interface BuffExportProps {
   buffs: BuffData[];
+  layout: SlotLayoutState;
   phaseInfo: { phase: number; percent: number };
 }
 
@@ -15,13 +18,7 @@ const BuffExportCard: React.FC<BuffExportCardProps> = ({ buff }) => {
   const nameLines = splitBuffName(buff.cleanName);
 
   return (
-    <div
-      className={styles.buffCard}
-      style={{
-        width: `${BUFF_CONFIG.export.cardWidth}px`,
-        height: `${BUFF_CONFIG.export.cardHeight}px`,
-      }}
-    >
+    <div className={styles.buffCard}>
       <img
         src={buff.imageUrl}
         alt=""
@@ -52,7 +49,11 @@ const BuffExportCard: React.FC<BuffExportCardProps> = ({ buff }) => {
   );
 };
 
-export const BuffExport: React.FC<BuffExportProps> = ({ buffs, phaseInfo }) => (
+export const BuffExport: React.FC<BuffExportProps> = ({
+  buffs,
+  layout,
+  phaseInfo,
+}) => (
   <ExportSection
     title={
       <>
@@ -63,15 +64,13 @@ export const BuffExport: React.FC<BuffExportProps> = ({ buffs, phaseInfo }) => (
       </>
     }
   >
-    <div
-      className={styles.buffGrid}
-      style={{
-        gridTemplateColumns: `repeat(${BUFF_CONFIG.export.cols}, ${BUFF_CONFIG.export.cardWidth}px)`,
-      }}
-    >
-      {buffs.map((buff) => (
-        <BuffExportCard key={`export-buff-${buff.type}`} buff={buff} />
-      ))}
-    </div>
+    <ExportSlotGrid
+      items={buffs}
+      layout={layout}
+      cellWidth={BUFF_CONFIG.export.cardWidth}
+      cellHeight={BUFF_CONFIG.export.cardHeight}
+      cellClassName={styles.buffCell}
+      renderItem={(buff) => <BuffExportCard buff={buff} />}
+    />
   </ExportSection>
 );

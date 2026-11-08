@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import type { CardProfile } from '../../hooks/useCardProfile';
-import { ExportBoard } from '../ExportBoard/ExportBoard';
 import type { ExportSelection } from '../ExportBoard/exportSelection';
+import { ExportBoard } from '../ExportBoard/ExportBoard';
 
 interface HubExportBoardProps {
   profile: CardProfile;
@@ -24,12 +24,15 @@ export const HubExportBoard: React.FC<HubExportBoardProps> = ({
     bgColor={bgColor}
     totalSlimeBonus={profile.totalSlimeBonus}
     equipment={profile.equipment}
+    equipmentLayout={profile.equipmentLayout}
     relics={profile.relics}
     relicLayout={profile.relicLayout}
     slimes={profile.slimes}
     slimeLayout={profile.slimeLayout}
     buffs={profile.buffs}
+    buffLayout={profile.buffLayout}
     artifacts={profile.artifacts}
+    artifactLayout={profile.artifactLayout}
     phaseInfo={phaseInfo}
     selection={selection}
   />

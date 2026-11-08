@@ -84,18 +84,23 @@ export function calculateSlotEntries<T extends LayoutItem>(
   return buildEntries(items, ordered, mode, hiddenSet);
 }
 
+export interface FilledSlot<T> {
+  item: T;
+  hidden: boolean;
+}
+
 export function fillSlots<T>(
   items: T[],
   entries: SlotEntry[],
   slotCount: number,
-): Array<T | null> {
-  const slots = new Array<T | null>(slotCount).fill(null);
+): Array<FilledSlot<T> | null> {
+  const slots = new Array<FilledSlot<T> | null>(slotCount).fill(null);
 
   items.forEach((item, itemIndex) => {
     const entry = entries[itemIndex];
     if (!entry?.visible) return;
     if (entry.index < 0 || entry.index >= slotCount) return;
-    slots[entry.index] = item;
+    slots[entry.index] = { item, hidden: entry.hidden };
   });
 
   return slots;
