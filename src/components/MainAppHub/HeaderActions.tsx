@@ -86,30 +86,34 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
   onToggleCollapsed,
 }) => (
   <div className={styles.toolsContainer}>
-    <BgColorPicker value={bgColor} onChange={onBgColorChange} />
+    <div className={styles.pickerGroup}>
+      <BgColorPicker value={bgColor} onChange={onBgColorChange} />
+    </div>
 
-    <ImportConfigButton onImportFile={onImportFile} />
+    <div className={styles.actionGroup}>
+      <ImportConfigButton onImportFile={onImportFile} />
 
-    <button
-      type="button"
-      className={cx(styles.actionBtn, styles.btnExport)}
-      onClick={onExportConfig}
-    >
-      Сохранить схему
-    </button>
-
-    <div className={styles.pngActions}>
       <button
         type="button"
-        className={cx(styles.actionBtn, styles.btnPng)}
-        onClick={onExportImage}
+        className={cx(styles.actionBtn, styles.btnExport)}
+        onClick={onExportConfig}
       >
-        Сохранить изображение
+        Сохранить схему
       </button>
 
-      {showCollapseToggle && (
-        <CollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapsed} />
-      )}
+      <div className={styles.pngActions}>
+        <button
+          type="button"
+          className={cx(styles.actionBtn, styles.btnPng)}
+          onClick={onExportImage}
+        >
+          Сохранить изображение
+        </button>
+
+        {showCollapseToggle && (
+          <CollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapsed} />
+        )}
+      </div>
     </div>
   </div>
 );

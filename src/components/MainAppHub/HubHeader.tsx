@@ -121,25 +121,23 @@ const HeaderControls: React.FC<HeaderControlsProps> = ({
       </span>
     </button>
 
-    <div className={styles.tabContainer}>
-      <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
+    <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
 
-      <button type="button" className={cx(styles.tabBtn, styles.btnHelp)} onClick={onOpenHelp}>
-        Справка
-      </button>
+    <button type="button" className={cx(styles.tabBtn, styles.btnHelp)} onClick={onOpenHelp}>
+      Справка
+    </button>
 
-      <input
-        type="text"
-        value={profile.playerName}
-        onChange={(event) => profile.setPlayerName(event.target.value)}
-        placeholder="Ник игрока"
-        className={styles.nameInput}
-      />
+    <input
+      type="text"
+      value={profile.playerName}
+      onChange={(event) => profile.setPlayerName(event.target.value)}
+      placeholder="Ник игрока"
+      className={styles.nameInput}
+    />
 
-      <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onRequestReset}>
-        Сбросить
-      </button>
-    </div>
+    <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onRequestReset}>
+      Сбросить
+    </button>
   </div>
 );
 

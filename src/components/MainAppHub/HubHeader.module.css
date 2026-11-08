@@ -13,7 +13,7 @@
 .leftGroup {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
   flex: 1 1 auto;
   min-width: 0;
@@ -27,7 +27,6 @@
   height: 36px;
   padding: 0;
   flex-shrink: 0;
-  align-self: flex-start;
 }
 
 .profilesBtnOpen {
@@ -47,15 +46,6 @@
   height: 2px;
   background-color: currentColor;
   border-radius: 1px;
-}
-
-.tabContainer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .tabMenuWrap {
@@ -171,6 +161,14 @@
 }
 
 .toolsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pickerGroup,
+.actionGroup {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -311,4 +309,25 @@
 
 .collapseIconDown {
   transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .header:not(.headerCollapsed) .leftGroup {
+    flex-basis: 100%;
+  }
+
+  .header:not(.headerCollapsed) .toolsContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .header:not(.headerCollapsed) .pickerGroup,
+  .header:not(.headerCollapsed) .actionGroup {
+    width: 100%;
+  }
+
+  .headerCollapsed .pickerGroup {
+    display: none;
+  }
 }
