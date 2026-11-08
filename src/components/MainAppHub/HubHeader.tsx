@@ -15,6 +15,7 @@ interface HubHeaderProps {
   onBgColorChange: (color: string) => void;
   onToggleProfiles: () => void;
   onOpenHelp: () => void;
+  onRequestReset: () => void;
   onExportImage: () => void;
 }
 
@@ -25,6 +26,7 @@ interface HeaderControlsProps {
   onTabChange: (tab: AppTab) => void;
   onToggleProfiles: () => void;
   onOpenHelp: () => void;
+  onRequestReset: () => void;
 }
 
 const WRAP_TOLERANCE_PX = 8;
@@ -100,6 +102,7 @@ const HeaderControls: React.FC<HeaderControlsProps> = ({
   onTabChange,
   onToggleProfiles,
   onOpenHelp,
+  onRequestReset,
 }) => (
   <div className={styles.leftGroup}>
     <button
@@ -133,7 +136,7 @@ const HeaderControls: React.FC<HeaderControlsProps> = ({
         className={styles.nameInput}
       />
 
-      <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={profile.resetProfile}>
+      <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onRequestReset}>
         Сбросить
       </button>
     </div>
@@ -149,6 +152,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
   onBgColorChange,
   onToggleProfiles,
   onOpenHelp,
+  onRequestReset,
   onExportImage,
 }) => {
   const { headerRef, isCollapsed, canCollapse, toggleCollapsed } =
@@ -166,6 +170,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
         onTabChange={onTabChange}
         onToggleProfiles={onToggleProfiles}
         onOpenHelp={onOpenHelp}
+        onRequestReset={onRequestReset}
       />
 
       <HeaderActions

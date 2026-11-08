@@ -7,6 +7,7 @@ import { HelpModal } from './HelpModal';
 import { ImagePreviewModal } from './ImagePreviewModal';
 import { DeleteProfileModal } from './DeleteProfileModal';
 import { ProfilesDrawer } from './ProfilesDrawer';
+import { ResetProfileModal } from './ResetProfileModal';
 import type { AppTab } from './tabs';
 import { useCardProfile, type CardProfile } from '../../hooks/useCardProfile';
 import { useExportSettings } from '../../hooks/useExportSettings';
@@ -93,6 +94,41 @@ function useProfileMenu(profile: CardProfile) {
   };
 }
 
+function useProfileReset(profile: CardProfile) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return {
+    isOpen,
+    request: () => setIsOpen(true),
+    cancel: () => setIsOpen(false),
+    confirm: () => {
+      profile.resetProfile();
+      setIsOpen(false);
+    },
+  };
+}
+
+interface ProfileModalsProps {
+  menu: ReturnType<typeof useProfileMenu>;
+  reset: ReturnType<typeof useProfileReset>;
+}
+
+const ProfileModals: React.FC<ProfileModalsProps> = ({ menu, reset }) => (
+  <>
+    <DeleteProfileModal
+      open={menu.deleteTarget !== null}
+      label={menu.deleteLabel}
+      onCancel={menu.cancelDelete}
+      onConfirm={menu.confirmDelete}
+    />
+    <ResetProfileModal
+      open={reset.isOpen}
+      onCancel={reset.cancel}
+      onConfirm={reset.confirm}
+    />
+  </>
+);
+
 interface HubWorkspaceProps {
   activeTab: AppTab;
   profile: CardProfile;
@@ -146,18 +182,14 @@ export const MainAppHub: React.FC = () => {
   const hub = useHubController();
   const { profile, exportSettings, phaseInfo, buffsProgress, dropChance, setDropChance } = hub;
   const menu = useProfileMenu(profile);
+  const reset = useProfileReset(profile);
 
   return (
     <div className={styles.hubContainer}>
       <ImagePreviewModal image={hub.previewImage} onClose={hub.closePreview} />
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
-      <DeleteProfileModal
-        open={menu.deleteTarget !== null}
-        label={menu.deleteLabel}
-        onCancel={menu.cancelDelete}
-        onConfirm={menu.confirmDelete}
-      />
+      <ProfileModals menu={menu} reset={reset} />
       <HubHeader
         activeTab={activeTab}
         profile={profile}
@@ -167,6 +199,7 @@ export const MainAppHub: React.FC = () => {
         onBgColorChange={profile.setBgColor}
         onToggleProfiles={menu.toggle}
         onOpenHelp={() => setIsHelpOpen(true)}
+        onRequestReset={reset.request}
         onExportImage={exportSettings.open}
       />
       <HubWorkspace

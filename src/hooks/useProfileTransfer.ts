@@ -109,11 +109,6 @@ function readConfigFile(
 }
 
 function resetProfile(state: ProfileState) {
-  const confirmReset = window.confirm(
-    "Вы уверены, что хотите полностью сбросить все введённые значения? Если нет, то рекомендуется сначала 'Сохранить схему'",
-  );
-  if (!confirmReset) return;
-
   state.setPlayerName('');
   state.setBgColor(DEFAULT_CARD_SETTINGS.bgColor);
   state.setExportSelection(DEFAULT_CARD_SETTINGS.exportSelection);

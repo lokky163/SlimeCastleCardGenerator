@@ -1,14 +1,29 @@
 .dialog {
   width: 100%;
-  max-width: 440px;
-  padding: 20px;
+  max-width: 460px;
+  padding: 22px 24px 20px;
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 0 12px;
   color: var(--color-accent);
   font-family: var(--font-title);
   font-size: 1.15rem;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: rgba(230, 168, 23, 0.12);
+  border: 1px solid rgba(230, 168, 23, 0.4);
 }
 
 .text {
@@ -16,22 +31,23 @@
   color: var(--color-text);
   font-family: var(--font-ui);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
 }
 
-.deleteBtn {
+.dangerBtn {
   background-color: var(--color-danger);
   border-color: var(--color-danger-border);
   color: #ff6b6b;
 }
 
-.deleteBtn:hover {
+.dangerBtn:hover {
   background-color: #a40000;
 }
