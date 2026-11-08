@@ -1,0 +1,4 @@
+background and equip 195x209
+eqip sign 53x53, top left 0, 0
+ss sign 62 x 40, top left - 0, 151 
+level sign 54x54, top left 75, 155

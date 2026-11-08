@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.controlRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #16213e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #0f3460;
+}
+
+.tableTitle {
+  color: #a0a0b0;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Экранная сетка превью: РАСТЯГИВАЕТСЯ НА ВСЮ ШИРИНУ экрана */
+.screenGrid {
+  display: grid;
+  /* Увеличили шаг сетки со 140px до 150px для идеальной посадки */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  background: #1a1a2e;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #2a2a4a;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+/* Обертка карточки слайма в превью */
+.slimeCardWrapper {
+  background: #232342;
+  padding: 12px;           /* Немного увеличили внутренние отступы для ширины рамки */
+  border-radius: 8px;
+  border: 1px solid #4a4a6a;
+  
+  /* ИСПРАВЛЕНИЕ: Центрируем карточку внутри рамки, если рамка растягивается */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Подсветка карточки, если она будет выведена на изображение (index != -1) */
+.slimeCardActive {
+  border-color: #e6a817;
+}
+
+.cardContainerSize {
+  width: 100%;
+  max-width: 146px;        /* Немного увеличили ширину под пропорции слайма (было 140px) */
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: center; /* Центрируем сам Canvas */
+}
+
+/* Поле ввода индекса для ручного режима */
+.manualInputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #a0a0b0;
+  font-family: sans-serif;
+  width: 100%;
+}
+
+.indexInput {
+  width: 44px;
+  background-color: #2a2a4a;
+  border: 1px solid #4a4a6a;
+  color: #e0e0e0;
+  border-radius: 4px;
+  padding: 3px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.indexInput:focus {
+  outline: none;
+  border-color: #e6a817;
+}
+
+/* ========================================================== */
+/* СКРЫТЫЙ HD-СТЕНД ДЛЯ СНИМКА PNG                            */
+/* ========================================================== */
+.hdHiddenContainer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-100%, -100%); /* Уносим вверх и влево за границы окна */
+  width: max-content;
+  height: max-content;
+  pointer-events: none;
+}
+
+.hdSlimesGrid {
+  display: grid;
+  gap: 5px; /* Зазор строго 5px по ТЗ */
+  padding: 0;
+  width: max-content;
+}
+
+.hdSlimeCell {
+  /* ЗАМЕНИТЬ НА 250px и 207px: */
+  width: 250px; 
+  height: 207px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.hdSlimeCellEmpty {
+  /* ЗАМЕНИТЬ НА 250px и 207px: */
+  width: 250px;
+  height: 207px;
+  background: transparent;
+}

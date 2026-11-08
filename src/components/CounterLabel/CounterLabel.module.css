@@ -1,0 +1,57 @@
+/* CounterLabel.module.css */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #2A2A4A;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #4A4A6A;
+}
+
+.labelText {
+  font-size: 0.9rem;
+  color: #b0b0c0;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+
+.valueText {
+  font-weight: bold;
+  color: #e6a817;
+  margin-left: 2px;
+}
+
+.controls {
+  display: flex;
+  gap: 4px;
+}
+
+.btn {
+  width: 28px;
+  height: 28px;
+  background: #16213E;
+  border: 1px solid #4a4a6a;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #3a3a5a;
+  border-color: #6a6a8a;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #2a2a4a;
+  border-color: #3a3a5a;
+}

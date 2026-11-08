@@ -1,0 +1,90 @@
+.cardContainer {
+  position: relative;
+  width: 100%;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.equipmentCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.grayedOut {
+  filter: grayscale(100%);
+}
+
+/* Выпадающее контекстное меню грейдов */
+.menuOverlay {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-47%);
+  width: 90%;
+  max-height: 55%;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 4px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  scrollbar-width: none;
+}
+
+.menuOverlay::-webkit-scrollbar {
+  display: none;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.menuItem {
+  background: #2a2a2a;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+  padding: 2% 4%;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 152 / 30;
+  box-sizing: border-box;
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: center;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+/* .menuItem {
+  background-color: #2a2a4a;
+  border: 1px solid #4a4a6a;
+  color: #e0e0e0;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center;
+  font-weight: bold;
+  text-transform: capitalize;
+} */
+
+.menuItem:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.selectedItem {
+  background: #3a3a3a;
+  border-color: #555;
+}

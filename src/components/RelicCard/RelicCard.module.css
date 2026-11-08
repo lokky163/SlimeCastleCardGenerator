@@ -1,0 +1,120 @@
+.cardContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 228 / 349;
+  cursor: pointer;
+  user-select: none;
+}
+
+.relicImage {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* border-radius: 2.6%; */
+}
+
+/* Полностью серое фоновое изображение для состояния 'no' */
+.grayedOut {
+  filter: grayscale(100%);
+}
+
+/* Цветной островок в форме ромба, накладываемый поверх серого */
+.coloredIsland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  
+  /* ИСПРАВЛЕНИЕ: Вырезаем ромб средствами чистого CSS */
+  clip-path: polygon(50.877% 0%, 60.526% 6.877%, 50.877% 13.754%, 41.228% 6.877%);
+}
+
+/* 5 звезд на самой карточке */
+.starsContainer {
+  position: absolute;
+  top: 84.527%;
+  left: 14.474%;
+  width: 71.052%;
+  height: 8.596%;
+  display: flex;
+  gap: 1.315%;
+}
+
+.starItem {
+  width: 18.518%;
+  aspect-ratio: 1 / 1;
+  display: block;
+}
+
+/* Меню выбора уровня */
+.menuOverlay {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 83.333%;
+  max-height: 40%;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 4%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  scrollbar-width: none;
+}
+
+.menuOverlay::-webkit-scrollbar {
+  display: none;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuItem {
+  background: #2a2a2a;
+  border: 1px solid #3d3d3d;
+  color: #fff;
+  padding: 2% 4%;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 162 / 30;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.menuItem:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.menuStars {
+  display: flex;
+  gap: 1.8%;
+  width: 100%;
+  justify-content: center;
+}
+
+.menuStarItem {
+  width: 18.5%;
+  aspect-ratio: 1 / 1;
+  display: block;
+}
+
+.noText {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #aaa;
+  font-size: clamp(10px, 4cqi, 14px);
+}
