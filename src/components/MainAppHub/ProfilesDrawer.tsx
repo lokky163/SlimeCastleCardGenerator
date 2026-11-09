@@ -1,8 +1,5 @@
 import { useRef } from 'react';
-import type {
-  ProfilesMoveDirection,
-  ProfilesNotice,
-} from '../../hooks/useProfiles';
+import type { ProfilesMoveDirection } from '../../hooks/useProfiles';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
 import styles from './ProfilesDrawer.module.css';
@@ -11,7 +8,6 @@ interface ProfilesDrawerProps {
   open: boolean;
   profiles: SccProfile[];
   activeProfileIndex: number;
-  notice: ProfilesNotice | null;
   onSelect: (index: number) => void;
   onAdd: () => void;
   onRequestDelete: (index: number) => void;
@@ -32,7 +28,6 @@ interface ProfileRowProps {
 }
 
 interface ProfilesFooterProps {
-  notice: ProfilesNotice | null;
   onExportAll: () => void;
   onImportAllFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -166,7 +161,6 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
 );
 
 const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
-  notice,
   onExportAll,
   onImportAllFile,
 }) => {
@@ -174,17 +168,6 @@ const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
 
   return (
     <div className={styles.footer}>
-      {notice && (
-        <p
-          className={cx(
-            styles.notice,
-            notice.tone === 'error' ? styles.noticeError : styles.noticeSuccess,
-          )}
-        >
-          {notice.text}
-        </p>
-      )}
-
       <button
         type="button"
         className={cx(styles.footerBtn, styles.saveAllBtn)}
@@ -216,7 +199,6 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   open,
   profiles,
   activeProfileIndex,
-  notice,
   onSelect,
   onAdd,
   onRequestDelete,
@@ -231,7 +213,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
       <div className={styles.list}>
         {profiles.map((profile, index) => (
           <ProfileRow
-            key={index}
+            key={profile.uid}
             profile={profile}
             index={index}
             active={index === activeProfileIndex}
@@ -249,7 +231,6 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
       </div>
 
       <ProfilesFooter
-        notice={notice}
         onExportAll={onExportAll}
         onImportAllFile={onImportAllFile}
       />

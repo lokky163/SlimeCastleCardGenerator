@@ -1,0 +1,53 @@
+.dialog {
+  width: min(420px, 100%);
+  padding: 28px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.icon {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid;
+  margin-bottom: 4px;
+}
+
+.iconSuccess {
+  color: #4ade80;
+  background-color: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.iconError {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.12);
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+}
+
+.text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.closeBtn {
+  width: 100%;
+  margin-top: 10px;
+}

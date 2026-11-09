@@ -7,6 +7,7 @@ import {
 import {
   PROFILES_FILE_TYPE,
   PROFILES_VERSION,
+  createProfileUid,
   type ProfilesFile,
   type ProfilesStore,
   type SccProfile,
@@ -16,12 +17,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+function readUid(value: unknown): string {
+  if (typeof value !== 'string') return createProfileUid();
+
+  const uid = value.trim();
+  return uid || createProfileUid();
+}
+
 function normalizeProfile(value: unknown): SccProfile | null {
   if (!isRecord(value) || !isRecord(value.settings) || !isRecord(value.modules)) {
     return null;
   }
 
   return {
+    uid: readUid(value.uid),
     playerName: typeof value.playerName === 'string' ? value.playerName : '',
     settings: value.settings as unknown as SccSettings,
     modules: value.modules as unknown as SccModules,
@@ -44,6 +53,7 @@ function normalizeLegacyProfile(value: unknown): SccProfile | null {
   if (!isRecord(value) || !isRecord(value.modules)) return null;
 
   return {
+    uid: createProfileUid(),
     playerName: typeof value.playerName === 'string' ? value.playerName : '',
     settings: isRecord(value.settings)
       ? (value.settings as unknown as SccSettings)

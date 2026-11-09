@@ -6,6 +6,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
+import type { NoticeData } from '../models/notice';
 import { ExportService } from '../services/ExportService';
 import { createProfilePayload } from '../services/ProfileConfig';
 import type { SccProfile } from '../services/ProfilesSchema';
@@ -13,11 +14,6 @@ import { loadProfiles, saveProfiles } from '../services/ProfilesStorage';
 import { createEmptyProfile } from '../services/profileDefaults';
 import { applyProfilePayload } from './useProfileTransfer';
 import type { ProfileState } from './useProfileState';
-
-export interface ProfilesNotice {
-  tone: 'success' | 'error';
-  text: string;
-}
 
 export interface ProfilesController {
   profiles: SccProfile[];
@@ -28,7 +24,7 @@ export interface ProfilesController {
   moveProfile: (index: number, direction: ProfilesMoveDirection) => void;
   exportAllProfiles: () => void;
   importAllProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  profilesNotice: ProfilesNotice | null;
+  profilesNotice: NoticeData | null;
   clearProfilesNotice: () => void;
 }
 
@@ -44,7 +40,7 @@ interface ProfilesHydration {
 
 interface ProfilesContext extends ProfilesHydration {
   state: ProfileState;
-  setNotice: Dispatch<SetStateAction<ProfilesNotice | null>>;
+  setNotice: Dispatch<SetStateAction<NoticeData | null>>;
 }
 
 function replaceProfile(
@@ -102,10 +98,12 @@ function useProfilesAutosave(
   useEffect(() => {
     if (!hydrated) return;
 
-    const current = createProfilePayload(state);
     setProfiles((previous) => {
       const stored = previous[activeProfileIndex];
-      if (!stored || sameProfile(stored, current)) return previous;
+      if (!stored) return previous;
+
+      const current = createProfilePayload(state, stored.uid);
+      if (sameProfile(stored, current)) return previous;
       return replaceProfile(previous, activeProfileIndex, current);
     });
   }, [state, setProfiles, activeProfileIndex, hydrated]);
@@ -120,11 +118,17 @@ function useProfilesPersistence(hydration: ProfilesHydration): void {
   }, [profiles, activeProfileIndex, hydrated]);
 }
 
-function syncCurrentProfile(context: ProfilesContext): void {
-  const current = createProfilePayload(context.state);
-  context.setProfiles((previous) =>
-    replaceProfile(previous, context.activeProfileIndex, current),
+function syncCurrentProfile(context: ProfilesContext): SccProfile[] {
+  const current = context.profiles[context.activeProfileIndex];
+  if (!current) return context.profiles;
+
+  const synced = replaceProfile(
+    context.profiles,
+    context.activeProfileIndex,
+    createProfilePayload(context.state, current.uid),
   );
+  context.setProfiles(synced);
+  return synced;
 }
 
 function selectProfile(context: ProfilesContext, index: number): void {
@@ -151,12 +155,10 @@ function addProfile(context: ProfilesContext): void {
 }
 
 function deleteProfile(context: ProfilesContext, index: number): void {
-  const { profiles, activeProfileIndex, setProfiles, setActiveProfileIndex } =
-    context;
-  if (!profiles[index]) return;
+  const { activeProfileIndex, setProfiles, setActiveProfileIndex } = context;
+  if (!context.profiles[index]) return;
 
-  const current = createProfilePayload(context.state);
-  const synced = replaceProfile(profiles, activeProfileIndex, current);
+  const synced = syncCurrentProfile(context);
   const remaining = synced.filter((_, itemIndex) => itemIndex !== index);
 
   if (remaining.length === 0) {
@@ -187,8 +189,7 @@ function moveProfile(
   const { profiles, activeProfileIndex } = context;
   if (!profiles[index] || !profiles[target]) return;
 
-  const current = createProfilePayload(context.state);
-  const synced = replaceProfile(profiles, activeProfileIndex, current);
+  const synced = syncCurrentProfile(context);
   const reordered = [...synced];
   [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
 
@@ -202,15 +203,57 @@ function moveProfile(
 }
 
 function exportAllProfiles(context: ProfilesContext): void {
-  const current = createProfilePayload(context.state);
-  const synced = replaceProfile(
-    context.profiles,
-    context.activeProfileIndex,
-    current,
-  );
-
-  context.setProfiles(synced);
+  const synced = syncCurrentProfile(context);
   ExportService.exportProfiles(synced);
+}
+
+interface MergedProfiles {
+  profiles: SccProfile[];
+  added: number;
+  updated: number;
+}
+
+function mergeProfiles(
+  existing: SccProfile[],
+  imported: SccProfile[],
+): MergedProfiles {
+  const profiles = [...existing];
+  const indexByUid = new Map(
+    profiles.map((profile, index) => [profile.uid, index]),
+  );
+  let added = 0;
+  let updated = 0;
+
+  for (const profile of imported) {
+    const index = indexByUid.get(profile.uid);
+    if (index === undefined) {
+      indexByUid.set(profile.uid, profiles.length);
+      profiles.push(profile);
+      added += 1;
+    } else {
+      profiles[index] = profile;
+      updated += 1;
+    }
+  }
+
+  return { profiles, added, updated };
+}
+
+function createImportNotice(
+  added: number,
+  updated: number,
+  activeUpdated: boolean,
+): NoticeData {
+  const lines: string[] = [];
+  if (added > 0) lines.push(`Добавлено новых: ${added}`);
+  if (updated > 0) lines.push(`Обновлено существующих: ${updated}`);
+  if (activeUpdated) lines.push('Активный профиль обновлён из файла.');
+
+  return {
+    tone: 'success',
+    title: 'Профили загружены',
+    text: lines.join('\n'),
+  };
 }
 
 function importAllProfilesFile(
@@ -229,30 +272,42 @@ function importAllProfilesFile(
     if (!imported) {
       context.setNotice({
         tone: 'error',
-        text: 'Ошибка при чтении файла профилей',
+        title: 'Не удалось загрузить профили',
+        text: 'Файл повреждён или имеет неподдерживаемый формат.',
       });
       return;
     }
 
-    const current = createProfilePayload(context.state);
-    context.setProfiles((previous) => [
-      ...replaceProfile(previous, context.activeProfileIndex, current),
-      ...imported,
-    ]);
-    context.setNotice({
-      tone: 'success',
-      text: `Добавлено профилей: ${imported.length}`,
-    });
+    const synced = syncCurrentProfile(context);
+    const merged = mergeProfiles(synced, imported);
+    const activeProfile = synced[context.activeProfileIndex];
+    const activeUpdated = Boolean(
+      activeProfile &&
+        imported.some((profile) => profile.uid === activeProfile.uid),
+    );
+
+    context.setProfiles(merged.profiles);
+    if (activeUpdated) {
+      const mergedActive = merged.profiles[context.activeProfileIndex];
+      if (mergedActive) applyProfilePayload(mergedActive, context.state);
+    }
+    context.setNotice(
+      createImportNotice(merged.added, merged.updated, activeUpdated),
+    );
   };
   reader.onerror = () => {
-    context.setNotice({ tone: 'error', text: 'Не удалось прочитать файл' });
+    context.setNotice({
+      tone: 'error',
+      title: 'Не удалось прочитать файл',
+      text: 'Попробуйте выбрать файл ещё раз.',
+    });
   };
   reader.readAsText(file);
 }
 
 export function useProfiles(state: ProfileState): ProfilesController {
   const hydration = useProfilesHydration(state);
-  const [notice, setNotice] = useState<ProfilesNotice | null>(null);
+  const [notice, setNotice] = useState<NoticeData | null>(null);
 
   useProfilesAutosave(state, hydration);
   useProfilesPersistence(hydration);

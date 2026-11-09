@@ -16,14 +16,18 @@ export function createConfigPayload(state: ProfileState): SccPayload {
   };
 }
 
-export function toProfilePayload(payload: SccPayload): SccProfile {
+export function toProfilePayload(payload: SccPayload, uid: string): SccProfile {
   return {
+    uid,
     playerName: payload.playerName,
     settings: payload.settings,
     modules: payload.modules,
   };
 }
 
-export function createProfilePayload(state: ProfileState): SccProfile {
-  return toProfilePayload(createConfigPayload(state));
+export function createProfilePayload(
+  state: ProfileState,
+  uid: string,
+): SccProfile {
+  return toProfilePayload(createConfigPayload(state), uid);
 }

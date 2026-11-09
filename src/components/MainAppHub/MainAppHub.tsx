@@ -8,6 +8,7 @@ import { ImagePreviewModal } from './ImagePreviewModal';
 import { DeleteProfileModal } from './DeleteProfileModal';
 import { ProfilesDrawer } from './ProfilesDrawer';
 import { ResetProfileModal } from './ResetProfileModal';
+import { NoticeModal } from '../ui/NoticeModal/NoticeModal';
 import type { AppTab } from './tabs';
 import { useCardProfile, type CardProfile } from '../../hooks/useCardProfile';
 import { useExportSettings } from '../../hooks/useExportSettings';
@@ -156,7 +157,6 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
       open={menu.isOpen}
       profiles={profile.profiles}
       activeProfileIndex={profile.activeProfileIndex}
-      notice={profile.profilesNotice}
       onSelect={menu.selectProfile}
       onAdd={menu.addProfile}
       onRequestDelete={menu.requestDelete}
@@ -177,6 +177,19 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
   </div>
 );
 
+const AppNotices: React.FC<{ profile: CardProfile }> = ({ profile }) => (
+  <>
+    <NoticeModal
+      notice={profile.profilesNotice}
+      onClose={profile.clearProfilesNotice}
+    />
+    <NoticeModal
+      notice={profile.transferNotice}
+      onClose={profile.clearTransferNotice}
+    />
+  </>
+);
+
 export const MainAppHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>('equipment');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -191,6 +204,7 @@ export const MainAppHub: React.FC = () => {
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
       <ProfileModals menu={menu} reset={reset} />
+      <AppNotices profile={profile} />
       <HubHeader
         activeTab={activeTab}
         profile={profile}

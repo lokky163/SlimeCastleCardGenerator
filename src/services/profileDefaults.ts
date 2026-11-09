@@ -6,7 +6,7 @@ import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import { createInitialEquipment } from '../models/equipment';
 import { RelicData, RELIC_NAMES } from '../models/relic';
 import { createInitialSlimes } from '../models/slime';
-import type { SccProfile } from './ProfilesSchema';
+import { createProfileUid, type SccProfile } from './ProfilesSchema';
 import { serializeModules } from './SccSerialization';
 
 export const createRelics = () =>
@@ -36,6 +36,7 @@ export function createEmptyProfile(): SccProfile {
   });
 
   return {
+    uid: createProfileUid(),
     playerName: '',
     settings: {
       bgColor: DEFAULT_CARD_SETTINGS.bgColor,

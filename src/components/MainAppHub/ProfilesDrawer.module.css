@@ -148,20 +148,6 @@
   background-color: var(--color-panel);
 }
 
-.notice {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.3;
-}
-
-.noticeError {
-  color: #ff6b6b;
-}
-
-.noticeSuccess {
-  color: var(--color-accent);
-}
-
 .footerBtn {
   width: 100%;
   padding: 9px 12px;
