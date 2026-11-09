@@ -65,6 +65,7 @@ export const SS_SLIME_NAME = [
   'Auralis',
   'Agnaros',
   'Monilia',
+  'Vladaris'
 ];
 
 export const SSS_SLIME_NAME = [
