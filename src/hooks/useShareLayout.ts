@@ -1,6 +1,7 @@
 import { useState, type RefObject } from 'react';
 import { saveAs } from 'file-saver';
 import { ExportService } from '../services/ExportService';
+import { shouldShowImagePreview } from '../utils/imagePreview';
 
 export function useShareLayout(
   boardRef: RefObject<HTMLDivElement | null>,
@@ -12,8 +13,7 @@ export function useShareLayout(
     const dataUrl = await ExportService.exportToPng(boardRef.current);
     if (!dataUrl) return;
 
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isIOS) {
+    if (shouldShowImagePreview(navigator.userAgent)) {
       setPreviewImage(dataUrl);
       return;
     }
