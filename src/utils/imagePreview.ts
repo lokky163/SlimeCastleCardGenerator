@@ -4,7 +4,7 @@ export type ImagePreviewMode = 'auto' | 'always' | 'never';
 // 'auto' — показывать только на iPhone/iPad;
 // 'always' — показывать на любой платформе;
 // 'never' — никогда не показывать, всегда скачивать файл.
-export const IMAGE_PREVIEW_MODE: ImagePreviewMode = 'always';
+export const IMAGE_PREVIEW_MODE: ImagePreviewMode = 'auto';
 
 export function shouldShowImagePreview(
   userAgent: string,
