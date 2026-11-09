@@ -1,5 +1,8 @@
 import { useRef } from 'react';
-import type { ProfilesNotice } from '../../hooks/useProfiles';
+import type {
+  ProfilesMoveDirection,
+  ProfilesNotice,
+} from '../../hooks/useProfiles';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
 import styles from './ProfilesDrawer.module.css';
@@ -12,6 +15,7 @@ interface ProfilesDrawerProps {
   onSelect: (index: number) => void;
   onAdd: () => void;
   onRequestDelete: (index: number) => void;
+  onMoveProfile: (index: number, direction: ProfilesMoveDirection) => void;
   onExportAll: () => void;
   onImportAllFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -20,8 +24,11 @@ interface ProfileRowProps {
   profile: SccProfile;
   index: number;
   active: boolean;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
   onSelect: (index: number) => void;
   onDelete: (index: number) => void;
+  onMove: (index: number, direction: ProfilesMoveDirection) => void;
 }
 
 interface ProfilesFooterProps {
@@ -50,16 +57,83 @@ const TrashIcon: React.FC = () => (
   </svg>
 );
 
+const MoveIcon: React.FC<{ direction: ProfilesMoveDirection }> = ({
+  direction,
+}) => (
+  <svg
+    aria-hidden="true"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ transform: direction === 'down' ? 'rotate(180deg)' : undefined }}
+  >
+    <path d="M12 19V5" />
+    <path d="M5 12l7-7 7 7" />
+  </svg>
+);
+
 function profileName(profile: SccProfile): string {
   return profile.playerName.trim() || 'Без ника';
 }
+
+interface ProfileMoveButtonsProps {
+  index: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMove: (index: number, direction: ProfilesMoveDirection) => void;
+}
+
+const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
+  index,
+  canMoveUp,
+  canMoveDown,
+  onMove,
+}) => {
+  if (!canMoveUp && !canMoveDown) return null;
+
+  return (
+    <div className={styles.reorderBtns}>
+      {canMoveUp && (
+        <button
+          type="button"
+          className={styles.moveBtn}
+          aria-label={`Переместить профиль ${index + 1} вверх`}
+          title={`Переместить профиль ${index + 1} вверх`}
+          onClick={() => onMove(index, 'up')}
+        >
+          <MoveIcon direction="up" />
+        </button>
+      )}
+
+      {canMoveDown && (
+        <button
+          type="button"
+          className={styles.moveBtn}
+          aria-label={`Переместить профиль ${index + 1} вниз`}
+          title={`Переместить профиль ${index + 1} вниз`}
+          onClick={() => onMove(index, 'down')}
+        >
+          <MoveIcon direction="down" />
+        </button>
+      )}
+    </div>
+  );
+};
 
 const ProfileRow: React.FC<ProfileRowProps> = ({
   profile,
   index,
   active,
+  canMoveUp,
+  canMoveDown,
   onSelect,
   onDelete,
+  onMove,
 }) => (
   <div className={cx(styles.profileRow, active && styles.profileRowActive)}>
     <button
@@ -71,6 +145,13 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
       <span className={styles.profileTitle}>Профиль {index + 1}:</span>
       <span className={styles.profileName}>{profileName(profile)}</span>
     </button>
+
+    <ProfileMoveButtons
+      index={index}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      onMove={onMove}
+    />
 
     <button
       type="button"
@@ -139,6 +220,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   onSelect,
   onAdd,
   onRequestDelete,
+  onMoveProfile,
   onExportAll,
   onImportAllFile,
 }) => {
@@ -153,8 +235,11 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
             profile={profile}
             index={index}
             active={index === activeProfileIndex}
+            canMoveUp={index > 0}
+            canMoveDown={index < profiles.length - 1}
             onSelect={onSelect}
             onDelete={onRequestDelete}
+            onMove={onMoveProfile}
           />
         ))}
 

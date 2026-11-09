@@ -25,11 +25,14 @@ export interface ProfilesController {
   selectProfile: (index: number) => void;
   addProfile: () => void;
   deleteProfile: (index: number) => void;
+  moveProfile: (index: number, direction: ProfilesMoveDirection) => void;
   exportAllProfiles: () => void;
   importAllProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
   profilesNotice: ProfilesNotice | null;
   clearProfilesNotice: () => void;
 }
+
+export type ProfilesMoveDirection = 'up' | 'down';
 
 interface ProfilesHydration {
   profiles: SccProfile[];
@@ -175,6 +178,29 @@ function deleteProfile(context: ProfilesContext, index: number): void {
   context.setNotice(null);
 }
 
+function moveProfile(
+  context: ProfilesContext,
+  index: number,
+  direction: ProfilesMoveDirection,
+): void {
+  const target = direction === 'up' ? index - 1 : index + 1;
+  const { profiles, activeProfileIndex } = context;
+  if (!profiles[index] || !profiles[target]) return;
+
+  const current = createProfilePayload(context.state);
+  const synced = replaceProfile(profiles, activeProfileIndex, current);
+  const reordered = [...synced];
+  [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+
+  let nextActiveIndex = activeProfileIndex;
+  if (activeProfileIndex === index) nextActiveIndex = target;
+  else if (activeProfileIndex === target) nextActiveIndex = index;
+
+  context.setProfiles(reordered);
+  context.setActiveProfileIndex(nextActiveIndex);
+  context.setNotice(null);
+}
+
 function exportAllProfiles(context: ProfilesContext): void {
   const current = createProfilePayload(context.state);
   const synced = replaceProfile(
@@ -239,6 +265,7 @@ export function useProfiles(state: ProfileState): ProfilesController {
     selectProfile: (index) => selectProfile(context, index),
     addProfile: () => addProfile(context),
     deleteProfile: (index) => deleteProfile(context, index),
+    moveProfile: (index, direction) => moveProfile(context, index, direction),
     exportAllProfiles: () => exportAllProfiles(context),
     importAllProfilesFile: (event) => importAllProfilesFile(context, event),
     profilesNotice: notice,
