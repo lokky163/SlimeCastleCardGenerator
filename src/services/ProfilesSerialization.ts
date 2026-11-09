@@ -1,3 +1,4 @@
+import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import {
   SCC_FILE_TYPE,
   type SccModules,
@@ -37,6 +38,21 @@ function normalizeProfiles(value: unknown): SccProfile[] | null {
     profiles.push(profile);
   }
   return profiles;
+}
+
+function normalizeLegacyProfile(value: unknown): SccProfile | null {
+  if (!isRecord(value) || !isRecord(value.modules)) return null;
+
+  return {
+    playerName: typeof value.playerName === 'string' ? value.playerName : '',
+    settings: isRecord(value.settings)
+      ? (value.settings as unknown as SccSettings)
+      : {
+          bgColor: DEFAULT_CARD_SETTINGS.bgColor,
+          exportSelection: { ...DEFAULT_CARD_SETTINGS.exportSelection },
+        },
+    modules: value.modules as unknown as SccModules,
+  };
 }
 
 export function createProfilesFile(profiles: SccProfile[]): ProfilesFile {
@@ -86,7 +102,7 @@ export function parseLegacyProfile(fileContent: string): SccProfile | null {
   try {
     const parsed = JSON.parse(fileContent) as unknown;
     if (!isRecord(parsed) || parsed.fileType !== SCC_FILE_TYPE) return null;
-    return normalizeProfile(parsed);
+    return normalizeLegacyProfile(parsed);
   } catch {
     return null;
   }
