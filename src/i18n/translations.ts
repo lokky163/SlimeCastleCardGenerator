@@ -255,6 +255,10 @@ export const translations: TranslationTree = {
       {
         ru: 'открывает дополнительное поле ввода для каждой карточки с индексом в сетке. Индексы начинаются с 0 и заканчиваются на {range}, слева направо сверху вниз. Дополнительно можно указать индекс -1, тогда карточка рисоваться не будет.',
       },
+    'To move a card, hold it for a moment and drag it onto another card. The grid switches to “Manual indexes”, and the two cards swap places.':
+      {
+        ru: 'Чтобы переместить карточку, зажмите её на мгновение и перетащите на другую карточку. Сетка переключится в режим «Ручные индексы», а карточки поменяются местами.',
+      },
     'In “Keep in place”, “Move to end”, and “Hide missing” modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored, but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.':
       {
         ru: 'В режимах «На месте», «В конец» и «Не показывать» можно включить переключатель «Добавить скрытие» — тогда под каждой карточкой появится кнопка «Скрыть/Показать». Скрытая карточка затемняется в редакторе, чтобы её можно было вернуть, но на итоговой картинке она не отображается. Если выбрать «Убрать скрытие», все карточки временно показываются, а их отметки сохраняются для следующего включения.',
