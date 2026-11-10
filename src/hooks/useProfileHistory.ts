@@ -117,6 +117,15 @@ export function useProfileHistory(
     if (!hydrated || !activeProfile) return;
 
     const snapshot = createProfilePayload(state, activeProfile.uid);
+    if (currentRef.current && currentRef.current.uid !== activeProfile.uid) {
+      pastRef.current = [];
+      futureRef.current = [];
+      currentRef.current = snapshot;
+      uidRef.current = activeProfile.uid;
+      syncFlags();
+      return;
+    }
+
     const previous = currentRef.current;
     currentRef.current = snapshot;
     if (!previous || sameProfile(previous, snapshot)) return;
@@ -132,7 +141,7 @@ export function useProfileHistory(
     commitPending();
 
     const previous = pastRef.current.pop();
-    if (!previous) return;
+    if (!previous || previous.uid !== activeProfile.uid) return;
 
     if (currentRef.current) futureRef.current.push(currentRef.current);
     currentRef.current = previous;
@@ -147,7 +156,7 @@ export function useProfileHistory(
     commitPending();
 
     const next = futureRef.current.pop();
-    if (!next) return;
+    if (!next || next.uid !== activeProfile.uid) return;
 
     if (currentRef.current) pastRef.current.push(currentRef.current);
     currentRef.current = next;
