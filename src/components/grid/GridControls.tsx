@@ -1,4 +1,8 @@
+import { useRef, useState } from 'react';
+import { cx } from '../../utils/classNames';
 import { useI18n } from '../../i18n/I18nProvider';
+import { MenuOption } from '../ui/MenuOption/MenuOption';
+import { PopupMenu } from '../ui/PopupMenu/PopupMenu';
 import type { LayoutMode } from './layout';
 import { LAYOUT_MODES } from './layout';
 import type { SlotLayoutController } from './useSlotLayout';
@@ -53,22 +57,55 @@ interface LayoutModeSelectProps {
 
 const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange }) => {
   const { t } = useI18n();
+  const [isOpen, setIsOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const current = LAYOUT_MODES.find((option) => option.value === mode) ?? LAYOUT_MODES[0];
+
+  const handleSelect = (nextMode: LayoutMode) => {
+    onModeChange(nextMode);
+    setIsOpen(false);
+  };
 
   return (
-    <label className={styles.modeBlock}>
+    <div className={styles.modeBlock}>
       <span className={styles.modeLabel}>{t('Missing:')}</span>
-      <select
-        className={styles.modeSelect}
-        value={mode}
-        onChange={(event) => onModeChange(event.target.value as LayoutMode)}
-      >
-        {LAYOUT_MODES.map((option) => (
-          <option key={option.value} value={option.value}>
-            {t(option.label)}
-          </option>
-        ))}
-      </select>
-    </label>
+
+      <div className={styles.modeDropdown} ref={anchorRef}>
+        <button
+          type="button"
+          className={cx(styles.modeToggle, isOpen && styles.modeToggleOpen)}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <span className={styles.modeValue}>{t(current.label)}</span>
+          <span className={cx(styles.modeArrow, isOpen && styles.modeArrowUp)} />
+        </button>
+
+        <PopupMenu
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          anchorRef={anchorRef}
+          placement="dropdown"
+          className={styles.modeMenu}
+        >
+          {LAYOUT_MODES.map((option) => (
+            <MenuOption
+              key={option.value}
+              selected={option.value === mode}
+              align="start"
+              className={cx(
+                styles.modeOption,
+                option.value === mode && styles.modeOptionActive,
+              )}
+              onClick={() => handleSelect(option.value)}
+            >
+              {t(option.label)}
+            </MenuOption>
+          ))}
+        </PopupMenu>
+      </div>
+    </div>
   );
 };
 

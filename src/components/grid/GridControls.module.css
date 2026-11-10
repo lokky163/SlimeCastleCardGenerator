@@ -13,7 +13,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-panel-3);
+  background: linear-gradient(135deg, var(--color-panel-3), var(--color-panel-2));
   border: 1px solid var(--color-border);
   padding: 6px 12px;
   border-radius: 6px;
@@ -23,14 +23,72 @@
   font-size: 0.85rem;
   color: var(--color-text-muted);
   font-family: var(--font-ui);
+  white-space: nowrap;
 }
 
-.modeSelect {
+.modeDropdown {
+  position: relative;
+}
+
+.modeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 148px;
   background: var(--color-panel);
   border: 1px solid var(--color-border);
   color: var(--color-text);
-  padding: 3px 6px;
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.modeToggle:hover,
+.modeToggleOpen {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.modeValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modeArrow {
+  flex-shrink: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 0.2s;
+}
+
+.modeArrowUp {
+  transform: rotate(180deg);
+}
+
+.modeMenu {
+  left: auto;
+  right: 0;
+  min-width: 100%;
+  width: max-content;
+}
+
+.modeOption {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.modeOptionActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
 }
