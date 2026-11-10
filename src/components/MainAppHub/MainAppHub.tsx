@@ -10,7 +10,9 @@ import { ProfilesDrawer } from './ProfilesDrawer';
 import { ResetProfileModal } from './ResetProfileModal';
 import { NoticeModal } from '../ui/NoticeModal/NoticeModal';
 import type { AppTab } from './tabs';
+import { PlayerNotFound } from './PlayerNotFound';
 import { useCardProfile, type CardProfile } from '../../hooks/useCardProfile';
+import { useAppRoute, type AppRouteController } from '../../hooks/useAppRoute';
 import { useExportSettings } from '../../hooks/useExportSettings';
 import { useShareLayout } from '../../hooks/useShareLayout';
 import {
@@ -67,7 +69,7 @@ function profileLabel(
     : t('Profile {index}', params);
 }
 
-function useProfileMenu(profile: CardProfile) {
+function useProfileMenu(profile: CardProfile, route: AppRouteController) {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
@@ -77,17 +79,21 @@ function useProfileMenu(profile: CardProfile) {
   };
 
   const selectProfile = (index: number) => {
-    profile.selectProfile(index);
+    route.selectProfile(index);
     closeOnMobile();
   };
 
   const addProfile = () => {
+    route.recoverRoute();
     profile.addProfile();
     closeOnMobile();
   };
 
   const confirmDelete = () => {
-    if (deleteTarget !== null) profile.deleteProfile(deleteTarget);
+    if (deleteTarget !== null) {
+      route.recoverRoute();
+      profile.deleteProfile(deleteTarget);
+    }
     setDeleteTarget(null);
   };
 
@@ -147,6 +153,7 @@ interface HubWorkspaceProps {
   dropChance: DropChanceSelection;
   onDropChanceChange: (chance: DropChanceSelection) => void;
   menu: ReturnType<typeof useProfileMenu>;
+  isNotFound: boolean;
 }
 
 const HubWorkspace: React.FC<HubWorkspaceProps> = ({
@@ -156,6 +163,7 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
   dropChance,
   onDropChanceChange,
   menu,
+  isNotFound,
 }) => (
   <div
     className={cx(
@@ -176,13 +184,17 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
     />
 
     <main className={styles.mainContent}>
-      <HubContent
-        activeTab={activeTab}
-        profile={profile}
-        buffsProgress={buffsProgress}
-        dropChance={dropChance}
-        onDropChanceChange={onDropChanceChange}
-      />
+      {isNotFound ? (
+        <PlayerNotFound />
+      ) : (
+        <HubContent
+          activeTab={activeTab}
+          profile={profile}
+          buffsProgress={buffsProgress}
+          dropChance={dropChance}
+          onDropChanceChange={onDropChanceChange}
+        />
+      )}
     </main>
   </div>
 );
@@ -195,11 +207,11 @@ const AppNotices: React.FC<{ profile: CardProfile }> = ({ profile }) => (
 );
 
 export const MainAppHub: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<AppTab>('equipment');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const hub = useHubController();
   const { profile, exportSettings, phaseInfo, buffsProgress, dropChance, setDropChance } = hub;
-  const menu = useProfileMenu(profile);
+  const route = useAppRoute(profile);
+  const menu = useProfileMenu(profile, route);
   const reset = useProfileReset(profile);
 
   return (
@@ -210,11 +222,11 @@ export const MainAppHub: React.FC = () => {
       <ProfileModals menu={menu} reset={reset} />
       <AppNotices profile={profile} />
       <HubHeader
-        activeTab={activeTab}
+        activeTab={route.activeTab}
         profile={profile}
         bgColor={profile.bgColor}
         isProfilesOpen={menu.isOpen}
-        onTabChange={setActiveTab}
+        onTabChange={route.selectTab}
         onBgColorChange={profile.setBgColor}
         onToggleProfiles={menu.toggle}
         onOpenHelp={() => setIsHelpOpen(true)}
@@ -222,12 +234,13 @@ export const MainAppHub: React.FC = () => {
         onExportImage={exportSettings.open}
       />
       <HubWorkspace
-        activeTab={activeTab}
+        activeTab={route.activeTab}
         profile={profile}
         buffsProgress={buffsProgress}
         dropChance={dropChance}
         onDropChanceChange={setDropChance}
         menu={menu}
+        isNotFound={route.isNotFound}
       />
       <HubExportBoard
         profile={profile}

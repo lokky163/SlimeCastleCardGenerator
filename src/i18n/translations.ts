@@ -101,6 +101,13 @@ export const translations: TranslationTree = {
     'Try selecting the file again.': { ru: 'Попробуйте выбрать файл ещё раз.' },
     'Got it': { ru: 'Понятно' },
   },
+  route: {
+    'Player not found': { ru: 'Игрок не найден' },
+    'The profile at this address does not exist. Pick a profile from the list.':
+      {
+        ru: 'Профиля с таким адресом не существует. Выберите профиль в списке слева.',
+      },
+  },
   imagePreview: {
     'Image is ready!': { ru: 'Изображение готово!' },
     'Press and hold the image below and choose': {

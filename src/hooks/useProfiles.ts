@@ -19,6 +19,7 @@ import type { ProfileState } from './useProfileState';
 export interface ProfilesController {
   profiles: SccProfile[];
   activeProfileIndex: number;
+  hydrated: boolean;
   selectProfile: (index: number) => void;
   addProfile: () => void;
   deleteProfile: (index: number) => void;
@@ -339,6 +340,7 @@ export function useProfiles(state: ProfileState): ProfilesController {
   return {
     profiles: hydration.profiles,
     activeProfileIndex: hydration.activeProfileIndex,
+    hydrated: hydration.hydrated,
     selectProfile: (index) => selectProfile(context, index),
     addProfile: () => addProfile(context),
     deleteProfile: (index) => deleteProfile(context, index),
