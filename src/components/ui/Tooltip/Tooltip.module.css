@@ -1,0 +1,70 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bubble {
+  position: absolute;
+  left: 50%;
+  z-index: 300;
+  max-width: 220px;
+  padding: 5px 9px;
+  border: 1px solid var(--color-menu-border);
+  border-radius: 6px;
+  background: var(--color-menu-bg);
+  box-shadow: 0 6px 18px var(--color-menu-shadow);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+}
+
+.top .bubble {
+  bottom: calc(100% + 8px);
+}
+
+.bottom .bubble {
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -4px;
+  border: 1px solid var(--color-menu-border);
+  background: var(--color-menu-bg);
+  transform: rotate(45deg);
+}
+
+.top .bubble::after {
+  bottom: -5px;
+  border-top: none;
+  border-left: none;
+}
+
+.bottom .bubble::after {
+  top: -5px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.wrap:hover .bubble,
+.wrap:focus-within .bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
