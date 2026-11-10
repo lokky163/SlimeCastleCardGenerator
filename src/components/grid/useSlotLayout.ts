@@ -17,7 +17,6 @@ export interface SlotLayoutController extends SlotLayoutState {
   setAutoSize: (autoSize: boolean) => void;
   setHideEnabled: (hideEnabled: boolean) => void;
   setSlotIndex: (itemIndex: number, slotIndex: number) => void;
-  swapItemSlots: (itemIndex: number, targetIndex: number) => void;
   setSlotVisible: (itemIndex: number, visible: boolean) => void;
   setItemHidden: (key: string, hidden: boolean) => void;
   applyLayout: (layout: SlotLayoutInput) => void;
@@ -31,7 +30,6 @@ type LayoutAction =
   | { type: 'setAutoSize'; autoSize: boolean }
   | { type: 'setHideEnabled'; hideEnabled: boolean }
   | { type: 'setSlotIndex'; itemIndex: number; slotIndex: number }
-  | { type: 'swapSlots'; itemIndex: number; targetIndex: number }
   | { type: 'setSlotVisible'; itemIndex: number; visible: boolean }
   | { type: 'setItemHidden'; key: string; hidden: boolean }
   | { type: 'apply'; layout: SlotLayoutInput }
@@ -246,31 +244,6 @@ function reduceLayout(
         index: action.slotIndex,
         visible: action.slotIndex >= 0,
       });
-    case 'swapSlots': {
-      const source = state.entries[action.itemIndex];
-      const target = state.entries[action.targetIndex];
-      if (
-        !source ||
-        !target ||
-        target.index < 0 ||
-        source.index === target.index
-      ) {
-        return state;
-      }
-
-      const entries = state.entries.map((entry, index) => {
-        if (index === action.itemIndex) {
-          return { ...entry, index: target.index, visible: true };
-        }
-        if (index === action.targetIndex) {
-          return { ...entry, index: source.index, visible: source.index >= 0 };
-        }
-        return entry;
-      });
-
-      // Free placement is only stored in manual mode, so a drag switches to it.
-      return { ...state, mode: 'manual', autoSize: false, entries };
-    }
     case 'setSlotVisible':
       return updateEntry(state, action.itemIndex, { visible: action.visible });
     case 'setItemHidden':
@@ -310,8 +283,6 @@ export function useSlotLayout<T extends LayoutItem>(
       dispatch({ type: 'setHideEnabled', hideEnabled }),
     setSlotIndex: (itemIndex, slotIndex) =>
       dispatch({ type: 'setSlotIndex', itemIndex, slotIndex }),
-    swapItemSlots: (itemIndex, targetIndex) =>
-      dispatch({ type: 'swapSlots', itemIndex, targetIndex }),
     setSlotVisible: (itemIndex, visible) =>
       dispatch({ type: 'setSlotVisible', itemIndex, visible }),
     setItemHidden: (key, hidden) => dispatch({ type: 'setItemHidden', key, hidden }),

@@ -171,9 +171,6 @@ const GridHelp: React.FC = () => {
       </p>
       <MissingModesHelp />
       <p>
-        {t('To move a card, hold it for a moment and drag it onto another card. The grid switches to “Manual indexes”, and the two cards swap places.')}
-      </p>
-      <p>
         {t('In “Keep in place”, “Move to end”, and “Hide missing” modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored, but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.')}
       </p>
     </>
