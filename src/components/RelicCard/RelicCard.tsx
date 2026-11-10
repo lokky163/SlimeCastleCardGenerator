@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { RelicState } from '../../models/relic';
 import { useI18n } from '../../i18n/I18nProvider';
+import { splitCamelCase } from '../../utils/formatName';
 import { useComposedImage } from '../../hooks/useComposedImage';
 import { ComposedImage } from '../ui/ComposedImage/ComposedImage';
 import { drawRelicImage, relicImageKey, RELIC_IMAGE_HEIGHT, RELIC_IMAGE_WIDTH } from './drawRelicImage';
@@ -23,7 +24,7 @@ export const RelicCard: React.FC<RelicCardProps> = ({
   const { t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const displayName = t(name);
+  const displayName = splitCamelCase(t(name));
 
   const imageSrc = useComposedImage(
     relicImageKey(imageUrl, state, displayName),
