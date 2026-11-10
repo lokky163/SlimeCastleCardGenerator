@@ -7,6 +7,7 @@
 
 .bubble {
   --tooltip-shift: -50%;
+  --tooltip-nudge: 0px;
   position: absolute;
   left: 50%;
   z-index: 300;
@@ -26,7 +27,7 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(var(--tooltip-shift)) translateY(4px);
+  transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(4px);
   transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
 }
 
@@ -36,7 +37,7 @@
 
 .bottom .bubble {
   top: calc(100% + 8px);
-  transform: translateX(var(--tooltip-shift)) translateY(-4px);
+  transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(-4px);
 }
 
 .alignStart .bubble {
@@ -53,7 +54,7 @@
 .bubble::after {
   content: '';
   position: absolute;
-  left: 50%;
+  left: calc(50% - var(--tooltip-nudge));
   width: 7px;
   height: 7px;
   margin-left: -4px;
@@ -63,13 +64,13 @@
 }
 
 .alignStart .bubble::after {
-  left: 14px;
+  left: calc(14px - var(--tooltip-nudge));
   margin-left: 0;
 }
 
 .alignEnd .bubble::after {
   left: auto;
-  right: 14px;
+  right: calc(14px + var(--tooltip-nudge));
 }
 
 .top .bubble::after {
@@ -88,5 +89,13 @@
 .wrap:has(:focus-visible) .bubble {
   opacity: 1;
   visibility: visible;
-  transform: translateX(var(--tooltip-shift)) translateY(0);
+  transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(0);
+}
+
+@media (max-width: 768px) {
+  .bubble {
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    white-space: normal;
+  }
 }
