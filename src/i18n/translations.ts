@@ -121,6 +121,22 @@ export const translations: TranslationTree = {
       },
     'Image preview': { ru: 'Предпросмотр изображения' },
   },
+  profileExport: {
+    'Profile export': { ru: 'Экспорт профиля' },
+    'All profiles export': { ru: 'Экспорт всех профилей' },
+    'The profile will be saved as a JSON file. Download it or send it to another app. You can load it back with the “Load” button in the profiles menu.':
+      {
+        ru: 'Профиль будет сохранён в виде JSON-файла. Скачайте его или отправьте в другое приложение. Загрузить файл обратно можно кнопкой «Загрузить» в меню профилей.',
+      },
+    'All profiles will be saved as a single JSON file. Download it or send it to another app. You can load it back with the “Load” button in the profiles menu.':
+      {
+        ru: 'Все профили будут сохранены в один JSON-файл. Скачайте его или отправьте в другое приложение. Загрузить файл обратно можно кнопкой «Загрузить» в меню профилей.',
+      },
+    'Direct sharing is not available in this browser. The file has been downloaded — you can send it manually.':
+      {
+        ru: 'Прямая отправка недоступна в этом браузере. Файл скачан — его можно отправить вручную.',
+      },
+  },
   export: {
     'Header (name and total bonus)': { ru: 'Шапка (ник и общий бонус)' },
     'What to show in the image': { ru: 'Что показать на изображении' },
@@ -180,17 +196,17 @@ export const translations: TranslationTree = {
       {
         ru: 'Кнопка с тремя горизонтальными линиями в левой части шапки открывает меню профилей. Там можно переключаться между профилями, добавлять новый пустой профиль и удалять существующие. У каждого профиля свой ник и полный набор настроек.',
       },
-    'The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” downloads a file with all profiles. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.':
+    'The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” opens a window where a single file with all profiles can be downloaded or shared. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.':
       {
-        ru: 'Кнопки “Сохранить все” и “Загрузить” в нижней части меню работают с профилями. “Сохранить все” скачивает файл со всеми профилями. “Загрузить” принимает как файл всех профилей, так и одиночный профиль: профиль с уже существующим uid перезаписывает старый, новый профиль добавляется в конец, а если uid в файле нет, он создаётся автоматически.',
+        ru: 'Кнопки “Сохранить все” и “Загрузить” в нижней части меню работают с профилями. “Сохранить все” открывает окно, в котором можно скачать или отправить один файл со всеми профилями. “Загрузить” принимает как файл всех профилей, так и одиночный профиль: профиль с уже существующим uid перезаписывает старый, новый профиль добавляется в конец, а если uid в файле нет, он создаётся автоматически.',
       },
     'To change the order of profiles, hold a profile for a moment and drag it to the desired place. You can also move the focused profile with Alt+ArrowUp and Alt+ArrowDown.':
       {
         ru: 'Чтобы изменить порядок профилей, зажмите профиль на мгновение и перетащите его на нужное место. Профиль в фокусе также можно двигать клавишами Alt+Стрелка вверх и Alt+Стрелка вниз.',
       },
-    'The “Save profile” button in the header downloads only the active profile together with its uid. You can load this file with the same “Load” button in the profiles menu.':
+    'The “Save profile” button in the header opens a window where the active profile file can be downloaded or shared. The file contains only the active profile together with its uid, and can be loaded with the same “Load” button in the profiles menu.':
       {
-        ru: 'Кнопка “Сохранить профиль” в шапке скачивает только активный профиль вместе с его uid. Загрузить этот файл можно той же кнопкой “Загрузить” в меню профилей.',
+        ru: 'Кнопка “Сохранить профиль” в шапке открывает окно, в котором файл активного профиля можно скачать или отправить. Файл содержит только активный профиль вместе с его uid, а загрузить его можно той же кнопкой “Загрузить” в меню профилей.',
       },
     'The sun or moon button in the header switches between light and dark themes. The selected theme is remembered and applied on the next launch.':
       {

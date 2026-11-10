@@ -21,6 +21,7 @@ interface HubHeaderProps {
   onToggleProfiles: () => void;
   onOpenHelp: () => void;
   onRequestReset: () => void;
+  onExportProfile: () => void;
   onExportImage: () => void;
 }
 
@@ -164,6 +165,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
   onToggleProfiles,
   onOpenHelp,
   onRequestReset,
+  onExportProfile,
   onExportImage,
 }) => {
   const { headerRef, isCollapsed, canCollapse, toggleCollapsed } =
@@ -200,7 +202,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
       <HeaderActions
         bgColor={bgColor}
         onBgColorChange={onBgColorChange}
-        onExportProfile={profile.exportProfile}
+        onExportProfile={onExportProfile}
         onExportImage={onExportImage}
         isCollapsed={isCollapsed}
         showCollapseToggle={canCollapse}

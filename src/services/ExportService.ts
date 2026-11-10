@@ -1,5 +1,9 @@
 import { toPng } from 'html-to-image';
-import { createProfilesFile, parseProfilesContent } from './ProfilesSerialization';
+import { sanitizeFileName } from '../utils/fileShare';
+import {
+  createProfilesFile as buildProfilesFile,
+  parseProfilesContent,
+} from './ProfilesSerialization';
 import type { SccProfile } from './ProfilesSchema';
 import {
   SCC_FILE_TYPE,
@@ -23,18 +27,16 @@ export class ExportService {
     return `${year}.${month}.${day}-${hours}.${minutes}.${seconds}`;
   }
 
-  private static downloadJson(payload: unknown, filename: string): void {
-    const jsonString = JSON.stringify(payload, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = window.document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
+  private static fileStamp(): string {
+    return ExportService.curFormattedDate().replace(/:/g, '-');
   }
 
-  static exportProfile(profile: SccProfile): void {
+  private static createJsonFile(payload: unknown, fileName: string): File {
+    const json = JSON.stringify(payload, null, 2);
+    return new File([json], fileName, { type: 'application/json' });
+  }
+
+  static createProfileFile(profile: SccProfile): File {
     const document: SccPayload & { uid: string } = {
       fileType: SCC_FILE_TYPE,
       version: SCC_VERSION,
@@ -45,18 +47,18 @@ export class ExportService {
       settings: profile.settings,
       modules: profile.modules,
     };
-    const name = profile.playerName.trim() || 'profile';
+    const name = sanitizeFileName(profile.playerName) || 'profile';
 
-    ExportService.downloadJson(
+    return ExportService.createJsonFile(
       document,
-      `${name}-${ExportService.curFormattedDate()}.json`,
+      `${name}-${ExportService.fileStamp()}.json`,
     );
   }
 
-  static exportProfiles(profiles: SccProfile[]): void {
-    ExportService.downloadJson(
-      createProfilesFile(profiles),
-      `slime-profiles-${ExportService.curFormattedDate()}.json`,
+  static createAllProfilesFile(profiles: SccProfile[]): File {
+    return ExportService.createJsonFile(
+      buildProfilesFile(profiles),
+      `slime-profiles-${ExportService.fileStamp()}.json`,
     );
   }
 

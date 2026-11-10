@@ -30,10 +30,10 @@ const GeneralHelp: React.FC = () => {
         {t('To change the order of profiles, hold a profile for a moment and drag it to the desired place. You can also move the focused profile with Alt+ArrowUp and Alt+ArrowDown.')}
       </p>
       <p>
-        {t('The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” downloads a file with all profiles. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.')}
+        {t('The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” opens a window where a single file with all profiles can be downloaded or shared. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.')}
       </p>
       <p>
-        {t('The “Save profile” button in the header downloads only the active profile together with its uid. You can load this file with the same “Load” button in the profiles menu.')}
+        {t('The “Save profile” button in the header opens a window where the active profile file can be downloaded or shared. The file contains only the active profile together with its uid, and can be loaded with the same “Load” button in the profiles menu.')}
       </p>
     </>
   );

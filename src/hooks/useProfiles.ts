@@ -25,8 +25,8 @@ export interface ProfilesController {
   addProfile: () => void;
   deleteProfile: (index: number) => void;
   reorderProfile: (from: number, to: number) => void;
-  exportProfile: () => void;
-  exportAllProfiles: () => void;
+  createProfileFile: () => File | null;
+  createAllProfilesFile: () => File | null;
   importProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
   undo: () => void;
   redo: () => void;
@@ -218,15 +218,15 @@ function reorderProfile(
   context.setNotice(null);
 }
 
-function exportProfile(context: ProfilesContext): void {
+function createProfileFile(context: ProfilesContext): File | null {
   const synced = syncCurrentProfile(context);
   const profile = synced[context.activeProfileIndex];
-  if (profile) ExportService.exportProfile(profile);
+  return profile ? ExportService.createProfileFile(profile) : null;
 }
 
-function exportAllProfiles(context: ProfilesContext): void {
+function createAllProfilesFile(context: ProfilesContext): File | null {
   const synced = syncCurrentProfile(context);
-  ExportService.exportProfiles(synced);
+  return ExportService.createAllProfilesFile(synced);
 }
 
 interface MergedProfiles {
@@ -360,8 +360,8 @@ export function useProfiles(state: ProfileState): ProfilesController {
     addProfile: () => addProfile(context),
     deleteProfile: (index) => deleteProfile(context, index),
     reorderProfile: (from, to) => reorderProfile(context, from, to),
-    exportProfile: () => exportProfile(context),
-    exportAllProfiles: () => exportAllProfiles(context),
+    createProfileFile: () => createProfileFile(context),
+    createAllProfilesFile: () => createAllProfilesFile(context),
     importProfilesFile: (event) => importProfilesFile(context, event),
     undo: history.undo,
     redo: history.redo,

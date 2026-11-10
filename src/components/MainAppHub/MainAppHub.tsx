@@ -6,6 +6,7 @@ import { HubHeader } from './HubHeader';
 import { HelpModal } from './HelpModal';
 import { ImagePreviewModal } from './ImagePreviewModal';
 import { DeleteProfileModal } from './DeleteProfileModal';
+import { ProfileExportModal } from './ProfileExportModal';
 import { ProfilesDrawer } from './ProfilesDrawer';
 import { ResetProfileModal } from './ResetProfileModal';
 import { NoticeModal } from '../ui/NoticeModal/NoticeModal';
@@ -14,6 +15,7 @@ import { PlayerNotFound } from './PlayerNotFound';
 import { useCardProfile, type CardProfile } from '../../hooks/useCardProfile';
 import { useAppRoute, type AppRouteController } from '../../hooks/useAppRoute';
 import { useExportSettings } from '../../hooks/useExportSettings';
+import { useProfileExport } from '../../hooks/useProfileExport';
 import { useShareLayout } from '../../hooks/useShareLayout';
 import {
   DEFAULT_DROP_CHANCE,
@@ -34,6 +36,7 @@ function useHubController() {
     useState<DropChanceSelection>(DEFAULT_DROP_CHANCE);
   const { previewImage, shareNotice, closePreview, downloadImage, shareImage, exportImage } =
     useShareLayout(boardRef, profile.playerName);
+  const profileExport = useProfileExport(profile);
   const exportSettings = useExportSettings(
     profile.exportSelection,
     profile.setExportSelection,
@@ -49,6 +52,7 @@ function useHubController() {
     closePreview,
     downloadImage,
     shareImage,
+    profileExport,
     exportSettings,
     phaseInfo: buffsProgress.active,
     buffsProgress,
@@ -155,6 +159,7 @@ interface HubWorkspaceProps {
   onDropChanceChange: (chance: DropChanceSelection) => void;
   menu: ReturnType<typeof useProfileMenu>;
   isNotFound: boolean;
+  onExportAllProfiles: () => void;
 }
 
 const HubWorkspace: React.FC<HubWorkspaceProps> = ({
@@ -165,6 +170,7 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
   onDropChanceChange,
   menu,
   isNotFound,
+  onExportAllProfiles,
 }) => (
   <div
     className={cx(
@@ -180,7 +186,7 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
       onAdd={menu.addProfile}
       onRequestDelete={menu.requestDelete}
       onReorderProfile={profile.reorderProfile}
-      onExportAll={profile.exportAllProfiles}
+      onExportAll={onExportAllProfiles}
       onImportFile={profile.importProfilesFile}
     />
 
@@ -224,6 +230,13 @@ export const MainAppHub: React.FC = () => {
         onDownload={hub.downloadImage}
         onShare={hub.shareImage}
       />
+      <ProfileExportModal
+        kind={hub.profileExport.kind}
+        shareNotice={hub.profileExport.shareNotice}
+        onClose={hub.profileExport.close}
+        onDownload={hub.profileExport.download}
+        onShare={hub.profileExport.share}
+      />
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
       <ProfileModals menu={menu} reset={reset} />
@@ -238,6 +251,7 @@ export const MainAppHub: React.FC = () => {
         onToggleProfiles={menu.toggle}
         onOpenHelp={() => setIsHelpOpen(true)}
         onRequestReset={reset.request}
+        onExportProfile={hub.profileExport.openActive}
         onExportImage={exportSettings.open}
       />
       <HubWorkspace
@@ -248,6 +262,7 @@ export const MainAppHub: React.FC = () => {
         onDropChanceChange={setDropChance}
         menu={menu}
         isNotFound={route.isNotFound}
+        onExportAllProfiles={hub.profileExport.openAll}
       />
       <HubExportBoard
         profile={profile}

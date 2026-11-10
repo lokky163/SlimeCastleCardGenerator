@@ -1,7 +1,11 @@
 import { useRef, useState, type RefObject } from 'react';
-import { saveAs } from 'file-saver';
 import { useI18n } from '../i18n/I18nProvider';
 import { ExportService } from '../services/ExportService';
+import {
+  downloadFile,
+  sanitizeFileName,
+  shareFile,
+} from '../utils/fileShare';
 
 export interface ShareLayoutController {
   previewImage: string | null;
@@ -12,21 +16,10 @@ export interface ShareLayoutController {
   exportImage: () => Promise<void>;
 }
 
-/**
- * Android rejects file names with characters that are legal on desktop but
- * forbidden by its storage layer, so the name is reduced to a safe subset.
- */
-function sanitizeFileName(name: string): string {
-  const cleaned = name
-    .replace(/[\\/:*?"<>|]/g, '-')
-    .replace(/\p{Cc}/gu, '-')
-    .trim();
-  return cleaned || 'card';
-}
-
 function imageFileName(playerName: string): string {
+  const name = sanitizeFileName(playerName) || 'card';
   const stamp = ExportService.curFormattedDate().replace(/:/g, '-');
-  return `${sanitizeFileName(playerName)}-${stamp}.png`;
+  return `${name}-${stamp}.png`;
 }
 
 /**
@@ -51,17 +44,6 @@ function dataUrlToBlob(dataUrl: string): Blob {
   }
 
   return new Blob([bytes], { type: mime });
-}
-
-function canShareFiles(file: File): boolean {
-  if (typeof navigator.share !== 'function') return false;
-  if (typeof navigator.canShare !== 'function') return false;
-
-  try {
-    return navigator.canShare({ files: [file] });
-  } catch {
-    return false;
-  }
 }
 
 export function useShareLayout(
@@ -101,11 +83,8 @@ export function useShareLayout(
   const downloadImage = async () => {
     if (!previewImage) return;
 
-    try {
-      saveAs(dataUrlToBlob(previewImage), imageFileName(playerName));
-    } catch (error) {
-      console.error('Не удалось скачать изображение:', error);
-    }
+    const file = fileRef.current ?? buildFile(previewImage);
+    if (file) downloadFile(file);
   };
 
   const shareImage = async () => {
@@ -113,19 +92,12 @@ export function useShareLayout(
     setShareNotice(null);
 
     const file = fileRef.current ?? buildFile(previewImage);
-
-    if (file && canShareFiles(file)) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: playerName.trim() || 'Slime Castle',
-        });
-        return;
-      } catch (error) {
-        // Closing the system share sheet is not an error worth reporting.
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        console.error('Не удалось поделиться изображением:', error);
-      }
+    if (file) {
+      const result = await shareFile(
+        file,
+        playerName.trim() || 'Slime Castle',
+      );
+      if (result !== 'unavailable') return;
     }
 
     // Sharing is unavailable (insecure context, in-app browser, old browser)
