@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-panel);
-  border-right: 2px solid #0f3460;
+  border-right: 2px solid var(--color-divider);
   color: var(--color-text);
   font-family: var(--font-ui);
 }
@@ -53,7 +53,7 @@
 }
 
 .profileSelect:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--color-hover-soft);
 }
 
 .profileTitle {
@@ -96,7 +96,7 @@
 }
 
 .moveBtn:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: var(--color-hover-strong);
   color: var(--color-accent);
 }
 
@@ -115,8 +115,8 @@
 }
 
 .deleteBtn:hover {
-  background-color: rgba(139, 0, 0, 0.3);
-  color: #ff6b6b;
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger-text);
 }
 
 .addBtn {
@@ -144,7 +144,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  border-top: 2px solid #0f3460;
+  border-top: 2px solid var(--color-divider);
   background-color: var(--color-panel);
 }
 
@@ -160,13 +160,13 @@
 }
 
 .saveAllBtn {
-  background-color: #1d4ed8;
-  border-color: #3b82f6;
-  color: var(--color-text);
+  background-color: var(--color-blue);
+  border-color: var(--color-blue-border);
+  color: var(--color-on-blue);
 }
 
 .saveAllBtn:hover {
-  background-color: #2563eb;
+  background-color: var(--color-blue-hover);
 }
 
 .loadAllBtn {
@@ -175,7 +175,7 @@
 }
 
 .loadAllBtn:hover {
-  background-color: #3a3a5a;
+  background-color: var(--color-panel-hover);
 }
 
 .fileInput {

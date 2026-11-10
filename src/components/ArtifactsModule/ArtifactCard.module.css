@@ -20,7 +20,7 @@
 
 .name {
   font: 700 0.85rem var(--font-title);
-  color: #fff;
+  color: var(--color-text);
   margin-bottom: 4px;
   min-height: 20px;
 }
@@ -44,7 +44,7 @@
 
 .noStars {
   font: 700 0.85rem var(--font-title);
-  color: #666;
+  color: var(--color-card-dim);
 }
 
 .zeroStars {
@@ -64,7 +64,7 @@
   width: 100%;
   background: var(--color-panel-3);
   border: 1px solid var(--color-border);
-  color: #fff;
+  color: var(--color-text);
   border-radius: var(--radius-sm);
   padding: 4px;
   text-align: center;
@@ -82,14 +82,14 @@
 }
 
 .separator {
-  color: #888;
+  color: var(--color-card-muted);
   font-weight: bold;
 }
 
 .limit {
-  background: #111122;
-  border-color: #222233;
-  color: #888999;
+  background: var(--color-card-limit-bg);
+  border-color: var(--color-card-limit-border);
+  color: var(--color-card-limit-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,16 +105,16 @@
 
 .levelLabel {
   font: 700 0.85rem var(--font-title);
-  color: #aaa;
+  color: var(--color-card-subtle);
 }
 
 .levelLabelDisabled {
-  color: #555;
+  color: var(--color-card-dim);
 }
 
 .disabled {
-  background: #28284d;
-  border-color: #222233;
-  color: #555566;
+  background: var(--color-card-disabled-bg);
+  border-color: var(--color-card-disabled-border);
+  color: var(--color-card-disabled-text);
   cursor: not-allowed;
 }

@@ -22,8 +22,8 @@
   height: 30px;
   flex-shrink: 0;
   border-radius: 50%;
-  background-color: rgba(230, 168, 23, 0.12);
-  border: 1px solid rgba(230, 168, 23, 0.4);
+  background-color: var(--color-accent-soft-bg);
+  border: 1px solid var(--color-accent-soft-border);
 }
 
 .text {
@@ -45,9 +45,9 @@
 .dangerBtn {
   background-color: var(--color-danger);
   border-color: var(--color-danger-border);
-  color: #ff6b6b;
+  color: var(--color-danger-text);
 }
 
 .dangerBtn:hover {
-  background-color: #a40000;
+  background-color: var(--color-danger-soft-hover);
 }

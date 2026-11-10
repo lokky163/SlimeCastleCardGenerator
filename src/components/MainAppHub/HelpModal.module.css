@@ -27,7 +27,7 @@
 }
 
 .body strong {
-  color: #fff;
+  color: var(--color-text);
 }
 
 .body ul {

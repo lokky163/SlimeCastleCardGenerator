@@ -3,6 +3,6 @@
   text-align: center;
   font-weight: bold;
   text-transform: uppercase;
-  color: #aaa;
+  color: var(--color-text-muted);
   font-size: clamp(8px, 4cqi, 14px);
 }

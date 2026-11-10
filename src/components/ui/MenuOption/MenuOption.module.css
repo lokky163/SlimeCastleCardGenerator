@@ -2,10 +2,10 @@
   box-sizing: border-box;
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #3d3d3d;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: #2a2a2a;
-  color: #fff;
+  background: var(--color-panel-3);
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -14,8 +14,8 @@
 }
 
 .option:hover {
-  background: #444;
-  border-color: #666;
+  background: var(--color-panel-hover);
+  border-color: var(--color-border-hover);
 }
 
 .center {
@@ -28,6 +28,6 @@
 }
 
 .selected {
-  background: #3a3a3a;
-  border-color: #555;
+  background: var(--color-panel-hover);
+  border-color: var(--color-border-hover);
 }

@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   background-color: var(--color-panel);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 40px var(--color-shadow);
   box-sizing: border-box;
 }
 
@@ -32,7 +32,7 @@
 .primaryBtn {
   background-color: var(--color-accent);
   border-color: var(--color-accent-soft);
-  color: var(--color-bg);
+  color: var(--color-on-accent);
 }
 
 .primaryBtn:hover {
@@ -50,5 +50,5 @@
 }
 
 .secondaryBtn:hover {
-  background-color: #3a3a5a;
+  background-color: var(--color-panel-hover);
 }

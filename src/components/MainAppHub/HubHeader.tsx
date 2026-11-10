@@ -3,6 +3,7 @@ import { cx } from '../../utils/classNames';
 import type { CardProfile } from '../../hooks/useCardProfile';
 import { HeaderActions } from './HeaderActions';
 import { TabMenu } from './TabMenu';
+import { ThemeToggle } from './ThemeToggle';
 import type { AppTab } from './tabs';
 import styles from './HubHeader.module.css';
 
@@ -170,6 +171,10 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
         onOpenHelp={onOpenHelp}
         onRequestReset={onRequestReset}
       />
+
+      <div className={styles.preferences}>
+        <ThemeToggle />
+      </div>
 
       <HeaderActions
         bgColor={bgColor}

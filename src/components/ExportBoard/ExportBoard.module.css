@@ -14,7 +14,7 @@
 }
 
 .header {
-  border-bottom: 5px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 5px solid var(--export-divider);
   padding-bottom: 25px;
   margin-bottom: 5px;
   text-align: center;
@@ -24,19 +24,19 @@
 .playerName {
   font-size: 60px;
   font-weight: bold;
-  color: var(--color-accent);
+  color: var(--export-accent);
   letter-spacing: 1px;
 }
 
 .bonus {
   font-size: 40px;
-  color: var(--color-text);
+  color: var(--export-text);
   margin-top: 6px;
   font-weight: 500;
 }
 
 .accent {
-  color: var(--color-accent);
+  color: var(--export-accent);
   font-weight: bold;
 }
 
@@ -45,7 +45,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  border-bottom: 5px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 5px solid var(--export-divider);
   padding-bottom: 25px;
   margin-bottom: 25px;
   box-sizing: border-box;
@@ -73,7 +73,7 @@
   font-size: 36px;
   font-weight: bold;
   margin-bottom: 15px;
-  color: #fff;
+  color: var(--export-heading);
 }
 
 .grid {
@@ -129,13 +129,13 @@
 }
 
 .buffTitleLine {
-  color: var(--color-text);
+  color: var(--export-text);
   line-height: 1.2;
   font-weight: 600;
 }
 
 .buffValue {
-  color: var(--color-accent);
+  color: var(--export-accent);
   font-weight: bold;
   margin-top: 4px;
 }
@@ -176,20 +176,20 @@
 
 .artifactFragments {
   font-size: 2.5em;
-  color: #b0b0c0;
+  color: var(--export-muted);
   font-weight: bold;
   margin-top: 2px;
 }
 
 .artifactLevel {
   font-size: 2.5rem;
-  color: #fff;
+  color: var(--export-heading);
   font-weight: bold;
   margin-top: 2px;
 }
 
 .muted {
-  color: #666;
+  color: var(--export-dim);
 }
 
 .grayedOut {

@@ -1,11 +1,11 @@
 .phase {
   font-size: 1.15rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--color-text);
   background: var(--color-panel);
   padding: 12px 20px;
   border-radius: var(--radius-md);
-  border: 1px dashed #0f3460;
+  border: 1px dashed var(--color-divider);
   font-family: var(--font-title);
   line-height: 1.5;
 }
@@ -25,7 +25,7 @@
 .phaseLegend {
   font-size: 0.8rem;
   font-weight: normal;
-  color: #b0b0c0;
+  color: var(--color-text-muted);
   font-family: var(--font-ui);
   white-space: nowrap;
 }
@@ -47,7 +47,7 @@
 .phaseRow + .phaseRow {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid rgba(15, 52, 96, 0.7);
+  border-top: 1px solid var(--color-divider);
 }
 
 .phaseLabel {
@@ -60,7 +60,7 @@
 
 .remaining {
   font-size: 0.9rem;
-  color: #b0b0c0;
+  color: var(--color-text-muted);
   margin-top: 0;
   font-weight: normal;
   white-space: nowrap;
@@ -70,7 +70,7 @@
   background: var(--color-panel);
   padding: 12px 20px;
   border-radius: var(--radius-md);
-  border: 1px dashed #0f3460;
+  border: 1px dashed var(--color-divider);
   font-size: 0.95rem;
   font-weight: normal;
   display: flex;
@@ -86,7 +86,7 @@
 }
 
 .calculatorLabel {
-  color: #b0b0c0;
+  color: var(--color-text-muted);
 }
 
 .chanceButtons {
@@ -119,7 +119,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #b0b0c0;
+  color: var(--color-text-muted);
 }
 
 .chanceInput {
@@ -139,11 +139,11 @@
 }
 
 .multiplier {
-  color: #fff;
+  color: var(--color-text);
 }
 
 .hint {
-  color: #b0b0c0;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
@@ -151,6 +151,6 @@
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
-  color: #b0b0c0;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }

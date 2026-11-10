@@ -5,7 +5,7 @@
   justify-content: space-between;
   padding: 12px 24px;
   background-color: var(--color-panel);
-  border-bottom: 2px solid #0f3460;
+  border-bottom: 2px solid var(--color-divider);
   gap: 12px;
   flex-shrink: 0;
 }
@@ -15,8 +15,17 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
+}
+
+.preferences {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-inline: auto;
 }
 
 .profilesBtn {
@@ -67,8 +76,8 @@
 }
 
 .tabBtn:hover {
-  background-color: #3a3a5a;
-  border-color: #6a6a8a;
+  background-color: var(--color-panel-hover);
+  border-color: var(--color-border-hover);
 }
 
 .dropdownToggle {
@@ -77,7 +86,7 @@
   gap: 8px;
   background-color: var(--color-accent);
   border-color: var(--color-accent-soft);
-  color: var(--color-bg);
+  color: var(--color-on-accent);
   font-weight: 700;
 }
 
@@ -120,7 +129,7 @@
 .tabMenu .tabOption.tabOptionActive {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-bg);
+  color: var(--color-on-accent);
   font-weight: 700;
 }
 
@@ -131,15 +140,15 @@
 .btnReset {
   background-color: var(--color-danger);
   border-color: var(--color-danger-border);
-  color: #ff3232;
+  color: var(--color-danger-text);
   font-weight: 600;
-  box-shadow: 0 0 6px rgba(139, 0, 0, 0.4);
+  box-shadow: 0 0 6px var(--color-danger-shadow);
 }
 
 .btnReset:hover {
-  background-color: #831919;
-  border-color: #ff6347;
-  box-shadow: 0 0 10px rgba(255, 69, 0, 0.6);
+  background-color: var(--color-danger-bg-hover);
+  border-color: var(--color-danger-text-hover);
+  box-shadow: 0 0 10px var(--color-danger-shadow-hover);
 }
 
 .nameInput {
@@ -231,18 +240,19 @@
 }
 
 .btnExport {
-  background-color: #1d4ed8;
-  border-color: #3b82f6;
+  background-color: var(--color-blue);
+  border-color: var(--color-blue-border);
+  color: var(--color-on-blue);
 }
 
 .btnExport:hover {
-  background-color: #2563eb;
+  background-color: var(--color-blue-hover);
 }
 
 .btnPng {
   background-color: var(--color-accent);
   border-color: var(--color-accent-soft);
-  color: var(--color-bg);
+  color: var(--color-on-accent);
 }
 
 .btnPng:hover {
@@ -282,7 +292,7 @@
 }
 
 .collapseBtn:hover {
-  background-color: #3a3a5a;
+  background-color: var(--color-panel-hover);
 }
 
 .collapseIcon {
@@ -299,6 +309,12 @@
 }
 
 @media (max-width: 768px) {
+  .preferences {
+    flex-basis: 100%;
+    justify-content: center;
+    margin-inline: 0;
+  }
+
   .header:not(.headerCollapsed) .leftGroup {
     flex-basis: 100%;
   }

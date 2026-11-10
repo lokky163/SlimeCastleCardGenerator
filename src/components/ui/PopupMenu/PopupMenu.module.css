@@ -1,9 +1,9 @@
 .menu {
   box-sizing: border-box;
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid #444;
+  background: var(--color-menu-bg);
+  border: 1px solid var(--color-menu-border);
   border-radius: var(--radius-sm);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 16px var(--color-menu-shadow);
   z-index: 100;
   overflow-y: auto;
   scrollbar-width: none;
