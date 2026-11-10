@@ -1,4 +1,5 @@
 import type { LanguageId } from '../services/Language';
+import { nameTranslations } from './nameTranslations';
 
 export interface TranslationEntry {
   readonly ru: string | readonly string[];
@@ -253,6 +254,7 @@ export const translations: TranslationTree = {
       },
     'row count * column count - 1': { ru: 'кол-во строк * кол-во столбцов - 1' },
   },
+  names: nameTranslations,
 };
 
 const dictionary = new Map<string, TranslationEntry>();

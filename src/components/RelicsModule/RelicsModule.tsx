@@ -35,6 +35,7 @@ export const RelicsModule: React.FC<RelicsModuleProps> = ({
         variant="relic"
         renderCard={(relic) => (
           <RelicCard
+            name={relic.name}
             imageUrl={relic.imageUrl}
             state={relic.state}
             onChangeState={(state) => handleStateChange(relic.name, state)}

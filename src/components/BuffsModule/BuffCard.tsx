@@ -28,7 +28,7 @@ export const BuffCard: React.FC<BuffCardProps> = ({ buff, onChangeValue }) => {
         className={styles.name}
         style={{ fontSize: BUFF_CONFIG.editor.titleFontSize }}
       >
-        {buff.cleanName}
+        {t(buff.cleanName)}
       </div>
 
       <input

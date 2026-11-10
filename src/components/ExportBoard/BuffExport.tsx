@@ -16,7 +16,8 @@ interface BuffExportCardProps {
 }
 
 const BuffExportCard: React.FC<BuffExportCardProps> = ({ buff }) => {
-  const nameLines = splitBuffName(buff.cleanName);
+  const { t } = useI18n();
+  const nameLines = splitBuffName(t(buff.cleanName));
 
   return (
     <div className={styles.buffCard}>

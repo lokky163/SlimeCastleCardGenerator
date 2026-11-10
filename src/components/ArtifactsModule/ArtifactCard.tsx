@@ -119,18 +119,23 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({
   onChangeState,
   onChangeFragments,
   onChangeLevel,
-}) => (
-  <div className={styles.card}>
-    <img
-      src={artifact.imageUrl}
-      alt={artifact.cleanName}
-      className={cx(styles.image, artifact.isBlackAndWhite && styles.grayedOut)}
-    />
+}) => {
+  const { t } = useI18n();
+  const displayName = t(artifact.cleanName);
 
-    <div className={styles.name}>{artifact.cleanName}</div>
+  return (
+    <div className={styles.card}>
+      <img
+        src={artifact.imageUrl}
+        alt={displayName}
+        className={cx(styles.image, artifact.isBlackAndWhite && styles.grayedOut)}
+      />
 
-    <ArtifactStars state={artifact.state} onChangeState={onChangeState} />
-    <ArtifactFragmentsRow artifact={artifact} onChange={onChangeFragments} />
-    <ArtifactLevelRow artifact={artifact} onChange={onChangeLevel} />
-  </div>
-);
+      <div className={styles.name}>{displayName}</div>
+
+      <ArtifactStars state={artifact.state} onChangeState={onChangeState} />
+      <ArtifactFragmentsRow artifact={artifact} onChange={onChangeFragments} />
+      <ArtifactLevelRow artifact={artifact} onChange={onChangeLevel} />
+    </div>
+  );
+};

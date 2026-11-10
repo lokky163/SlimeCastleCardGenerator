@@ -58,12 +58,16 @@ function applyClickZone(
   }
 }
 
-export function useSlimeImage(slime: SlimeData, isEditingLevel: boolean): string {
+export function useSlimeImage(
+  slime: SlimeData,
+  displayName: string,
+  isEditingLevel: boolean,
+): string {
   return useComposedImage(
-    slimeImageKey(slime, isEditingLevel),
+    slimeImageKey(slime, displayName, isEditingLevel),
     SLIME_IMAGE_WIDTH,
     SLIME_IMAGE_HEIGHT,
-    (ctx) => drawSlimeImage(ctx, slime, isEditingLevel),
+    (ctx) => drawSlimeImage(ctx, slime, displayName, isEditingLevel),
   );
 }
 

@@ -1,5 +1,6 @@
 import { ComposedImage } from '../ui/ComposedImage/ComposedImage';
 import type { SlimeData } from '../../models/slime';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   useSlimeImage,
   useSlimeInteractions,
@@ -17,6 +18,7 @@ interface SlimeCardProps extends SlimeCardHandlers {
 
 interface SlimeCardViewProps extends SlimeCardHandlers {
   slime: SlimeData;
+  displayName: string;
   width: number;
   imageSrc: string;
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -29,6 +31,7 @@ interface SlimeCardViewProps extends SlimeCardHandlers {
 
 const SlimeCardView: React.FC<SlimeCardViewProps> = ({
   slime,
+  displayName,
   width,
   imageSrc,
   cardRef,
@@ -48,7 +51,7 @@ const SlimeCardView: React.FC<SlimeCardViewProps> = ({
   >
     <ComposedImage
       src={imageSrc}
-      alt={slime.cleanName}
+      alt={displayName}
       aspectRatio={`${SLIME_IMAGE_WIDTH} / ${SLIME_IMAGE_HEIGHT}`}
       grayscale={slime.isBlackAndWhite}
       className={styles.artwork}
@@ -80,16 +83,19 @@ export const SlimeCard: React.FC<SlimeCardProps> = ({
   onChangeLevel,
   onChangeSkin = () => {},
 }) => {
+  const { t } = useI18n();
+  const displayName = t(slime.cleanName);
   const interactions = useSlimeInteractions(slime, {
     onChangeState,
     onChangeLevel,
     onChangeSkin,
   });
-  const imageSrc = useSlimeImage(slime, interactions.isEditingLevel);
+  const imageSrc = useSlimeImage(slime, displayName, interactions.isEditingLevel);
 
   return (
     <SlimeCardView
       slime={slime}
+      displayName={displayName}
       width={width}
       imageSrc={imageSrc}
       cardRef={interactions.cardRef}

@@ -20,6 +20,7 @@ export const RelicExport: React.FC<RelicExportProps> = ({ relics, layout }) => (
       cellClassName={styles.relicCell}
       renderItem={(relic) => (
         <RelicCard
+          name={relic.name}
           imageUrl={relic.imageUrl}
           state={relic.state}
           onChangeState={() => {}}

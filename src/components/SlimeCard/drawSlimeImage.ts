@@ -7,13 +7,18 @@ export const SLIME_IMAGE_HEIGHT = 276;
 const WIDTH = SLIME_IMAGE_WIDTH;
 const HEIGHT = SLIME_IMAGE_HEIGHT;
 
-export function slimeImageKey(slime: SlimeData, hideLevel: boolean): string {
+export function slimeImageKey(
+  slime: SlimeData,
+  displayName: string,
+  hideLevel: boolean,
+): string {
   return [
     'slime',
     slime.imageUrl,
     slime.rarity,
     slime.state,
     slime.level,
+    displayName,
     hideLevel ? 'edit' : 'view',
   ].join(':');
 }
@@ -58,6 +63,7 @@ function getStarInfo(state: SlimeState): { type: 'yellow' | 'red' | null; count:
 export async function drawSlimeImage(
   ctx: CanvasRenderingContext2D,
   slime: SlimeData,
+  displayName: string,
   hideLevel: boolean,
 ): Promise<void> {
   await loadCardFont();
@@ -70,7 +76,7 @@ export async function drawSlimeImage(
   if (!hideLevel) drawText(ctx, `Lv.${slime.level}`, 27);
 
   if (!slime.hasStars) {
-    drawText(ctx, slime.cleanName, 216);
+    drawText(ctx, displayName, 216);
     return;
   }
 
