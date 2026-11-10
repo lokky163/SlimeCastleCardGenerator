@@ -178,7 +178,7 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
       onSelect={menu.selectProfile}
       onAdd={menu.addProfile}
       onRequestDelete={menu.requestDelete}
-      onMoveProfile={profile.moveProfile}
+      onReorderProfile={profile.reorderProfile}
       onExportAll={profile.exportAllProfiles}
       onImportFile={profile.importProfilesFile}
     />

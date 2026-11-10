@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import type { ProfilesMoveDirection } from '../../hooks/useProfiles';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
@@ -13,7 +12,7 @@ interface ProfilesDrawerProps {
   onSelect: (index: number) => void;
   onAdd: () => void;
   onRequestDelete: (index: number) => void;
-  onMoveProfile: (index: number, direction: ProfilesMoveDirection) => void;
+  onReorderProfile: (from: number, to: number) => void;
   onExportAll: () => void;
   onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,17 +21,29 @@ interface ProfileRowProps {
   profile: SccProfile;
   index: number;
   active: boolean;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
+  dragging: boolean;
+  dropTarget: boolean;
   onSelect: (index: number) => void;
   onDelete: (index: number) => void;
-  onMove: (index: number, direction: ProfilesMoveDirection) => void;
+  onPointerDown: (event: React.PointerEvent<HTMLDivElement>, index: number) => void;
+  onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerUp: () => void;
+  onPointerCancel: () => void;
+  onPointerLeave: () => void;
 }
 
 interface ProfilesFooterProps {
   onExportAll: () => void;
   onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+interface DragState {
+  from: number;
+  over: number;
+}
+
+const LONG_PRESS_MS = 400;
+const MOVE_TOLERANCE_PX = 10;
 
 const TrashIcon: React.FC = () => (
   <svg
@@ -54,95 +65,42 @@ const TrashIcon: React.FC = () => (
   </svg>
 );
 
-const MoveIcon: React.FC<{ direction: ProfilesMoveDirection }> = ({
-  direction,
-}) => (
-  <svg
-    aria-hidden="true"
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ transform: direction === 'down' ? 'rotate(180deg)' : undefined }}
-  >
-    <path d="M12 19V5" />
-    <path d="M5 12l7-7 7 7" />
-  </svg>
-);
-
 function profileName(profile: SccProfile, emptyLabel: string): string {
   return profile.playerName.trim() || emptyLabel;
 }
-
-interface ProfileMoveButtonsProps {
-  index: number;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
-  onMove: (index: number, direction: ProfilesMoveDirection) => void;
-}
-
-const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
-  index,
-  canMoveUp,
-  canMoveDown,
-  onMove,
-}) => {
-  const { t } = useI18n();
-  if (!canMoveUp && !canMoveDown) return null;
-
-  const upLabel = t('Move profile {index} up', { index: index + 1 });
-  const downLabel = t('Move profile {index} down', { index: index + 1 });
-
-  return (
-    <div className={styles.reorderBtns}>
-      {canMoveUp && (
-        <Tooltip label={upLabel} placement="bottom" align="end">
-          <button
-            type="button"
-            className={styles.moveBtn}
-            aria-label={upLabel}
-            onClick={() => onMove(index, 'up')}
-          >
-            <MoveIcon direction="up" />
-          </button>
-        </Tooltip>
-      )}
-
-      {canMoveDown && (
-        <Tooltip label={downLabel} placement="bottom" align="end">
-          <button
-            type="button"
-            className={styles.moveBtn}
-            aria-label={downLabel}
-            onClick={() => onMove(index, 'down')}
-          >
-            <MoveIcon direction="down" />
-          </button>
-        </Tooltip>
-      )}
-    </div>
-  );
-};
 
 const ProfileRow: React.FC<ProfileRowProps> = ({
   profile,
   index,
   active,
-  canMoveUp,
-  canMoveDown,
+  dragging,
+  dropTarget,
   onSelect,
   onDelete,
-  onMove,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onPointerCancel,
+  onPointerLeave,
 }) => {
   const { t } = useI18n();
   const deleteLabel = t('Delete profile {index}', { index: index + 1 });
 
   return (
-    <div className={cx(styles.profileRow, active && styles.profileRowActive)}>
+    <div
+      className={cx(
+        styles.profileRow,
+        active && styles.profileRowActive,
+        dragging && styles.profileRowDragging,
+        dropTarget && styles.profileRowDropTarget,
+      )}
+      data-profile-index={index}
+      onPointerDown={(event) => onPointerDown(event, index)}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      onPointerLeave={onPointerLeave}
+    >
       <button
         type="button"
         className={styles.profileSelect}
@@ -157,18 +115,12 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
         </span>
       </button>
 
-      <ProfileMoveButtons
-        index={index}
-        canMoveUp={canMoveUp}
-        canMoveDown={canMoveDown}
-        onMove={onMove}
-      />
-
       <Tooltip label={deleteLabel} placement="bottom" align="end">
         <button
           type="button"
           className={styles.deleteBtn}
           aria-label={deleteLabel}
+          data-no-drag="true"
           onClick={() => onDelete(index)}
         >
           <TrashIcon />
@@ -221,15 +173,137 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   onSelect,
   onAdd,
   onRequestDelete,
-  onMoveProfile,
+  onReorderProfile,
   onExportAll,
   onImportFile,
 }) => {
   const { t } = useI18n();
+  const [drag, setDrag] = useState<DragState | null>(null);
+  const dragRef = useRef<DragState | null>(null);
+  const pressRef = useRef<{ x: number; y: number; index: number } | null>(null);
+  const timerRef = useRef<number | null>(null);
+  const justDraggedRef = useRef(false);
+
+  const clearPressTimer = () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  useEffect(() => () => clearPressTimer(), []);
+
+  const beginPress = (
+    event: React.PointerEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    if (event.button !== 0) return;
+    if ((event.target as HTMLElement).closest('[data-no-drag]')) return;
+
+    justDraggedRef.current = false;
+    pressRef.current = { x: event.clientX, y: event.clientY, index };
+    clearPressTimer();
+
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = null;
+      const press = pressRef.current;
+      if (!press) return;
+
+      justDraggedRef.current = true;
+      const next = { from: press.index, over: press.index };
+      dragRef.current = next;
+      setDrag(next);
+    }, LONG_PRESS_MS);
+  };
+
+  const trackPress = (event: React.PointerEvent<HTMLDivElement>) => {
+    const press = pressRef.current;
+    if (!press || dragRef.current) return;
+
+    const dx = event.clientX - press.x;
+    const dy = event.clientY - press.y;
+    if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) {
+      clearPressTimer();
+      pressRef.current = null;
+    }
+  };
+
+  const endPress = () => {
+    clearPressTimer();
+    pressRef.current = null;
+  };
+
+  useEffect(() => {
+    if (!drag) return;
+
+    const updateTarget = (x: number, y: number) => {
+      const element = document.elementFromPoint(x, y);
+      const row = element?.closest<HTMLElement>('[data-profile-index]');
+      if (!row) return;
+
+      const over = Number(row.dataset.profileIndex);
+      const current = dragRef.current;
+      if (!current || !Number.isFinite(over) || over === current.over) return;
+
+      const next = { ...current, over };
+      dragRef.current = next;
+      setDrag(next);
+    };
+
+    const finish = (apply: boolean) => {
+      const current = dragRef.current;
+      dragRef.current = null;
+      pressRef.current = null;
+      setDrag(null);
+
+      if (apply && current && current.from !== current.over) {
+        onReorderProfile(current.from, current.over);
+      }
+
+      window.setTimeout(() => {
+        justDraggedRef.current = false;
+      }, 0);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      updateTarget(event.clientX, event.clientY);
+    };
+    const handlePointerUp = () => finish(true);
+    const handlePointerCancel = () => finish(false);
+    const handleTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerCancel);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [drag, onReorderProfile]);
+
   if (!open) return null;
 
   return (
-    <aside id="profiles-drawer" className={styles.drawer} aria-label={t('Profiles')}>
+    <aside
+      id="profiles-drawer"
+      className={styles.drawer}
+      aria-label={t('Profiles')}
+      onClickCapture={(event) => {
+        if (!justDraggedRef.current) return;
+        event.preventDefault();
+        event.stopPropagation();
+        justDraggedRef.current = false;
+      }}
+      onContextMenu={(event) => {
+        if (dragRef.current) event.preventDefault();
+      }}
+    >
       <div className={styles.list}>
         {profiles.map((profile, index) => (
           <ProfileRow
@@ -237,11 +311,17 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
             profile={profile}
             index={index}
             active={index === activeProfileIndex}
-            canMoveUp={index > 0}
-            canMoveDown={index < profiles.length - 1}
+            dragging={drag?.from === index}
+            dropTarget={drag !== null && drag.over === index && drag.from !== index}
             onSelect={onSelect}
             onDelete={onRequestDelete}
-            onMove={onMoveProfile}
+            onPointerDown={beginPress}
+            onPointerMove={trackPress}
+            onPointerUp={endPress}
+            onPointerCancel={endPress}
+            onPointerLeave={() => {
+              if (!dragRef.current) endPress();
+            }}
           />
         ))}
 

@@ -24,7 +24,7 @@ export interface ProfilesController {
   selectProfile: (index: number) => void;
   addProfile: () => void;
   deleteProfile: (index: number) => void;
-  moveProfile: (index: number, direction: ProfilesMoveDirection) => void;
+  reorderProfile: (from: number, to: number) => void;
   exportProfile: () => void;
   exportAllProfiles: () => void;
   importProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -35,8 +35,6 @@ export interface ProfilesController {
   profilesNotice: NoticeData | null;
   clearProfilesNotice: () => void;
 }
-
-export type ProfilesMoveDirection = 'up' | 'down';
 
 interface ProfilesHydration {
   profiles: SccProfile[];
@@ -191,22 +189,29 @@ function deleteProfile(context: ProfilesContext, index: number): void {
   context.setNotice(null);
 }
 
-function moveProfile(
+function reorderProfile(
   context: ProfilesContext,
-  index: number,
-  direction: ProfilesMoveDirection,
+  from: number,
+  to: number,
 ): void {
-  const target = direction === 'up' ? index - 1 : index + 1;
   const { profiles, activeProfileIndex } = context;
-  if (!profiles[index] || !profiles[target]) return;
+  if (from === to || !profiles[from] || !profiles[to]) return;
 
   const synced = syncCurrentProfile(context);
+  if (!synced[from] || !synced[to]) return;
+
   const reordered = [...synced];
-  [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+  const [moved] = reordered.splice(from, 1);
+  reordered.splice(to, 0, moved);
 
   let nextActiveIndex = activeProfileIndex;
-  if (activeProfileIndex === index) nextActiveIndex = target;
-  else if (activeProfileIndex === target) nextActiveIndex = index;
+  if (activeProfileIndex === from) {
+    nextActiveIndex = to;
+  } else if (from < activeProfileIndex && to >= activeProfileIndex) {
+    nextActiveIndex = activeProfileIndex - 1;
+  } else if (from > activeProfileIndex && to <= activeProfileIndex) {
+    nextActiveIndex = activeProfileIndex + 1;
+  }
 
   context.setProfiles(reordered);
   context.setActiveProfileIndex(nextActiveIndex);
@@ -354,7 +359,7 @@ export function useProfiles(state: ProfileState): ProfilesController {
     selectProfile: (index) => selectProfile(context, index),
     addProfile: () => addProfile(context),
     deleteProfile: (index) => deleteProfile(context, index),
-    moveProfile: (index, direction) => moveProfile(context, index, direction),
+    reorderProfile: (from, to) => reorderProfile(context, from, to),
     exportProfile: () => exportProfile(context),
     exportAllProfiles: () => exportAllProfiles(context),
     importProfilesFile: (event) => importProfilesFile(context, event),

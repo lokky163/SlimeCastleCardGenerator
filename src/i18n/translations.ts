@@ -75,8 +75,6 @@ export const translations: TranslationTree = {
     'Profile {index}:': { ru: 'Профиль {index}:' },
     'Profile {index}': { ru: 'Профиль {index}' },
     'Profile {index} ({name})': { ru: 'Профиль {index} ({name})' },
-    'Move profile {index} up': { ru: 'Переместить профиль {index} вверх' },
-    'Move profile {index} down': { ru: 'Переместить профиль {index} вниз' },
     'Delete profile {index}': { ru: 'Удалить профиль {index}' },
     '+ Add profile': { ru: '+ Добавить профиль' },
     'Delete profile?': { ru: 'Удалить профиль?' },
