@@ -63,7 +63,7 @@ const ExportOptionsActions: React.FC<ExportOptionsActionsProps> = ({
         onClick={onExport}
         disabled={!hasSelection}
       >
-        {t('Download PNG')}
+        {t('Generate PNG')}
       </button>
     </div>
   );

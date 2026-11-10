@@ -32,7 +32,7 @@ function useHubController() {
   const boardRef = useRef<HTMLDivElement>(null);
   const [dropChance, setDropChance] =
     useState<DropChanceSelection>(DEFAULT_DROP_CHANCE);
-  const { previewImage, canShare, closePreview, downloadImage, shareImage, exportImage } =
+  const { previewImage, shareNotice, closePreview, downloadImage, shareImage, exportImage } =
     useShareLayout(boardRef, profile.playerName);
   const exportSettings = useExportSettings(
     profile.exportSelection,
@@ -45,7 +45,7 @@ function useHubController() {
     profile,
     boardRef,
     previewImage,
-    canShare,
+    shareNotice,
     closePreview,
     downloadImage,
     shareImage,
@@ -219,7 +219,7 @@ export const MainAppHub: React.FC = () => {
     <div className={styles.hubContainer}>
       <ImagePreviewModal
         image={hub.previewImage}
-        canShare={hub.canShare}
+        shareNotice={hub.shareNotice}
         onClose={hub.closePreview}
         onDownload={hub.downloadImage}
         onShare={hub.shareImage}

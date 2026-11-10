@@ -2,12 +2,11 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
 import modalStyles from '../ui/Modal/Modal.module.css';
-import { Tooltip } from '../ui/Tooltip/Tooltip';
 import styles from './ImagePreviewModal.module.css';
 
 interface ImagePreviewModalProps {
   image: string | null;
-  canShare: boolean;
+  shareNotice: string | null;
   onClose: () => void;
   onDownload: () => void;
   onShare: () => void;
@@ -15,15 +14,12 @@ interface ImagePreviewModalProps {
 
 export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
   image,
-  canShare,
+  shareNotice,
   onClose,
   onDownload,
   onShare,
 }) => {
   const { t } = useI18n();
-  const shareLabel = canShare
-    ? t('Share')
-    : t('Sharing is not supported in this browser');
 
   return (
     <Modal open={Boolean(image)} onClose={onClose} className={styles.dialog}>
@@ -53,18 +49,20 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
           {t('Download')}
         </button>
 
-        <Tooltip label={shareLabel} placement="top" align="end">
-          <button
-            type="button"
-            className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
-            aria-label={shareLabel}
-            disabled={!canShare}
-            onClick={onShare}
-          >
-            {t('Share')}
-          </button>
-        </Tooltip>
+        <button
+          type="button"
+          className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
+          onClick={onShare}
+        >
+          {t('Share')}
+        </button>
       </div>
+
+      {shareNotice && (
+        <p className={styles.notice} role="status">
+          {shareNotice}
+        </p>
+      )}
     </Modal>
   );
 };

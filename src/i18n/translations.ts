@@ -41,7 +41,7 @@ export const translations: TranslationTree = {
     Load: { ru: 'Загрузить' },
     'Select all': { ru: 'Выбрать всё' },
     'Clear all': { ru: 'Снять всё' },
-    'Download PNG': { ru: 'Скачать PNG' },
+    'Generate PNG': { ru: 'Сформировать PNG' },
     Download: { ru: 'Скачать' },
     Share: { ru: 'Поделиться' },
     'Permanent buffs': { ru: 'Перманентные бафы' },
@@ -115,9 +115,10 @@ export const translations: TranslationTree = {
     'Download the image or share it with other apps.': {
       ru: 'Скачайте изображение или поделитесь им в других приложениях.',
     },
-    'Sharing is not supported in this browser': {
-      ru: 'Отправка не поддерживается этим браузером',
-    },
+    'Direct sharing is not available in this browser. The image has been downloaded — you can send it manually.':
+      {
+        ru: 'Прямая отправка недоступна в этом браузере. Изображение скачано — его можно отправить вручную.',
+      },
     'Image preview': { ru: 'Предпросмотр изображения' },
   },
   export: {
