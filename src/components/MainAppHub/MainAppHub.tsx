@@ -162,7 +162,7 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
       onRequestDelete={menu.requestDelete}
       onMoveProfile={profile.moveProfile}
       onExportAll={profile.exportAllProfiles}
-      onImportAllFile={profile.importAllProfilesFile}
+      onImportFile={profile.importProfilesFile}
     />
 
     <main className={styles.mainContent}>
@@ -178,16 +178,10 @@ const HubWorkspace: React.FC<HubWorkspaceProps> = ({
 );
 
 const AppNotices: React.FC<{ profile: CardProfile }> = ({ profile }) => (
-  <>
-    <NoticeModal
-      notice={profile.profilesNotice}
-      onClose={profile.clearProfilesNotice}
-    />
-    <NoticeModal
-      notice={profile.transferNotice}
-      onClose={profile.clearTransferNotice}
-    />
-  </>
+  <NoticeModal
+    notice={profile.profilesNotice}
+    onClose={profile.clearProfilesNotice}
+  />
 );
 
 export const MainAppHub: React.FC = () => {

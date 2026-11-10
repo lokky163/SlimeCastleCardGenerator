@@ -1,8 +1,12 @@
 import { toPng } from 'html-to-image';
-import { importScc, type IImportedSccData } from './SccImport';
-import { createProfilesFile, parseProfilesFile } from './ProfilesSerialization';
+import { createProfilesFile, parseProfilesContent } from './ProfilesSerialization';
 import type { SccProfile } from './ProfilesSchema';
-import { SCC_MODULES, type SccPayload } from './SccSchema';
+import {
+  SCC_FILE_TYPE,
+  SCC_MODULES,
+  SCC_VERSION,
+  type SccPayload,
+} from './SccSchema';
 
 export class ExportService {
   static curFormattedDate() {
@@ -30,16 +34,22 @@ export class ExportService {
     URL.revokeObjectURL(url);
   }
 
-  static exportToScc(payload: SccPayload): void {
-    const document: SccPayload = {
-      ...payload,
+  static exportProfile(profile: SccProfile): void {
+    const document: SccPayload & { uid: string } = {
+      fileType: SCC_FILE_TYPE,
+      version: SCC_VERSION,
+      uid: profile.uid,
+      playerName: profile.playerName,
       exportDate: new Date().toISOString(),
       exportedModules: [...SCC_MODULES],
+      settings: profile.settings,
+      modules: profile.modules,
     };
+    const name = profile.playerName.trim() || 'profile';
 
     ExportService.downloadJson(
       document,
-      `${payload.playerName}-${ExportService.curFormattedDate()}.json`,
+      `${name}-${ExportService.curFormattedDate()}.json`,
     );
   }
 
@@ -50,12 +60,8 @@ export class ExportService {
     );
   }
 
-  static importFromScc(fileContent: string): IImportedSccData | null {
-    return importScc(fileContent);
-  }
-
   static importProfiles(fileContent: string): SccProfile[] | null {
-    return parseProfilesFile(fileContent);
+    return parseProfilesContent(fileContent);
   }
 
   static async exportToPng(element: HTMLDivElement | null): Promise<string | null> {

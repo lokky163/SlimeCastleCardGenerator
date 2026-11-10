@@ -230,14 +230,6 @@
   transition: background 0.2s, border-color 0.2s;
 }
 
-.btnImport {
-  background-color: var(--color-panel-3);
-}
-
-.btnImport:hover {
-  background-color: #3a3a5a;
-}
-
 .btnExport {
   background-color: #1d4ed8;
   border-color: #3b82f6;
@@ -263,10 +255,6 @@
   gap: 12px;
 }
 
-.fileInput {
-  display: none;
-}
-
 .headerCollapsed {
   padding-top: 8px;
   padding-bottom: 8px;
@@ -276,7 +264,6 @@
 .headerCollapsed .btnHelp,
 .headerCollapsed .btnReset,
 .headerCollapsed .pickerBlock,
-.headerCollapsed .btnImport,
 .headerCollapsed .btnExport,
 .headerCollapsed .btnPng {
   display: none;

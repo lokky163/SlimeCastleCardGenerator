@@ -24,15 +24,22 @@ function readUid(value: unknown): string {
   return uid || createProfileUid();
 }
 
+function readSettings(value: unknown): SccSettings {
+  if (isRecord(value)) return value as unknown as SccSettings;
+
+  return {
+    bgColor: DEFAULT_CARD_SETTINGS.bgColor,
+    exportSelection: { ...DEFAULT_CARD_SETTINGS.exportSelection },
+  };
+}
+
 function normalizeProfile(value: unknown): SccProfile | null {
-  if (!isRecord(value) || !isRecord(value.settings) || !isRecord(value.modules)) {
-    return null;
-  }
+  if (!isRecord(value) || !isRecord(value.modules)) return null;
 
   return {
     uid: readUid(value.uid),
     playerName: typeof value.playerName === 'string' ? value.playerName : '',
-    settings: value.settings as unknown as SccSettings,
+    settings: readSettings(value.settings),
     modules: value.modules as unknown as SccModules,
   };
 }
@@ -49,22 +56,6 @@ function normalizeProfiles(value: unknown): SccProfile[] | null {
   return profiles;
 }
 
-function normalizeLegacyProfile(value: unknown): SccProfile | null {
-  if (!isRecord(value) || !isRecord(value.modules)) return null;
-
-  return {
-    uid: createProfileUid(),
-    playerName: typeof value.playerName === 'string' ? value.playerName : '',
-    settings: isRecord(value.settings)
-      ? (value.settings as unknown as SccSettings)
-      : {
-          bgColor: DEFAULT_CARD_SETTINGS.bgColor,
-          exportSelection: { ...DEFAULT_CARD_SETTINGS.exportSelection },
-        },
-    modules: value.modules as unknown as SccModules,
-  };
-}
-
 export function createProfilesFile(profiles: SccProfile[]): ProfilesFile {
   return {
     fileType: PROFILES_FILE_TYPE,
@@ -75,16 +66,33 @@ export function createProfilesFile(profiles: SccProfile[]): ProfilesFile {
   };
 }
 
-export function parseProfilesFile(fileContent: string): SccProfile[] | null {
+function hasValidProfileCount(parsed: Record<string, unknown>, count: number): boolean {
+  return typeof parsed.profileCount !== 'number' || parsed.profileCount === count;
+}
+
+/**
+ * Читает как файл всех профилей, так и одиночный профиль.
+ * Профилям без uid uid генерируется при нормализации.
+ */
+export function parseProfilesContent(fileContent: string): SccProfile[] | null {
   try {
     const parsed = JSON.parse(fileContent) as unknown;
-    if (!isRecord(parsed) || parsed.fileType !== PROFILES_FILE_TYPE) return null;
+    if (!isRecord(parsed)) return null;
 
-    const profiles = normalizeProfiles(parsed.profiles);
-    if (!profiles) return null;
-    if (parsed.profileCount !== profiles.length) return null;
+    if (parsed.fileType === PROFILES_FILE_TYPE) {
+      const profiles = normalizeProfiles(parsed.profiles);
+      if (!profiles || !hasValidProfileCount(parsed, profiles.length)) {
+        return null;
+      }
+      return profiles;
+    }
 
-    return profiles;
+    if (parsed.fileType === SCC_FILE_TYPE) {
+      const profile = normalizeProfile(parsed);
+      return profile ? [profile] : null;
+    }
+
+    return null;
   } catch {
     return null;
   }
@@ -112,7 +120,7 @@ export function parseLegacyProfile(fileContent: string): SccProfile | null {
   try {
     const parsed = JSON.parse(fileContent) as unknown;
     if (!isRecord(parsed) || parsed.fileType !== SCC_FILE_TYPE) return null;
-    return normalizeLegacyProfile(parsed);
+    return normalizeProfile(parsed);
   } catch {
     return null;
   }

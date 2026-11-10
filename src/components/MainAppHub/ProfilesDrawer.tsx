@@ -13,7 +13,7 @@ interface ProfilesDrawerProps {
   onRequestDelete: (index: number) => void;
   onMoveProfile: (index: number, direction: ProfilesMoveDirection) => void;
   onExportAll: () => void;
-  onImportAllFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface ProfileRowProps {
@@ -29,7 +29,7 @@ interface ProfileRowProps {
 
 interface ProfilesFooterProps {
   onExportAll: () => void;
-  onImportAllFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TrashIcon: React.FC = () => (
@@ -162,7 +162,7 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
 
 const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
   onExportAll,
-  onImportAllFile,
+  onImportFile,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -181,7 +181,7 @@ const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
         className={cx(styles.footerBtn, styles.loadAllBtn)}
         onClick={() => fileInputRef.current?.click()}
       >
-        Загрузить все
+        Загрузить
       </button>
 
       <input
@@ -189,7 +189,7 @@ const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
         ref={fileInputRef}
         accept=".json"
         className={styles.fileInput}
-        onChange={onImportAllFile}
+        onChange={onImportFile}
       />
     </div>
   );
@@ -204,7 +204,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   onRequestDelete,
   onMoveProfile,
   onExportAll,
-  onImportAllFile,
+  onImportFile,
 }) => {
   if (!open) return null;
 
@@ -232,7 +232,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
 
       <ProfilesFooter
         onExportAll={onExportAll}
-        onImportAllFile={onImportAllFile}
+        onImportFile={onImportFile}
       />
     </aside>
   );

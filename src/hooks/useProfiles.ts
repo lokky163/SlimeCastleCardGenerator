@@ -22,8 +22,9 @@ export interface ProfilesController {
   addProfile: () => void;
   deleteProfile: (index: number) => void;
   moveProfile: (index: number, direction: ProfilesMoveDirection) => void;
+  exportProfile: () => void;
   exportAllProfiles: () => void;
-  importAllProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  importProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
   profilesNotice: NoticeData | null;
   clearProfilesNotice: () => void;
 }
@@ -202,6 +203,12 @@ function moveProfile(
   context.setNotice(null);
 }
 
+function exportProfile(context: ProfilesContext): void {
+  const synced = syncCurrentProfile(context);
+  const profile = synced[context.activeProfileIndex];
+  if (profile) ExportService.exportProfile(profile);
+}
+
 function exportAllProfiles(context: ProfilesContext): void {
   const synced = syncCurrentProfile(context);
   ExportService.exportProfiles(synced);
@@ -240,6 +247,7 @@ function mergeProfiles(
 }
 
 function createImportNotice(
+  importedCount: number,
   added: number,
   updated: number,
   activeUpdated: boolean,
@@ -251,12 +259,12 @@ function createImportNotice(
 
   return {
     tone: 'success',
-    title: 'Профили загружены',
+    title: importedCount === 1 ? 'Профиль загружен' : 'Профили загружены',
     text: lines.join('\n'),
   };
 }
 
-function importAllProfilesFile(
+function importProfilesFile(
   context: ProfilesContext,
   event: React.ChangeEvent<HTMLInputElement>,
 ): void {
@@ -272,7 +280,7 @@ function importAllProfilesFile(
     if (!imported) {
       context.setNotice({
         tone: 'error',
-        title: 'Не удалось загрузить профили',
+        title: 'Не удалось загрузить профиль',
         text: 'Файл повреждён или имеет неподдерживаемый формат.',
       });
       return;
@@ -292,7 +300,12 @@ function importAllProfilesFile(
       if (mergedActive) applyProfilePayload(mergedActive, context.state);
     }
     context.setNotice(
-      createImportNotice(merged.added, merged.updated, activeUpdated),
+      createImportNotice(
+        imported.length,
+        merged.added,
+        merged.updated,
+        activeUpdated,
+      ),
     );
   };
   reader.onerror = () => {
@@ -321,8 +334,9 @@ export function useProfiles(state: ProfileState): ProfilesController {
     addProfile: () => addProfile(context),
     deleteProfile: (index) => deleteProfile(context, index),
     moveProfile: (index, direction) => moveProfile(context, index, direction),
+    exportProfile: () => exportProfile(context),
     exportAllProfiles: () => exportAllProfiles(context),
-    importAllProfilesFile: (event) => importAllProfilesFile(context, event),
+    importProfilesFile: (event) => importProfilesFile(context, event),
     profilesNotice: notice,
     clearProfilesNotice: () => setNotice(null),
   };

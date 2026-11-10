@@ -1,11 +1,7 @@
-import { useState } from 'react';
 import { DEFAULT_CARD_SETTINGS } from '../models/cardSettings';
 import { createInitialEquipment } from '../models/equipment';
-import type { NoticeData } from '../models/notice';
 import { createInitialSlimes } from '../models/slime';
 import type { SlotLayoutState } from '../components/grid/layout';
-import { ExportService } from '../services/ExportService';
-import { createConfigPayload } from '../services/ProfileConfig';
 import type { SccProfile } from '../services/ProfilesSchema';
 import {
   parseSccObject,
@@ -32,7 +28,7 @@ function toSlotLayout(layout: ImportedModuleLayout): SlotLayoutState {
   };
 }
 
-export function applyImportedData(imported: IImportedSccData, state: ProfileState) {
+function applyImportedData(imported: IImportedSccData, state: ProfileState) {
   state.setPlayerName(imported.playerName);
   if (imported.bgColor) state.setBgColor(imported.bgColor);
   if (imported.exportSelection) state.setExportSelection(imported.exportSelection);
@@ -78,73 +74,6 @@ export function applyProfilePayload(
   return true;
 }
 
-function saveConfig(state: ProfileState) {
-  ExportService.exportToScc(createConfigPayload(state));
-}
-
-const INVALID_PROFILE_TEXT =
-  'Файл повреждён или имеет неподдерживаемый формат.';
-
-function errorNotice(title: string, text: string): NoticeData {
-  return { tone: 'error', title, text };
-}
-
-function applyConfigContent(
-  content: unknown,
-  state: ProfileState,
-  showNotice: (notice: NoticeData) => void,
-): void {
-  if (typeof content !== 'string' || !content) {
-    showNotice(
-      errorNotice('Не удалось прочитать файл', 'Файл пуст или недоступен.'),
-    );
-    return;
-  }
-
-  try {
-    const imported = ExportService.importFromScc(content);
-    if (!imported) {
-      showNotice(
-        errorNotice('Не удалось загрузить профиль', INVALID_PROFILE_TEXT),
-      );
-      return;
-    }
-
-    applyImportedData(imported, state);
-    showNotice({
-      tone: 'success',
-      title: 'Профиль загружен',
-      text: 'Данные из файла применены к текущему профилю.',
-    });
-  } catch (error) {
-    console.error('Ошибка парсинга файла:', error);
-    showNotice(
-      errorNotice('Не удалось загрузить профиль', INVALID_PROFILE_TEXT),
-    );
-  }
-}
-
-function readConfigFile(
-  event: React.ChangeEvent<HTMLInputElement>,
-  state: ProfileState,
-  showNotice: (notice: NoticeData) => void,
-) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (loadEvent) => {
-    applyConfigContent(loadEvent.target?.result, state, showNotice);
-  };
-  reader.onerror = () => {
-    showNotice(
-      errorNotice('Не удалось прочитать файл', 'Попробуйте выбрать файл ещё раз.'),
-    );
-  };
-
-  reader.readAsText(file);
-}
-
 function resetProfile(state: ProfileState) {
   state.setPlayerName('');
   state.setBgColor(DEFAULT_CARD_SETTINGS.bgColor);
@@ -162,14 +91,7 @@ function resetProfile(state: ProfileState) {
 }
 
 export function useProfileTransfer(state: ProfileState) {
-  const [notice, setNotice] = useState<NoticeData | null>(null);
-
   return {
-    exportConfig: () => saveConfig(state),
-    importConfigFile: (event: React.ChangeEvent<HTMLInputElement>) =>
-      readConfigFile(event, state, setNotice),
     resetProfile: () => resetProfile(state),
-    transferNotice: notice,
-    clearTransferNotice: () => setNotice(null),
   };
 }

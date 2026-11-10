@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { cx } from '../../utils/classNames';
 import { BgColorPicker } from './BgColorPicker';
 import styles from './HubHeader.module.css';
@@ -6,50 +5,17 @@ import styles from './HubHeader.module.css';
 interface HeaderActionsProps {
   bgColor: string;
   onBgColorChange: (color: string) => void;
-  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onExportConfig: () => void;
+  onExportProfile: () => void;
   onExportImage: () => void;
   isCollapsed: boolean;
   showCollapseToggle: boolean;
   onToggleCollapsed: () => void;
 }
 
-interface ImportConfigButtonProps {
-  onImportFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
 interface CollapseButtonProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
-
-const ImportConfigButton: React.FC<ImportConfigButtonProps> = ({ onImportFile }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onImportFile(event);
-    event.target.value = '';
-  };
-
-  return (
-    <>
-      <button
-        type="button"
-        className={cx(styles.actionBtn, styles.btnImport)}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        Загрузить профиль
-      </button>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept=".json"
-        className={styles.fileInput}
-      />
-    </>
-  );
-};
 
 const CollapseButton: React.FC<CollapseButtonProps> = ({ isCollapsed, onToggle }) => {
   const label = isCollapsed
@@ -78,8 +44,7 @@ const CollapseButton: React.FC<CollapseButtonProps> = ({ isCollapsed, onToggle }
 export const HeaderActions: React.FC<HeaderActionsProps> = ({
   bgColor,
   onBgColorChange,
-  onImportFile,
-  onExportConfig,
+  onExportProfile,
   onExportImage,
   isCollapsed,
   showCollapseToggle,
@@ -91,12 +56,10 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
     </div>
 
     <div className={styles.actionGroup}>
-      <ImportConfigButton onImportFile={onImportFile} />
-
       <button
         type="button"
         className={cx(styles.actionBtn, styles.btnExport)}
-        onClick={onExportConfig}
+        onClick={onExportProfile}
       >
         Сохранить профиль
       </button>

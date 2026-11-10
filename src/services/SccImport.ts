@@ -274,11 +274,3 @@ export function parseSccObject(parsed: unknown): IImportedSccData | null {
     ),
   };
 }
-
-export function importScc(fileContent: string): IImportedSccData | null {
-  try {
-    return parseSccObject(JSON.parse(fileContent));
-  } catch {
-    return null;
-  }
-}

@@ -174,8 +174,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
       <HeaderActions
         bgColor={bgColor}
         onBgColorChange={onBgColorChange}
-        onImportFile={profile.importConfigFile}
-        onExportConfig={profile.exportConfig}
+        onExportProfile={profile.exportProfile}
         onExportImage={onExportImage}
         isCollapsed={isCollapsed}
         showCollapseToggle={canCollapse}
