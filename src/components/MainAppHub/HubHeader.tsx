@@ -4,6 +4,7 @@ import type { CardProfile } from '../../hooks/useCardProfile';
 import { useI18n } from '../../i18n/I18nProvider';
 import { Tooltip } from '../ui/Tooltip/Tooltip';
 import { HeaderActions } from './HeaderActions';
+import { HistoryControls } from './HistoryControls';
 import { LanguageToggle } from './LanguageToggle';
 import { TabMenu } from './TabMenu';
 import { ThemeToggle } from './ThemeToggle';
@@ -186,6 +187,14 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
       <div className={styles.preferences}>
         <LanguageToggle />
         <ThemeToggle />
+        <div className={styles.historySlot}>
+          <HistoryControls
+            canUndo={profile.canUndo}
+            canRedo={profile.canRedo}
+            onUndo={profile.undo}
+            onRedo={profile.redo}
+          />
+        </div>
       </div>
 
       <HeaderActions

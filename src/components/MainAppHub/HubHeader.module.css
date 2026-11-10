@@ -28,6 +28,10 @@
   margin-inline: auto;
 }
 
+.historySlot {
+  display: inline-flex;
+}
+
 .profilesBtn {
   display: inline-flex;
   align-items: center;
@@ -350,6 +354,10 @@
   .headerCollapsed .preferences {
     flex-basis: auto;
     margin-inline: 0;
+  }
+
+  .headerCollapsed .historySlot {
+    display: none;
   }
 
   .headerCollapsed .toolsContainer {

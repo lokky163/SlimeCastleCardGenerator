@@ -61,6 +61,8 @@ export const translations: TranslationTree = {
     'PNG background:': { ru: 'Фон PNG:' },
     'Choose custom color': { ru: 'Выбрать свой цвет' },
     'Change language': { ru: 'Сменить язык' },
+    'Undo (Ctrl+Z)': { ru: 'Отменить (Ctrl+Z)' },
+    'Redo (Ctrl+Shift+Z)': { ru: 'Повторить (Ctrl+Shift+Z)' },
   },
   themes: {
     'Dark theme': { ru: 'Тёмная тема' },

@@ -13,6 +13,7 @@ import { createProfilePayload } from '../services/ProfileConfig';
 import type { SccProfile } from '../services/ProfilesSchema';
 import { loadProfiles, saveProfiles } from '../services/ProfilesStorage';
 import { createEmptyProfile } from '../services/profileDefaults';
+import { useProfileHistory } from './useProfileHistory';
 import { applyProfilePayload } from './useProfileTransfer';
 import type { ProfileState } from './useProfileState';
 
@@ -27,6 +28,10 @@ export interface ProfilesController {
   exportProfile: () => void;
   exportAllProfiles: () => void;
   importProfilesFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
   profilesNotice: NoticeData | null;
   clearProfilesNotice: () => void;
 }
@@ -334,6 +339,11 @@ export function useProfiles(state: ProfileState): ProfilesController {
 
   useProfilesAutosave(state, hydration);
   useProfilesPersistence(hydration);
+  const history = useProfileHistory(
+    state,
+    hydration.profiles[hydration.activeProfileIndex],
+    hydration.hydrated,
+  );
 
   const context: ProfilesContext = { state, ...hydration, setNotice, t };
 
@@ -348,6 +358,10 @@ export function useProfiles(state: ProfileState): ProfilesController {
     exportProfile: () => exportProfile(context),
     exportAllProfiles: () => exportAllProfiles(context),
     importProfilesFile: (event) => importProfilesFile(context, event),
+    undo: history.undo,
+    redo: history.redo,
+    canUndo: history.canUndo,
+    canRedo: history.canRedo,
     profilesNotice: notice,
     clearProfilesNotice: () => setNotice(null),
   };
