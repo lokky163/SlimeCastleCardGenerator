@@ -15,6 +15,10 @@ export interface EditorGridConfig {
   maxHeight: number;
   minPerRow: number;
   maxPerRow: number;
+  /** Card width floor on phone-width screens; desktop keeps `minWidth`. */
+  mobileMinWidth: number;
+  /** Column floor on phone-width screens; desktop keeps `minPerRow`. */
+  mobileMinPerRow: number;
   /** Natural card width at scale 1 (also used by the editor card wrapper). */
   baseWidth: number;
   /** Card height divided by card width, taken from the original card. */
@@ -29,6 +33,8 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     maxHeight: 1000,
     minPerRow: 2,
     maxPerRow: 4,
+    mobileMinWidth: 88,
+    mobileMinPerRow: 1,
     baseWidth: 150,
     heightRatio: 209 / 207,
   },
@@ -39,6 +45,8 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     maxHeight: 1000,
     minPerRow: 2,
     maxPerRow: 100,
+    mobileMinWidth: 88,
+    mobileMinPerRow: 1,
     baseWidth: 130,
     heightRatio: 276 / 333,
   },
@@ -49,6 +57,8 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     maxHeight: 1000,
     minPerRow: 2,
     maxPerRow: 100,
+    mobileMinWidth: 88,
+    mobileMinPerRow: 1,
     baseWidth: 130,
     heightRatio: 349 / 228,
   },
@@ -59,6 +69,8 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     maxHeight: 1000,
     minPerRow: 1,
     maxPerRow: 100,
+    mobileMinWidth: 88,
+    mobileMinPerRow: 1,
     baseWidth: 160,
     heightRatio: 212 / 160,
   },
@@ -69,10 +81,28 @@ export const EDITOR_GRID_CONFIG: Record<CardGridVariant, EditorGridConfig> = {
     maxHeight: 1000,
     minPerRow: 2,
     maxPerRow: 100,
+    mobileMinWidth: 88,
+    mobileMinPerRow: 1,
     baseWidth: 160,
     heightRatio: 167 / 160,
   },
 };
+
+/** Phone-width layout where card floors must fit the viewport. */
+export const MOBILE_GRID_QUERY = '(max-width: 768px)';
+
+export function resolveEditorGridConfig(
+  config: EditorGridConfig,
+  isMobile: boolean,
+): EditorGridConfig {
+  if (!isMobile) return config;
+
+  return {
+    ...config,
+    minWidth: config.mobileMinWidth,
+    minPerRow: config.mobileMinPerRow,
+  };
+}
 
 export const EDITOR_GRID_GAP = 16;
 export const EDITOR_CELL_HORIZONTAL_PADDING = 24;
