@@ -309,9 +309,13 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    padding-inline: 12px;
+  }
+
   .preferences {
     flex-basis: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     margin-inline: 0;
   }
 
