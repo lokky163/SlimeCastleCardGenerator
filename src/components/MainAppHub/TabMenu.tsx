@@ -28,7 +28,7 @@ export const TabMenu: React.FC<TabMenuProps> = ({ activeTab, onTabChange }) => {
         className={cx(styles.tabBtn, styles.dropdownToggle)}
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        {t(TAB_LABELS[activeTab])}
+        <span className={styles.tabLabel}>{t(TAB_LABELS[activeTab])}</span>
         <span className={cx(styles.arrow, isMenuOpen && styles.arrowUp)} />
       </button>
 
