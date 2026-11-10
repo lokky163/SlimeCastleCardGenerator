@@ -183,6 +183,10 @@ export const translations: TranslationTree = {
       {
         ru: 'Кнопки “Сохранить все” и “Загрузить” в нижней части меню работают с профилями. “Сохранить все” скачивает файл со всеми профилями. “Загрузить” принимает как файл всех профилей, так и одиночный профиль: профиль с уже существующим uid перезаписывает старый, новый профиль добавляется в конец, а если uid в файле нет, он создаётся автоматически.',
       },
+    'To change the order of profiles, hold a profile for a moment and drag it to the desired place. You can also move the focused profile with Alt+ArrowUp and Alt+ArrowDown.':
+      {
+        ru: 'Чтобы изменить порядок профилей, зажмите профиль на мгновение и перетащите его на нужное место. Профиль в фокусе также можно двигать клавишами Alt+Стрелка вверх и Alt+Стрелка вниз.',
+      },
     'The “Save profile” button in the header downloads only the active profile together with its uid. You can load this file with the same “Load” button in the profiles menu.':
       {
         ru: 'Кнопка “Сохранить профиль” в шапке скачивает только активный профиль вместе с его uid. Загрузить этот файл можно той же кнопкой “Загрузить” в меню профилей.',
@@ -194,6 +198,10 @@ export const translations: TranslationTree = {
     'The flag button in the header changes the interface language. The selected language is remembered and applied on the next launch.':
       {
         ru: 'Кнопка с флагом в шапке меняет язык интерфейса. Выбранный язык запоминается и применяется при следующем запуске.',
+      },
+    'The arrow buttons to the right of the theme and language icons undo and redo changes. Keyboard shortcuts: Ctrl+Z to undo, Ctrl+Shift+Z or Ctrl+Y to redo.':
+      {
+        ru: 'Кнопки со стрелками справа от иконок темы и языка отменяют и повторяют изменения. Горячие клавиши: Ctrl+Z — отменить, Ctrl+Shift+Z или Ctrl+Y — повторить.',
       },
     'The “Save image” button opens a window with the finished player card, where it can be downloaded or shared with other apps.': {
       ru: 'Кнопка “Сохранить изображение” открывает окно с готовой карточкой игрока, где её можно скачать или отправить в другие приложения.',

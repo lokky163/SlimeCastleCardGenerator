@@ -27,6 +27,9 @@ const GeneralHelp: React.FC = () => {
         {t('The button with three horizontal lines on the left side of the header opens the profiles menu. There you can switch between profiles, add a new empty profile, and delete existing ones. Each profile has its own player name and full set of settings.')}
       </p>
       <p>
+        {t('To change the order of profiles, hold a profile for a moment and drag it to the desired place. You can also move the focused profile with Alt+ArrowUp and Alt+ArrowDown.')}
+      </p>
+      <p>
         {t('The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” downloads a file with all profiles. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.')}
       </p>
       <p>
@@ -46,6 +49,9 @@ const PreferencesHelp: React.FC = () => {
       </p>
       <p>
         {t('The flag button in the header changes the interface language. The selected language is remembered and applied on the next launch.')}
+      </p>
+      <p>
+        {t('The arrow buttons to the right of the theme and language icons undo and redo changes. Keyboard shortcuts: Ctrl+Z to undo, Ctrl+Shift+Z or Ctrl+Y to redo.')}
       </p>
       <p>{t('The “Save image” button opens a window with the finished player card, where it can be downloaded or shared with other apps.')}</p>
     </>

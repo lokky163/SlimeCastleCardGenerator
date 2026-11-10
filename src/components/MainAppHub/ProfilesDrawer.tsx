@@ -20,11 +20,13 @@ interface ProfilesDrawerProps {
 interface ProfileRowProps {
   profile: SccProfile;
   index: number;
+  total: number;
   active: boolean;
   dragging: boolean;
   dropTarget: boolean;
   onSelect: (index: number) => void;
   onDelete: (index: number) => void;
+  onReorder: (from: number, to: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLDivElement>, index: number) => void;
   onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
   onPointerUp: () => void;
@@ -72,11 +74,13 @@ function profileName(profile: SccProfile, emptyLabel: string): string {
 const ProfileRow: React.FC<ProfileRowProps> = ({
   profile,
   index,
+  total,
   active,
   dragging,
   dropTarget,
   onSelect,
   onDelete,
+  onReorder,
   onPointerDown,
   onPointerMove,
   onPointerUp,
@@ -105,7 +109,18 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
         type="button"
         className={styles.profileSelect}
         aria-current={active ? 'true' : undefined}
+        aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
         onClick={() => onSelect(index)}
+        onKeyDown={(event) => {
+          if (!event.altKey) return;
+          if (event.key === 'ArrowUp' && index > 0) {
+            event.preventDefault();
+            onReorder(index, index - 1);
+          } else if (event.key === 'ArrowDown' && index < total - 1) {
+            event.preventDefault();
+            onReorder(index, index + 1);
+          }
+        }}
       >
         <span className={styles.profileTitle}>
           {t('Profile {index}:', { index: index + 1 })}
@@ -310,11 +325,13 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
             key={profile.uid}
             profile={profile}
             index={index}
+            total={profiles.length}
             active={index === activeProfileIndex}
             dragging={drag?.from === index}
             dropTarget={drag !== null && drag.over === index && drag.from !== index}
             onSelect={onSelect}
             onDelete={onRequestDelete}
+            onReorder={onReorderProfile}
             onPointerDown={beginPress}
             onPointerMove={trackPress}
             onPointerUp={endPress}
