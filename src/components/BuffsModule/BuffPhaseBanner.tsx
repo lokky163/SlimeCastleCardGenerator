@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import type { PhaseProgress } from '../../utils/buffProgress';
 import styles from './BuffsModule.module.css';
 
@@ -28,14 +29,19 @@ const PhaseRow: React.FC<PhaseRowProps> = ({ title, progress }) => (
 export const BuffPhaseBanner: React.FC<BuffPhaseBannerProps> = ({
   phaseOne,
   phaseTwo,
-}) => (
-  <div className={styles.phase}>
-    <div className={styles.phaseHeader}>
-      {/* <span className={styles.phaseTitle}>Перманентные бафы</span> */}
-      <span className={styles.phaseLegend}>Осталось выбить пермачей: Мин / Средне / Макс</span>
-    </div>
+}) => {
+  const { t } = useI18n();
 
-    <PhaseRow title="1 фаза" progress={phaseOne} />
-    <PhaseRow title="2 фаза" progress={phaseTwo} />
-  </div>
-);
+  return (
+    <div className={styles.phase}>
+      <div className={styles.phaseHeader}>
+        <span className={styles.phaseLegend}>
+          {t('Permanent buffs left: Min / Avg / Max')}
+        </span>
+      </div>
+
+      <PhaseRow title={t('Phase 1')} progress={phaseOne} />
+      <PhaseRow title={t('Phase 2')} progress={phaseTwo} />
+    </div>
+  );
+};

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { cx } from '../../utils/classNames';
+import { useI18n } from '../../i18n/I18nProvider';
 import { MenuOption } from '../ui/MenuOption/MenuOption';
 import { PopupMenu } from '../ui/PopupMenu/PopupMenu';
 import { TAB_LABELS, TAB_ORDER, type AppTab } from './tabs';
@@ -11,6 +12,7 @@ interface TabMenuProps {
 }
 
 export const TabMenu: React.FC<TabMenuProps> = ({ activeTab, onTabChange }) => {
+  const { t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuAnchorRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +28,7 @@ export const TabMenu: React.FC<TabMenuProps> = ({ activeTab, onTabChange }) => {
         className={cx(styles.tabBtn, styles.dropdownToggle)}
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        {TAB_LABELS[activeTab]}
+        {t(TAB_LABELS[activeTab])}
         <span className={cx(styles.arrow, isMenuOpen && styles.arrowUp)} />
       </button>
 
@@ -45,7 +47,7 @@ export const TabMenu: React.FC<TabMenuProps> = ({ activeTab, onTabChange }) => {
             className={cx(styles.tabOption, activeTab === tab && styles.tabOptionActive)}
             onClick={() => handleSelect(tab)}
           >
-            {TAB_LABELS[tab]}
+            {t(TAB_LABELS[tab])}
           </MenuOption>
         ))}
       </PopupMenu>

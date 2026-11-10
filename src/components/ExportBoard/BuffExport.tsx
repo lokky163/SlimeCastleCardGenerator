@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { BUFF_CONFIG, splitBuffName, type BuffData } from '../../models/buff';
 import type { SlotLayoutState } from '../grid/layout';
 import { ExportSection } from './ExportSection';
@@ -53,24 +54,31 @@ export const BuffExport: React.FC<BuffExportProps> = ({
   buffs,
   layout,
   phaseInfo,
-}) => (
-  <ExportSection
-    title={
-      <>
-        Перманентные бафы{' '}
-        <span className={styles.accent}>
-          {phaseInfo.phase} фаза: {phaseInfo.percent.toFixed(0)}%
-        </span>
-      </>
-    }
-  >
-    <ExportSlotGrid
-      items={buffs}
-      layout={layout}
-      cellWidth={BUFF_CONFIG.export.cardWidth}
-      cellHeight={BUFF_CONFIG.export.cardHeight}
-      cellClassName={styles.buffCell}
-      renderItem={(buff) => <BuffExportCard buff={buff} />}
-    />
-  </ExportSection>
-);
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <ExportSection
+      title={
+        <>
+          {t('Permanent buffs')}{' '}
+          <span className={styles.accent}>
+            {t('Phase {phase}: {percent}%', {
+              phase: phaseInfo.phase,
+              percent: phaseInfo.percent.toFixed(0),
+            })}
+          </span>
+        </>
+      }
+    >
+      <ExportSlotGrid
+        items={buffs}
+        layout={layout}
+        cellWidth={BUFF_CONFIG.export.cardWidth}
+        cellHeight={BUFF_CONFIG.export.cardHeight}
+        cellClassName={styles.buffCell}
+        renderItem={(buff) => <BuffExportCard buff={buff} />}
+      />
+    </ExportSection>
+  );
+};

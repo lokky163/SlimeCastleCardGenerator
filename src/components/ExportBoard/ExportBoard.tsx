@@ -5,6 +5,7 @@ import type { EquipmentData } from '../../models/equipment';
 import type { RelicData } from '../../models/relic';
 import type { SlimeData } from '../../models/slime';
 import type { ExportSelection } from '../../models/exportSelection';
+import { useI18n } from '../../i18n/I18nProvider';
 import type { SlotLayoutState } from '../grid/layout';
 import { ArtifactExport } from './ArtifactExport';
 import { BuffExport } from './BuffExport';
@@ -49,28 +50,34 @@ export const ExportBoard: React.FC<ExportBoardProps> = ({
   artifactLayout,
   phaseInfo,
   selection,
-}) => (
-  <div ref={boardRef} className={styles.board} style={{ backgroundColor: bgColor }}>
-    {selection.header && (
-      <div className={styles.header}>
-        <div className={styles.playerName}>{playerName.trim() || 'Ник игрока'}</div>
-        <div className={styles.bonus}>
-          Общий бонус слайма:{' '}
-          <span className={styles.accent}>{totalSlimeBonus.toFixed(2)}</span>
-        </div>
-      </div>
-    )}
+}) => {
+  const { t } = useI18n();
 
-    {selection.equipment && (
-      <EquipmentExport equipment={equipment} layout={equipmentLayout} />
-    )}
-    {selection.relics && <RelicExport relics={relics} layout={relicLayout} />}
-    {selection.slimes && <SlimeExport slimes={slimes} layout={slimeLayout} />}
-    {selection.buffs && (
-      <BuffExport buffs={buffs} layout={buffLayout} phaseInfo={phaseInfo} />
-    )}
-    {selection.artifacts && (
-      <ArtifactExport artifacts={artifacts} layout={artifactLayout} />
-    )}
-  </div>
-);
+  return (
+    <div ref={boardRef} className={styles.board} style={{ backgroundColor: bgColor }}>
+      {selection.header && (
+        <div className={styles.header}>
+          <div className={styles.playerName}>
+            {playerName.trim() || t('Player name')}
+          </div>
+          <div className={styles.bonus}>
+            {t('Total slime bonus:')}{' '}
+            <span className={styles.accent}>{totalSlimeBonus.toFixed(2)}</span>
+          </div>
+        </div>
+      )}
+
+      {selection.equipment && (
+        <EquipmentExport equipment={equipment} layout={equipmentLayout} />
+      )}
+      {selection.relics && <RelicExport relics={relics} layout={relicLayout} />}
+      {selection.slimes && <SlimeExport slimes={slimes} layout={slimeLayout} />}
+      {selection.buffs && (
+        <BuffExport buffs={buffs} layout={buffLayout} phaseInfo={phaseInfo} />
+      )}
+      {selection.artifacts && (
+        <ArtifactExport artifacts={artifacts} layout={artifactLayout} />
+      )}
+    </div>
+  );
+};

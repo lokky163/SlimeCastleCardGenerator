@@ -21,6 +21,7 @@ import {
   getBuffsProgress,
   type BuffsProgress,
 } from '../../utils/buffProgress';
+import { useI18n } from '../../i18n/I18nProvider';
 import { cx } from '../../utils/classNames';
 import styles from './MainAppHub.module.css';
 
@@ -53,12 +54,21 @@ function useHubController() {
   };
 }
 
-function profileLabel(profile: CardProfile, index: number): string {
+function profileLabel(
+  profile: CardProfile,
+  index: number,
+  t: ReturnType<typeof useI18n>['t'],
+): string {
   const name = profile.profiles[index]?.playerName.trim();
-  return name ? `Профиль ${index + 1} (${name})` : `Профиль ${index + 1}`;
+  const params = { index: index + 1, name: name ?? '' };
+
+  return name
+    ? t('Profile {index} ({name})', params)
+    : t('Profile {index}', params);
 }
 
 function useProfileMenu(profile: CardProfile) {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
@@ -91,7 +101,7 @@ function useProfileMenu(profile: CardProfile) {
     selectProfile,
     addProfile,
     deleteLabel:
-      deleteTarget === null ? '' : profileLabel(profile, deleteTarget),
+      deleteTarget === null ? '' : profileLabel(profile, deleteTarget, t),
   };
 }
 

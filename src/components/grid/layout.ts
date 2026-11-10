@@ -29,10 +29,10 @@ export type SlotLayoutBase = Omit<SlotLayoutState, 'entries' | 'hiddenKeys'> & {
 export type SlotLayoutInput = SlotLayoutBase & { entries: SlotEntry[] };
 
 export const LAYOUT_MODES: Array<{ value: LayoutMode; label: string }> = [
-  { value: 'default', label: 'На месте' },
-  { value: 'to-end', label: 'В конец' },
-  { value: 'hidden', label: 'Не показывать' },
-  { value: 'manual', label: 'Ручные индексы' },
+  { value: 'default', label: 'Keep in place' },
+  { value: 'to-end', label: 'Move to end' },
+  { value: 'hidden', label: 'Hide missing' },
+  { value: 'manual', label: 'Manual indexes' },
 ];
 
 function buildEntries<T extends LayoutItem>(

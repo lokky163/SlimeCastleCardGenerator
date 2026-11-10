@@ -84,6 +84,20 @@ export const ALL_EQUIPMENT_GRADES: EquipmentGrade[] = [
   'no', 'epic', 'legendary', 'mythic', 'mythic1', 'mythic2', 'mythic3', 'fantasy', 'fantasy1', 'fantasy2'
 ];
 
+/** Английские подписи грейдов; переводятся через i18n. */
+export const EQUIPMENT_GRADE_LABELS: Record<EquipmentGrade, string> = {
+  no: 'None',
+  epic: 'Epic',
+  legendary: 'Legendary',
+  mythic: 'Mythic',
+  mythic1: 'Mythic 1',
+  mythic2: 'Mythic 2',
+  mythic3: 'Mythic 3',
+  fantasy: 'Fantasy',
+  fantasy1: 'Fantasy 1',
+  fantasy2: 'Fantasy 2',
+};
+
 // Функция сборки начального статичного списка предметов (8 штук — по 4 предмета на 2 сета)
 export function createInitialEquipment(): EquipmentData[] {
   const items: EquipmentData[] = [];

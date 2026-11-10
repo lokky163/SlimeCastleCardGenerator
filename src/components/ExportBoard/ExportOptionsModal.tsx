@@ -1,4 +1,5 @@
 import type { ExportSettings } from '../../hooks/useExportSettings';
+import { useI18n } from '../../i18n/I18nProvider';
 import { EXPORT_OPTIONS, type ExportOption } from '../../models/exportSelection';
 import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
@@ -19,16 +20,20 @@ const ExportOptionRow: React.FC<ExportOptionRowProps> = ({
   option,
   checked,
   onToggle,
-}) => (
-  <label className={styles.option}>
-    <input
-      type="checkbox"
-      checked={checked}
-      onChange={() => onToggle(option.key)}
-    />
-    <span>{option.label}</span>
-  </label>
-);
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <label className={styles.option}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={() => onToggle(option.key)}
+      />
+      <span>{t(option.label)}</span>
+    </label>
+  );
+};
 
 interface ExportOptionsActionsProps {
   hasSelection: boolean;
@@ -40,27 +45,32 @@ const ExportOptionsActions: React.FC<ExportOptionsActionsProps> = ({
   hasSelection,
   onClose,
   onExport,
-}) => (
-  <div className={styles.actions}>
-    <button
-      type="button"
-      className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
-      onClick={onClose}
-    >
-      Отмена
-    </button>
-    <button
-      type="button"
-      className={cx(modalStyles.actionBtn, modalStyles.primaryBtn)}
-      onClick={onExport}
-      disabled={!hasSelection}
-    >
-      Скачать PNG
-    </button>
-  </div>
-);
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <div className={styles.actions}>
+      <button
+        type="button"
+        className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
+        onClick={onClose}
+      >
+        {t('Cancel')}
+      </button>
+      <button
+        type="button"
+        className={cx(modalStyles.actionBtn, modalStyles.primaryBtn)}
+        onClick={onExport}
+        disabled={!hasSelection}
+      >
+        {t('Download PNG')}
+      </button>
+    </div>
+  );
+};
 
 export const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ settings }) => {
+  const { t } = useI18n();
   const hasSelection = EXPORT_OPTIONS.some(
     (option) => settings.selection[option.key],
   );
@@ -68,15 +78,15 @@ export const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ settings
   return (
     <Modal open={settings.isOpen} onClose={settings.close} className={styles.dialog}>
       <div className={styles.header}>
-        <h3>Что показать на изображении</h3>
+        <h3>{t('What to show in the image')}</h3>
       </div>
 
       <div className={styles.bulkActions}>
         <button type="button" className={styles.linkBtn} onClick={settings.selectAll}>
-          Выбрать всё
+          {t('Select all')}
         </button>
         <button type="button" className={styles.linkBtn} onClick={settings.clearAll}>
-          Снять всё
+          {t('Clear all')}
         </button>
       </div>
 

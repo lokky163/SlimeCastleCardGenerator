@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useI18n } from '../../../i18n/I18nProvider';
 import { cx } from '../../../utils/classNames';
 import { Modal } from '../Modal/Modal';
 import modalStyles from '../Modal/Modal.module.css';
@@ -38,37 +39,41 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   children,
   confirmLabel,
-  cancelLabel = 'Отмена',
+  cancelLabel,
   danger = true,
   onCancel,
   onConfirm,
-}) => (
-  <Modal open={open} onClose={onCancel} className={styles.dialog}>
-    <h3 className={styles.title}>
-      <span className={styles.icon} aria-hidden="true">
-        <WarningIcon />
-      </span>
-      {title}
-    </h3>
-    <p className={styles.text}>{children}</p>
-    <div className={styles.actions}>
-      <button
-        type="button"
-        className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
-        onClick={onCancel}
-      >
-        {cancelLabel}
-      </button>
-      <button
-        type="button"
-        className={cx(
-          modalStyles.actionBtn,
-          danger ? styles.dangerBtn : modalStyles.primaryBtn,
-        )}
-        onClick={onConfirm}
-      >
-        {confirmLabel}
-      </button>
-    </div>
-  </Modal>
-);
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <Modal open={open} onClose={onCancel} className={styles.dialog}>
+      <h3 className={styles.title}>
+        <span className={styles.icon} aria-hidden="true">
+          <WarningIcon />
+        </span>
+        {title}
+      </h3>
+      <p className={styles.text}>{children}</p>
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={cx(modalStyles.actionBtn, modalStyles.secondaryBtn)}
+          onClick={onCancel}
+        >
+          {cancelLabel ?? t('Cancel')}
+        </button>
+        <button
+          type="button"
+          className={cx(
+            modalStyles.actionBtn,
+            danger ? styles.dangerBtn : modalStyles.primaryBtn,
+          )}
+          onClick={onConfirm}
+        >
+          {confirmLabel}
+        </button>
+      </div>
+    </Modal>
+  );
+};

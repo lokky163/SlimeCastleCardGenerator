@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import type { ProfilesMoveDirection } from '../../hooks/useProfiles';
+import { useI18n } from '../../i18n/I18nProvider';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
 import styles from './ProfilesDrawer.module.css';
@@ -72,8 +73,8 @@ const MoveIcon: React.FC<{ direction: ProfilesMoveDirection }> = ({
   </svg>
 );
 
-function profileName(profile: SccProfile): string {
-  return profile.playerName.trim() || 'Без ника';
+function profileName(profile: SccProfile, emptyLabel: string): string {
+  return profile.playerName.trim() || emptyLabel;
 }
 
 interface ProfileMoveButtonsProps {
@@ -89,7 +90,11 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
   canMoveDown,
   onMove,
 }) => {
+  const { t } = useI18n();
   if (!canMoveUp && !canMoveDown) return null;
+
+  const upLabel = t('Move profile {index} up', { index: index + 1 });
+  const downLabel = t('Move profile {index} down', { index: index + 1 });
 
   return (
     <div className={styles.reorderBtns}>
@@ -97,8 +102,8 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
         <button
           type="button"
           className={styles.moveBtn}
-          aria-label={`Переместить профиль ${index + 1} вверх`}
-          title={`Переместить профиль ${index + 1} вверх`}
+          aria-label={upLabel}
+          title={upLabel}
           onClick={() => onMove(index, 'up')}
         >
           <MoveIcon direction="up" />
@@ -109,8 +114,8 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
         <button
           type="button"
           className={styles.moveBtn}
-          aria-label={`Переместить профиль ${index + 1} вниз`}
-          title={`Переместить профиль ${index + 1} вниз`}
+          aria-label={downLabel}
+          title={downLabel}
           onClick={() => onMove(index, 'down')}
         >
           <MoveIcon direction="down" />
@@ -129,41 +134,51 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
   onSelect,
   onDelete,
   onMove,
-}) => (
-  <div className={cx(styles.profileRow, active && styles.profileRowActive)}>
-    <button
-      type="button"
-      className={styles.profileSelect}
-      aria-current={active ? 'true' : undefined}
-      onClick={() => onSelect(index)}
-    >
-      <span className={styles.profileTitle}>Профиль {index + 1}:</span>
-      <span className={styles.profileName}>{profileName(profile)}</span>
-    </button>
+}) => {
+  const { t } = useI18n();
+  const deleteLabel = t('Delete profile {index}', { index: index + 1 });
 
-    <ProfileMoveButtons
-      index={index}
-      canMoveUp={canMoveUp}
-      canMoveDown={canMoveDown}
-      onMove={onMove}
-    />
+  return (
+    <div className={cx(styles.profileRow, active && styles.profileRowActive)}>
+      <button
+        type="button"
+        className={styles.profileSelect}
+        aria-current={active ? 'true' : undefined}
+        onClick={() => onSelect(index)}
+      >
+        <span className={styles.profileTitle}>
+          {t('Profile {index}:', { index: index + 1 })}
+        </span>
+        <span className={styles.profileName}>
+          {profileName(profile, t('No name'))}
+        </span>
+      </button>
 
-    <button
-      type="button"
-      className={styles.deleteBtn}
-      aria-label={`Удалить профиль ${index + 1}`}
-      title={`Удалить профиль ${index + 1}`}
-      onClick={() => onDelete(index)}
-    >
-      <TrashIcon />
-    </button>
-  </div>
-);
+      <ProfileMoveButtons
+        index={index}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+        onMove={onMove}
+      />
+
+      <button
+        type="button"
+        className={styles.deleteBtn}
+        aria-label={deleteLabel}
+        title={deleteLabel}
+        onClick={() => onDelete(index)}
+      >
+        <TrashIcon />
+      </button>
+    </div>
+  );
+};
 
 const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
   onExportAll,
   onImportFile,
 }) => {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -173,7 +188,7 @@ const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
         className={cx(styles.footerBtn, styles.saveAllBtn)}
         onClick={onExportAll}
       >
-        Сохранить все
+        {t('Save all')}
       </button>
 
       <button
@@ -181,7 +196,7 @@ const ProfilesFooter: React.FC<ProfilesFooterProps> = ({
         className={cx(styles.footerBtn, styles.loadAllBtn)}
         onClick={() => fileInputRef.current?.click()}
       >
-        Загрузить
+        {t('Load')}
       </button>
 
       <input
@@ -206,10 +221,11 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   onExportAll,
   onImportFile,
 }) => {
+  const { t } = useI18n();
   if (!open) return null;
 
   return (
-    <aside id="profiles-drawer" className={styles.drawer} aria-label="Профили">
+    <aside id="profiles-drawer" className={styles.drawer} aria-label={t('Profiles')}>
       <div className={styles.list}>
         {profiles.map((profile, index) => (
           <ProfileRow
@@ -226,7 +242,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
         ))}
 
         <button type="button" className={styles.addBtn} onClick={onAdd}>
-          + Добавить профиль
+          {t('+ Add profile')}
         </button>
       </div>
 

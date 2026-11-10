@@ -1,3 +1,5 @@
+import { useI18n } from '../../i18n/I18nProvider';
+import type { LanguageId } from '../../services/Language';
 import { cx } from '../../utils/classNames';
 import {
   calculateDropMultiplier,
@@ -44,11 +46,14 @@ interface ChanceSelectorProps {
 }
 
 const ChanceSelector: React.FC<ChanceSelectorProps> = ({ chance, onChange }) => {
+  const { t } = useI18n();
   const selectMode = (mode: DropChanceMode) => onChange({ ...chance, mode });
 
   return (
     <div className={styles.chanceRow}>
-      <span className={styles.calculatorLabel}>Шанс выпадения пермача:</span>
+      <span className={styles.calculatorLabel}>
+        {t('Permanent buff drop chance:')}
+      </span>
 
       <div className={styles.chanceButtons}>
         <ChanceButton
@@ -67,7 +72,7 @@ const ChanceSelector: React.FC<ChanceSelectorProps> = ({ chance, onChange }) => 
           active={chance.mode === 'custom'}
           onClick={() => selectMode('custom')}
         >
-          Свой
+          {t('Custom')}
         </ChanceButton>
       </div>
 
@@ -76,7 +81,7 @@ const ChanceSelector: React.FC<ChanceSelectorProps> = ({ chance, onChange }) => 
           <input
             type="text"
             inputMode="decimal"
-            aria-label="Свой шанс выпадения пермача, %"
+            aria-label={t('Custom permanent buff drop chance, %')}
             className={styles.chanceInput}
             value={chance.custom}
             onChange={(event) =>
@@ -90,18 +95,34 @@ const ChanceSelector: React.FC<ChanceSelectorProps> = ({ chance, onChange }) => 
   );
 };
 
-function getDropsWord(value: number): string {
-  const mod10 = value % 10;
-  const mod100 = value % 100;
-
-  if (mod10 === 1 && mod100 !== 11) return 'капля';
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
-    return 'капли';
-  }
-  return 'капель';
+function formatInteger(language: LanguageId, value: number): string {
+  return new Intl.NumberFormat(language === 'ru' ? 'ru-RU' : 'en-US').format(
+    value,
+  );
 }
 
-const formatInteger = (value: number) => value.toLocaleString('ru-RU');
+interface DropsValueProps {
+  drops: number;
+}
+
+const DropsValue: React.FC<DropsValueProps> = ({ drops }) => {
+  const { language, tPlural } = useI18n();
+
+  return (
+    <span className={styles.accent}>
+      ≈ {formatInteger(language, drops)} {tPlural('Drop', drops)}
+    </span>
+  );
+};
+
+const DropsRow: React.FC<{ label: string; drops: number }> = ({
+  label,
+  drops,
+}) => (
+  <span>
+    {label} <DropsValue drops={drops} />
+  </span>
+);
 
 interface DropCostsProps {
   multiplier: number;
@@ -113,33 +134,29 @@ const DropCosts: React.FC<DropCostsProps> = ({
   multiplier,
   phaseOneDrops,
   phaseTwoDrops,
-}) => (
-  <>
-    <div className={styles.multiplier}>
-      Множитель капель:{' '}
-      <span className={styles.accent}>×{multiplier.toFixed(2)}</span>
-      <span className={styles.hint}>
-        {' '}
-        — в среднем, с гарантом на {DROP_PITY_THRESHOLD}-м ролле
-      </span>
-    </div>
+}) => {
+  const { t } = useI18n();
 
-    <div className={styles.dropCosts}>
-      <span>
-        До закрытия 1 фазы:{' '}
-        <span className={styles.accent}>
-          ≈ {formatInteger(phaseOneDrops)} {getDropsWord(phaseOneDrops)}
+  return (
+    <>
+      <div className={styles.multiplier}>
+        {t('Drop multiplier:')}{' '}
+        <span className={styles.accent}>×{multiplier.toFixed(2)}</span>
+        <span className={styles.hint}>
+          {' '}
+          {t('— on average, with pity at roll {roll}', {
+            roll: DROP_PITY_THRESHOLD,
+          })}
         </span>
-      </span>
-      <span>
-        До закрытия 2 фазы:{' '}
-        <span className={styles.accent}>
-          ≈ {formatInteger(phaseTwoDrops)} {getDropsWord(phaseTwoDrops)}
-        </span>
-      </span>
-    </div>
-  </>
-);
+      </div>
+
+      <div className={styles.dropCosts}>
+        <DropsRow label={t('Until phase 1 is complete:')} drops={phaseOneDrops} />
+        <DropsRow label={t('Until phase 2 is complete:')} drops={phaseTwoDrops} />
+      </div>
+    </>
+  );
+};
 
 export const BuffDropCalculator: React.FC<BuffDropCalculatorProps> = ({
   phaseOne,

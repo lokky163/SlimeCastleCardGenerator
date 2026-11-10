@@ -14,12 +14,12 @@ export interface ExportOption {
 }
 
 export const EXPORT_OPTIONS: ExportOption[] = [
-  { key: 'header', label: 'Шапка (ник и общий бонус)' },
-  { key: 'equipment', label: 'Снаряжение' },
-  { key: 'relics', label: 'Реликвии' },
-  { key: 'slimes', label: 'Слаймы' },
-  { key: 'buffs', label: 'Перманентные бафы' },
-  { key: 'artifacts', label: 'Артефакты' },
+  { key: 'header', label: 'Header (name and total bonus)' },
+  { key: 'equipment', label: 'Equipment' },
+  { key: 'relics', label: 'Relics' },
+  { key: 'slimes', label: 'Slimes' },
+  { key: 'buffs', label: 'Permanent buffs' },
+  { key: 'artifacts', label: 'Artifacts' },
 ];
 
 export const DEFAULT_EXPORT_SELECTION: ExportSelection = {

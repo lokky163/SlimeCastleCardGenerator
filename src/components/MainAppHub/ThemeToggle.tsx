@@ -1,4 +1,5 @@
 import { useTheme } from '../../hooks/useTheme';
+import { useI18n } from '../../i18n/I18nProvider';
 import type { ThemeIconName } from '../../services/Theme';
 import styles from './ThemeToggle.module.css';
 
@@ -37,8 +38,9 @@ const ThemeIcon: React.FC<{ name: ThemeIconName }> = ({ name }) =>
   name === 'sun' ? <SunIcon /> : <MoonIcon />;
 
 export const ThemeToggle: React.FC = () => {
+  const { t } = useI18n();
   const { nextTheme, toggleTheme } = useTheme();
-  const label = nextTheme.toggleLabel;
+  const label = t(nextTheme.toggleLabelKey);
 
   return (
     <button

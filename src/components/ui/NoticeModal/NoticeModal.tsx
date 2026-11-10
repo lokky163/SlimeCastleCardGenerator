@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/I18nProvider';
 import type { NoticeData } from '../../../models/notice';
 import { cx } from '../../../utils/classNames';
 import { Modal } from '../Modal/Modal';
@@ -46,8 +47,11 @@ const ErrorIcon: React.FC = () => (
 export const NoticeModal: React.FC<NoticeModalProps> = ({
   notice,
   onClose,
-}) => (
-  <Modal open={Boolean(notice)} onClose={onClose} className={styles.dialog}>
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <Modal open={Boolean(notice)} onClose={onClose} className={styles.dialog}>
     {notice && (
       <>
         <span
@@ -72,9 +76,10 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({
           )}
           onClick={onClose}
         >
-          Понятно
+          {t('Got it')}
         </button>
       </>
     )}
-  </Modal>
-);
+    </Modal>
+  );
+};

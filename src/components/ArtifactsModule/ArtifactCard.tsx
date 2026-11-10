@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useI18n } from '../../i18n/I18nProvider';
 import {
   getArtifactStarImages,
   type ArtifactData,
@@ -32,6 +33,7 @@ const parseNumber = (raw: string, fallback: number) => {
 };
 
 const ArtifactStars: React.FC<ArtifactStarsProps> = ({ state, onChangeState }) => {
+  const { t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const stars = getArtifactStarImages(state);
@@ -48,7 +50,7 @@ const ArtifactStars: React.FC<ArtifactStarsProps> = ({ state, onChangeState }) =
         className={styles.starsButton}
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        {state === 'no' && <span className={styles.noStars}>Нет</span>}
+        {state === 'no' && <span className={styles.noStars}>{t('None')}</span>}
         {state === '0' && <span className={styles.zeroStars}>0 ★</span>}
         {stars.length > 0 && <StarRating stars={stars} size={16} />}
       </button>
@@ -64,45 +66,53 @@ const ArtifactStars: React.FC<ArtifactStarsProps> = ({ state, onChangeState }) =
   );
 };
 
-const ArtifactFragmentsRow: React.FC<ArtifactFieldProps> = ({ artifact, onChange }) => (
-  <div className={styles.fragmentsRow}>
-    {artifact.state !== '5y' && (
-      <>
-        <input
-          type="text"
-          className={cx(styles.input, styles.fragmentsValue)}
-          value={artifact.fragments === 0 ? '' : artifact.fragments}
-          onChange={(event) => onChange(parseNumber(event.target.value, 0))}
-          placeholder="0"
-        />
-        <span className={styles.separator}>/</span>
-      </>
-    )}
-    <div className={cx(styles.input, styles.limit)}>
-      {artifact.state === '5y' ? 'max' : artifact.maxFragments}
-    </div>
-  </div>
-);
+const ArtifactFragmentsRow: React.FC<ArtifactFieldProps> = ({ artifact, onChange }) => {
+  const { t } = useI18n();
 
-const ArtifactLevelRow: React.FC<ArtifactFieldProps> = ({ artifact, onChange }) => (
-  <div className={styles.levelRow}>
-    <span
-      className={cx(
-        styles.levelLabel,
-        artifact.isBlackAndWhite && styles.levelLabelDisabled,
+  return (
+    <div className={styles.fragmentsRow}>
+      {artifact.state !== '5y' && (
+        <>
+          <input
+            type="text"
+            className={cx(styles.input, styles.fragmentsValue)}
+            value={artifact.fragments === 0 ? '' : artifact.fragments}
+            onChange={(event) => onChange(parseNumber(event.target.value, 0))}
+            placeholder="0"
+          />
+          <span className={styles.separator}>/</span>
+        </>
       )}
-    >
-      Lv.
-    </span>
-    <input
-      type="text"
-      className={cx(styles.input, artifact.isBlackAndWhite && styles.disabled)}
-      value={artifact.level}
-      onChange={(event) => onChange(parseNumber(event.target.value, 1))}
-      disabled={artifact.isBlackAndWhite}
-    />
-  </div>
-);
+      <div className={cx(styles.input, styles.limit)}>
+        {artifact.state === '5y' ? t('max') : artifact.maxFragments}
+      </div>
+    </div>
+  );
+};
+
+const ArtifactLevelRow: React.FC<ArtifactFieldProps> = ({ artifact, onChange }) => {
+  const { t } = useI18n();
+
+  return (
+    <div className={styles.levelRow}>
+      <span
+        className={cx(
+          styles.levelLabel,
+          artifact.isBlackAndWhite && styles.levelLabelDisabled,
+        )}
+      >
+        {t('Lv.')}
+      </span>
+      <input
+        type="text"
+        className={cx(styles.input, artifact.isBlackAndWhite && styles.disabled)}
+        value={artifact.level}
+        onChange={(event) => onChange(parseNumber(event.target.value, 1))}
+        disabled={artifact.isBlackAndWhite}
+      />
+    </div>
+  );
+};
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({
   artifact,

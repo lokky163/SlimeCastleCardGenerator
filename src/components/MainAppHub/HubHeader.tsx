@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cx } from '../../utils/classNames';
 import type { CardProfile } from '../../hooks/useCardProfile';
+import { useI18n } from '../../i18n/I18nProvider';
 import { HeaderActions } from './HeaderActions';
+import { LanguageToggle } from './LanguageToggle';
 import { TabMenu } from './TabMenu';
 import { ThemeToggle } from './ThemeToggle';
 import type { AppTab } from './tabs';
@@ -104,43 +106,47 @@ const HeaderControls: React.FC<HeaderControlsProps> = ({
   onToggleProfiles,
   onOpenHelp,
   onRequestReset,
-}) => (
-  <div className={styles.leftGroup}>
-    <button
-      type="button"
-      className={cx(styles.tabBtn, styles.profilesBtn, isProfilesOpen && styles.profilesBtnOpen)}
-      aria-label={isProfilesOpen ? 'Закрыть меню профилей' : 'Открыть меню профилей'}
-      aria-expanded={isProfilesOpen}
-      aria-controls="profiles-drawer"
-      title="Профили"
-      onClick={onToggleProfiles}
-    >
-      <span className={styles.burgerIcon} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </span>
-    </button>
+}) => {
+  const { t } = useI18n();
 
-    <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
+  return (
+    <div className={styles.leftGroup}>
+      <button
+        type="button"
+        className={cx(styles.tabBtn, styles.profilesBtn, isProfilesOpen && styles.profilesBtnOpen)}
+        aria-label={t(isProfilesOpen ? 'Close profiles menu' : 'Open profiles menu')}
+        aria-expanded={isProfilesOpen}
+        aria-controls="profiles-drawer"
+        title={t('Profiles')}
+        onClick={onToggleProfiles}
+      >
+        <span className={styles.burgerIcon} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+      </button>
 
-    <button type="button" className={cx(styles.tabBtn, styles.btnHelp)} onClick={onOpenHelp}>
-      Справка
-    </button>
+      <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
 
-    <input
-      type="text"
-      value={profile.playerName}
-      onChange={(event) => profile.setPlayerName(event.target.value)}
-      placeholder="Ник игрока"
-      className={styles.nameInput}
-    />
+      <button type="button" className={cx(styles.tabBtn, styles.btnHelp)} onClick={onOpenHelp}>
+        {t('Help')}
+      </button>
 
-    <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onRequestReset}>
-      Сбросить
-    </button>
-  </div>
-);
+      <input
+        type="text"
+        value={profile.playerName}
+        onChange={(event) => profile.setPlayerName(event.target.value)}
+        placeholder={t('Player name')}
+        className={styles.nameInput}
+      />
+
+      <button type="button" className={cx(styles.tabBtn, styles.btnReset)} onClick={onRequestReset}>
+        {t('Reset')}
+      </button>
+    </div>
+  );
+};
 
 export const HubHeader: React.FC<HubHeaderProps> = ({
   activeTab,
@@ -173,6 +179,7 @@ export const HubHeader: React.FC<HubHeaderProps> = ({
       />
 
       <div className={styles.preferences}>
+        <LanguageToggle />
         <ThemeToggle />
       </div>
 

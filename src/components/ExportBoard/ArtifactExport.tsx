@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import type { ArtifactData } from '../../models/artifact';
 import { getArtifactStarImages } from '../../models/artifact';
 import type { SlotLayoutState } from '../grid/layout';
@@ -12,22 +13,28 @@ interface ArtifactExportProps {
   layout: SlotLayoutState;
 }
 
-const ArtifactExportCard: React.FC<{ artifact: ArtifactData }> = ({ artifact }) => (
-  <div className={styles.artifactCard}>
-    <img
-      src={artifact.imageUrl}
-      alt=""
-      className={cx(styles.artifactImage, artifact.isBlackAndWhite && styles.grayedOut)}
-    />
-    <div className={styles.artifactStars}>
-      <StarRating stars={getArtifactStarImages(artifact.state)} size={48} />
+const ArtifactExportCard: React.FC<{ artifact: ArtifactData }> = ({ artifact }) => {
+  const { t } = useI18n();
+  const fragments =
+    artifact.state === '5y' ? t('max') : artifact.fragmentsText;
+
+  return (
+    <div className={styles.artifactCard}>
+      <img
+        src={artifact.imageUrl}
+        alt=""
+        className={cx(styles.artifactImage, artifact.isBlackAndWhite && styles.grayedOut)}
+      />
+      <div className={styles.artifactStars}>
+        <StarRating stars={getArtifactStarImages(artifact.state)} size={48} />
+      </div>
+      <div className={styles.artifactFragments}>{fragments}</div>
+      <div className={cx(styles.artifactLevel, artifact.isBlackAndWhite && styles.muted)}>
+        {t('Lv.')}{artifact.level}
+      </div>
     </div>
-    <div className={styles.artifactFragments}>{artifact.fragmentsText}</div>
-    <div className={cx(styles.artifactLevel, artifact.isBlackAndWhite && styles.muted)}>
-      Lv.{artifact.level}
-    </div>
-  </div>
-);
+  );
+};
 
 export const ArtifactExport: React.FC<ArtifactExportProps> = ({
   artifacts,

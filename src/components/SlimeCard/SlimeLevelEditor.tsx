@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../../i18n/I18nProvider';
 import styles from './SlimeLevelEditor.module.css';
 
 interface SlimeLevelEditorProps {
@@ -12,6 +13,7 @@ export const SlimeLevelEditor: React.FC<SlimeLevelEditorProps> = ({
   onCommit,
   onCancel,
 }) => {
+  const { t } = useI18n();
   const [tempLevel, setTempLevel] = useState(level.toString());
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -33,7 +35,7 @@ export const SlimeLevelEditor: React.FC<SlimeLevelEditorProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <span className={styles.prefix}>Lv.</span>
+      <span className={styles.prefix}>{t('Lv.')}</span>
       <input
         ref={inputRef}
         type="text"

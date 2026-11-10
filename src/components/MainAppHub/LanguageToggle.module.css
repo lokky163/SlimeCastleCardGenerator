@@ -1,0 +1,54 @@
+.wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+  background-color: var(--color-panel-3);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.toggle:hover {
+  background-color: var(--color-panel-hover);
+  border-color: var(--color-border-hover);
+}
+
+.flag {
+  width: 22px;
+  height: 15px;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+
+.menu {
+  left: auto;
+  right: 0;
+  min-width: 150px;
+}
+
+.option {
+  justify-content: flex-start;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.optionFlag {
+  width: 20px;
+  height: 14px;
+  flex-shrink: 0;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--color-border);
+}

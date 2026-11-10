@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../i18n/I18nProvider';
 import { SlimeCard } from '../SlimeCard/SlimeCard';
 import { type SlimeData, type SlimeState } from '../../models/slime';
 import { GridControls } from '../grid/GridControls';
@@ -23,27 +24,31 @@ export const SlimesModule: React.FC<SlimesModuleProps> = ({
   onChangeState,
   onChangeLevel,
   onChangeSkin,
-}) => (
-  <ModulePanel>
-    <GridControls layout={layout}>
-      <div className={styles.bonus}>
-        Общий бонус слайма: {totalSlimeBonus.toFixed(2)}
-      </div>
-    </GridControls>
+}) => {
+  const { t } = useI18n();
 
-    <SlotGrid
-      items={slimes}
-      layout={layout}
-      variant="slime"
-      renderCard={(slime, _itemIndex, width) => (
-        <SlimeCard
-          slime={slime}
-          width={width}
-          onChangeState={(state) => onChangeState(slime.name, state)}
-          onChangeLevel={(level) => onChangeLevel(slime.name, level)}
-          onChangeSkin={() => onChangeSkin(slime.name, slime.nextSkin())}
-        />
-      )}
-    />
-  </ModulePanel>
-);
+  return (
+    <ModulePanel>
+      <GridControls layout={layout}>
+        <div className={styles.bonus}>
+          {t('Total slime bonus:')} {totalSlimeBonus.toFixed(2)}
+        </div>
+      </GridControls>
+
+      <SlotGrid
+        items={slimes}
+        layout={layout}
+        variant="slime"
+        renderCard={(slime, _itemIndex, width) => (
+          <SlimeCard
+            slime={slime}
+            width={width}
+            onChangeState={(state) => onChangeState(slime.name, state)}
+            onChangeLevel={(level) => onChangeLevel(slime.name, level)}
+            onChangeSkin={() => onChangeSkin(slime.name, slime.nextSkin())}
+          />
+        )}
+      />
+    </ModulePanel>
+  );
+};

@@ -6,6 +6,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
+import { useI18n } from '../i18n/I18nProvider';
 import type { NoticeData } from '../models/notice';
 import { ExportService } from '../services/ExportService';
 import { createProfilePayload } from '../services/ProfileConfig';
@@ -39,9 +40,12 @@ interface ProfilesHydration {
   hydrated: boolean;
 }
 
+type Translate = ReturnType<typeof useI18n>['t'];
+
 interface ProfilesContext extends ProfilesHydration {
   state: ProfileState;
   setNotice: Dispatch<SetStateAction<NoticeData | null>>;
+  t: Translate;
 }
 
 function replaceProfile(
@@ -251,15 +255,18 @@ function createImportNotice(
   added: number,
   updated: number,
   activeUpdated: boolean,
+  t: Translate,
 ): NoticeData {
   const lines: string[] = [];
-  if (added > 0) lines.push(`Добавлено новых: ${added}`);
-  if (updated > 0) lines.push(`Обновлено существующих: ${updated}`);
-  if (activeUpdated) lines.push('Активный профиль обновлён из файла.');
+  if (added > 0) lines.push(t('Added: {count}', { count: added }));
+  if (updated > 0) lines.push(t('Updated: {count}', { count: updated }));
+  if (activeUpdated) {
+    lines.push(t('The active profile was updated from the file.'));
+  }
 
   return {
     tone: 'success',
-    title: importedCount === 1 ? 'Профиль загружен' : 'Профили загружены',
+    title: t(importedCount === 1 ? 'Profile loaded' : 'Profiles loaded'),
     text: lines.join('\n'),
   };
 }
@@ -280,8 +287,8 @@ function importProfilesFile(
     if (!imported) {
       context.setNotice({
         tone: 'error',
-        title: 'Не удалось загрузить профиль',
-        text: 'Файл повреждён или имеет неподдерживаемый формат.',
+        title: context.t('Could not load profile'),
+        text: context.t('The file is damaged or has an unsupported format.'),
       });
       return;
     }
@@ -305,27 +312,29 @@ function importProfilesFile(
         merged.added,
         merged.updated,
         activeUpdated,
+        context.t,
       ),
     );
   };
   reader.onerror = () => {
     context.setNotice({
       tone: 'error',
-      title: 'Не удалось прочитать файл',
-      text: 'Попробуйте выбрать файл ещё раз.',
+      title: context.t('Could not read file'),
+      text: context.t('Try selecting the file again.'),
     });
   };
   reader.readAsText(file);
 }
 
 export function useProfiles(state: ProfileState): ProfilesController {
+  const { t } = useI18n();
   const hydration = useProfilesHydration(state);
   const [notice, setNotice] = useState<NoticeData | null>(null);
 
   useProfilesAutosave(state, hydration);
   useProfilesPersistence(hydration);
 
-  const context: ProfilesContext = { state, ...hydration, setNotice };
+  const context: ProfilesContext = { state, ...hydration, setNotice, t };
 
   return {
     profiles: hydration.profiles,

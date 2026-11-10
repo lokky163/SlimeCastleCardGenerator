@@ -1,5 +1,10 @@
 import type { RefObject } from 'react';
-import { ALL_EQUIPMENT_GRADES, type EquipmentGrade } from '../../models/equipment';
+import { useI18n } from '../../i18n/I18nProvider';
+import {
+  ALL_EQUIPMENT_GRADES,
+  EQUIPMENT_GRADE_LABELS,
+  type EquipmentGrade,
+} from '../../models/equipment';
 import { MenuOption } from '../ui/MenuOption/MenuOption';
 import { PopupMenu } from '../ui/PopupMenu/PopupMenu';
 
@@ -30,21 +35,25 @@ export const EquipmentGradeMenu: React.FC<EquipmentGradeMenuProps> = ({
   anchorRef,
   grade,
   onChange,
-}) => (
-  <PopupMenu open={open} onClose={onClose} anchorRef={anchorRef}>
-    {ALL_EQUIPMENT_GRADES.map((option) => {
-      const selected = option === grade;
+}) => {
+  const { t } = useI18n();
 
-      return (
-        <MenuOption
-          key={option}
-          selected={selected}
-          onClick={() => onChange(option)}
-          style={selected ? undefined : { color: GRADE_COLORS[option] }}
-        >
-          {option}
-        </MenuOption>
-      );
-    })}
-  </PopupMenu>
-);
+  return (
+    <PopupMenu open={open} onClose={onClose} anchorRef={anchorRef}>
+      {ALL_EQUIPMENT_GRADES.map((option) => {
+        const selected = option === grade;
+
+        return (
+          <MenuOption
+            key={option}
+            selected={selected}
+            onClick={() => onChange(option)}
+            style={selected ? undefined : { color: GRADE_COLORS[option] }}
+          >
+            {t(EQUIPMENT_GRADE_LABELS[option])}
+          </MenuOption>
+        );
+      })}
+    </PopupMenu>
+  );
+};

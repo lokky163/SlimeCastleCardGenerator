@@ -3,8 +3,8 @@ export type ThemeIconName = 'sun' | 'moon';
 
 export interface ThemeDefinition {
   id: ThemeId;
-  title: string;
-  toggleLabel: string;
+  titleKey: string;
+  toggleLabelKey: string;
   icon: ThemeIconName;
 }
 
@@ -18,14 +18,14 @@ export const DEFAULT_THEME: ThemeId = 'dark';
 export const THEMES: readonly ThemeDefinition[] = [
   {
     id: 'dark',
-    title: 'Тёмная тема',
-    toggleLabel: 'Переключить на тёмную тему',
+    titleKey: 'Dark theme',
+    toggleLabelKey: 'Switch to dark theme',
     icon: 'moon',
   },
   {
     id: 'light',
-    title: 'Светлая тема',
-    toggleLabel: 'Переключить на светлую тему',
+    titleKey: 'Light theme',
+    toggleLabelKey: 'Switch to light theme',
     icon: 'sun',
   },
 ];

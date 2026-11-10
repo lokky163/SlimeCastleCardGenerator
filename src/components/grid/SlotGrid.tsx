@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { CardGrid, CardGridItem, type CardGridVariant } from './CardGrid';
 import { EDITOR_GRID_CONFIG } from './editorGridConfig';
 import { ScaledCard } from './ScaledCard';
@@ -20,22 +21,26 @@ interface SlotIndexInputProps {
   onChange: (value: number) => void;
 }
 
-const SlotIndexInput: React.FC<SlotIndexInputProps> = ({ value, max, onChange }) => (
-  <div className={styles.manualInput}>
-    <span>Слот:</span>
-    <input
-      type="number"
-      min={-1}
-      max={max}
-      value={value}
-      className={styles.indexInput}
-      onChange={(event) => {
-        const parsed = parseInt(event.target.value, 10);
-        onChange(Number.isNaN(parsed) ? -1 : parsed);
-      }}
-    />
-  </div>
-);
+const SlotIndexInput: React.FC<SlotIndexInputProps> = ({ value, max, onChange }) => {
+  const { t } = useI18n();
+
+  return (
+    <div className={styles.manualInput}>
+      <span>{t('Slot:')}</span>
+      <input
+        type="number"
+        min={-1}
+        max={max}
+        value={value}
+        className={styles.indexInput}
+        onChange={(event) => {
+          const parsed = parseInt(event.target.value, 10);
+          onChange(Number.isNaN(parsed) ? -1 : parsed);
+        }}
+      />
+    </div>
+  );
+};
 
 export function SlotGrid<T extends LayoutItem>({
   items,

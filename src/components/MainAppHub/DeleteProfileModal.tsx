@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { ConfirmModal } from '../ui/ConfirmModal/ConfirmModal';
 
 interface DeleteProfileModalProps {
@@ -12,14 +13,18 @@ export const DeleteProfileModal: React.FC<DeleteProfileModalProps> = ({
   label,
   onCancel,
   onConfirm,
-}) => (
-  <ConfirmModal
-    open={open}
-    title="Удалить профиль?"
-    confirmLabel="Удалить"
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-  >
-    {label} будет удалён без возможности восстановления.
-  </ConfirmModal>
-);
+}) => {
+  const { t } = useI18n();
+
+  return (
+    <ConfirmModal
+      open={open}
+      title={t('Delete profile?')}
+      confirmLabel={t('Delete')}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+    >
+      {t('{label} will be deleted permanently.', { label })}
+    </ConfirmModal>
+  );
+};

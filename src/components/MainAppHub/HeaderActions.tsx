@@ -1,4 +1,5 @@
 import { cx } from '../../utils/classNames';
+import { useI18n } from '../../i18n/I18nProvider';
 import { BgColorPicker } from './BgColorPicker';
 import styles from './HubHeader.module.css';
 
@@ -18,9 +19,8 @@ interface CollapseButtonProps {
 }
 
 const CollapseButton: React.FC<CollapseButtonProps> = ({ isCollapsed, onToggle }) => {
-  const label = isCollapsed
-    ? 'Развернуть верхнюю панель'
-    : 'Свернуть верхнюю панель';
+  const { t } = useI18n();
+  const label = t(isCollapsed ? 'Expand top panel' : 'Collapse top panel');
 
   return (
     <button
@@ -49,34 +49,38 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
   isCollapsed,
   showCollapseToggle,
   onToggleCollapsed,
-}) => (
-  <div className={styles.toolsContainer}>
-    <div className={styles.pickerGroup}>
-      <BgColorPicker value={bgColor} onChange={onBgColorChange} />
-    </div>
+}) => {
+  const { t } = useI18n();
 
-    <div className={styles.actionGroup}>
-      <button
-        type="button"
-        className={cx(styles.actionBtn, styles.btnExport)}
-        onClick={onExportProfile}
-      >
-        Сохранить профиль
-      </button>
+  return (
+    <div className={styles.toolsContainer}>
+      <div className={styles.pickerGroup}>
+        <BgColorPicker value={bgColor} onChange={onBgColorChange} />
+      </div>
 
-      <div className={styles.pngActions}>
+      <div className={styles.actionGroup}>
         <button
           type="button"
-          className={cx(styles.actionBtn, styles.btnPng)}
-          onClick={onExportImage}
+          className={cx(styles.actionBtn, styles.btnExport)}
+          onClick={onExportProfile}
         >
-          Сохранить изображение
+          {t('Save profile')}
         </button>
 
-        {showCollapseToggle && (
-          <CollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapsed} />
-        )}
+        <div className={styles.pngActions}>
+          <button
+            type="button"
+            className={cx(styles.actionBtn, styles.btnPng)}
+            onClick={onExportImage}
+          >
+            {t('Save image')}
+          </button>
+
+          {showCollapseToggle && (
+            <CollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapsed} />
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

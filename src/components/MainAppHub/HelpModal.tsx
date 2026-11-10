@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { cx } from '../../utils/classNames';
 import { Modal } from '../ui/Modal/Modal';
 import modalStyles from '../ui/Modal/Modal.module.css';
@@ -8,86 +9,207 @@ interface HelpModalProps {
   onClose: () => void;
 }
 
-const GameHelp: React.FC = () => (
-  <>
-    <p><strong>Общие:</strong></p>
-    <p>Нажатие на кнопку слева от кнопки “Справка” открывает меню выбора вкладки для настройки, а именно: “Снаряжение”, “Слаймы”, “Реликвии”, “Артефакты”, “Баффы”.</p>
-    <p>При любом изменении происходит автоматическое сохранение активного профиля в локальных файлах браузера. Все профили хранятся в браузере вместе.</p>
-    <p>Кнопка с тремя горизонтальными линиями в левой части шапки открывает меню профилей. Там можно переключаться между профилями, добавлять новый пустой профиль и удалять существующие. У каждого профиля свой ник и полный набор настроек.</p>
-    <p>Кнопки “Сохранить все” и “Загрузить” в нижней части меню работают с профилями. “Сохранить все” скачивает файл со всеми профилями. “Загрузить” принимает как файл всех профилей, так и одиночный профиль: профиль с уже существующим uid перезаписывает старый, новый профиль добавляется в конец, а если uid в файле нет, он создаётся автоматически.</p>
-    <p>Кнопка “Сохранить профиль” в шапке скачивает только активный профиль вместе с его uid. Загрузить этот файл можно той же кнопкой “Загрузить” в меню профилей.</p>
-    <p>Кнопка с солнцем или луной в шапке переключает светлую и тёмную тему. Выбранная тема запоминается и применяется при следующем запуске.</p>
-    <p>Кнопка “Сохранить изображение” скачивает готовую карточку игрока.</p>
+const Divider: React.FC = () => <hr className={styles.divider} />;
 
-    <hr className={styles.divider} />
+const GeneralHelp: React.FC = () => {
+  const { t } = useI18n();
 
-    <p><strong>Снаряжение:</strong></p>
-    <p>Нажатие на картинку со снаряжением открывает меню выбора редкости от эпического до фентези2.</p>
+  return (
+    <>
+      <p><strong>{t('General:')}</strong></p>
+      <p>
+        {t('Clicking the button to the left of “Help” opens the tab menu: “Equipment”, “Slimes”, “Relics”, “Artifacts”, “Buffs”.')}
+      </p>
+      <p>
+        {t('Any change automatically saves the active profile to the browser local storage. All profiles are stored together in the browser.')}
+      </p>
+      <p>
+        {t('The button with three horizontal lines on the left side of the header opens the profiles menu. There you can switch between profiles, add a new empty profile, and delete existing ones. Each profile has its own player name and full set of settings.')}
+      </p>
+      <p>
+        {t('The “Save all” and “Load” buttons at the bottom of the menu work with profiles. “Save all” downloads a file with all profiles. “Load” accepts both a file with all profiles and a single profile: a profile with an existing uid overwrites the old one, a new profile is appended, and if the file has no uid, one is created automatically.')}
+      </p>
+      <p>
+        {t('The “Save profile” button in the header downloads only the active profile together with its uid. You can load this file with the same “Load” button in the profiles menu.')}
+      </p>
+    </>
+  );
+};
 
-    <hr className={styles.divider} />
+const PreferencesHelp: React.FC = () => {
+  const { t } = useI18n();
 
-    <p><strong>Слаймы:</strong></p>
-    <p>Нажатие в области уровня (верхние 25%) открывает поле ввода уровня слайма. Нажатие в области имени слайма/звёзд (нижние 25%) открывает меню выбора количества звёзд. Нажатие по середине меняет скин слайма</p>
-    <p>Вариант “no” – слайма нет, 0 – 0 звезд на слайме. Автоматически на основе уровня и количества звёзд высчитывается общий бонус слайма.</p>
+  return (
+    <>
+      <p>
+        {t('The sun or moon button in the header switches between light and dark themes. The selected theme is remembered and applied on the next launch.')}
+      </p>
+      <p>
+        {t('The flag button in the header changes the interface language. The selected language is remembered and applied on the next launch.')}
+      </p>
+      <p>{t('The “Save image” button downloads the finished player card.')}</p>
+    </>
+  );
+};
 
-    <hr className={styles.divider} />
+const EquipmentHelp: React.FC = () => {
+  const { t } = useI18n();
 
-    <p><strong>Реликвии:</strong></p>
-    <p>Нажатие в области звёзд (нижние 20%) вызывает меню выбора количества звёзд аналогичное такому же для слаймов.</p>
+  return (
+    <>
+      <p><strong>{t('Equipment:')}</strong></p>
+      <p>
+        {t('Clicking an equipment image opens the rarity menu from epic to fantasy 2.')}
+      </p>
+    </>
+  );
+};
 
-    <hr className={styles.divider} />
+const SlimesHelp: React.FC = () => {
+  const { t } = useI18n();
 
-    <p><strong>Артефакты:</strong></p>
-    <p>Нажатие на звёзды (Слово Нет, <span className={styles.starHint}>0 ★</span> тоже) вызывает меню выбора количества звёзд</p>
-    <p>Можно указать количество осколков и уровень артефакта</p>
+  return (
+    <>
+      <p><strong>{t('Slimes:')}</strong></p>
+      <p>
+        {t('Clicking in the level area (top 25%) opens the slime level input. Clicking in the name/stars area (bottom 25%) opens the star count menu. Clicking in the middle changes the slime skin.')}
+      </p>
+      <p>
+        {t('The “None” option means no slime; 0 means 0 stars on the slime. The total slime bonus is calculated automatically from the level and star count.')}
+      </p>
+    </>
+  );
+};
 
-    <hr className={styles.divider} />
+const RelicsHelp: React.FC = () => {
+  const { t } = useI18n();
 
-    <p><strong>Бафы:</strong></p>
-    <p>Можно вводить значения пермобафов. <strong>1 фазой</strong> считаются все бафы кроме атаки (ATK), здоровья (HP), сопротивления криту (Critical Resistance). Остаток пермачей показывается сразу для обеих фаз, даже если первая ещё не закрыта.</p>
-    <p>Ниже можно выбрать шанс выпадения пермача: <strong>4.5%</strong>, <strong>9%</strong> (с бафом x2) или ввести свой. Калькулятор учитывает гарант на 30-м ролле: если пермач выпал раньше, счётчик гаранта сбрасывается. Среднее число капель на один пермач считается по формуле <strong>(1 − (1 − p)<sup>30</sup>) / p</strong>, где p — шанс выпадения. Для 4.5% это ≈16.64, для 9% — ≈10.46. Итоговые капли показываются отдельно для 1 и 2 фазы.</p>
-  </>
-);
+  return (
+    <>
+      <p><strong>{t('Relics:')}</strong></p>
+      <p>
+        {t('Clicking in the stars area (bottom 20%) opens a star count menu similar to the one for slimes.')}
+      </p>
+    </>
+  );
+};
 
-const GridHelp: React.FC = () => (
-  <>
-    <p><strong>Сетка и порядок на карточке:</strong></p>
-    <p>На каждой вкладке можно настроить сетку итоговой карточки. Размер сетки бывает автоматическим и ручным. Автоматический размер подбирает строки и столбцы по числу показанных карточек: сначала заполняется ширина (до 6 столбцов для слаймов, реликвий и баффов и до 4 для снаряжения и артефактов), затем добавляются строки. Ручной размер показывает счётчики строк и столбцов. Режим «Ручные индексы» всегда использует ручной размер.</p>
-    <p>Карточки заполняют сетку слева направо сверху вниз. Параметр «Отсутствующие» отвечает за то, что делать с отсутствующими и вручную скрытыми карточками:</p>
+const ArtifactsHelp: React.FC = () => {
+  const { t } = useI18n();
+
+  return (
+    <>
+      <p><strong>{t('Artifacts:')}</strong></p>
+      <p>
+        {t('Clicking the stars (including “None” and “0 ★”) opens the star count menu.')}
+      </p>
+      <p>{t('You can set the number of fragments and the artifact level.')}</p>
+    </>
+  );
+};
+
+const BuffsHelp: React.FC = () => {
+  const { t } = useI18n();
+
+  return (
+    <>
+      <p><strong>{t('Buffs:')}</strong></p>
+      <p>
+        {t('You can enter permanent buff values. Phase 1 includes all buffs except attack (ATK), health (HP), and critical resistance. The remaining permanent buffs are shown for both phases at once, even if the first phase is not complete.')}
+      </p>
+      <p>
+        {t('Below you can choose the permanent buff drop chance: 4.5%, 9% (with the x2 buff), or enter a custom value. The calculator accounts for pity at roll 30: if a permanent buff drops earlier, the pity counter resets. The average number of drops per permanent buff is calculated as (1 − (1 − p)^30) / p, where p is the drop chance. For 4.5% it is ≈16.64, for 9% it is ≈10.46. The resulting drops are shown separately for phases 1 and 2.')}
+      </p>
+    </>
+  );
+};
+
+const MissingModesHelp: React.FC = () => {
+  const { t } = useI18n();
+
+  return (
     <ul>
-      <li><strong>На месте:</strong> отсутствующие карточки остаются в своих ячейках, а скрытые не рисуются и оставляют на своих местах пустоту.</li>
-      <li><strong>В конец:</strong> переносит отсутствующие и скрытые карточки после заполненных, как это происходит в игре. Скрытые не рисуются и не создают пропусков.</li>
-      <li><strong>Не показывать:</strong> не рисует отсутствующие и скрытые карточки; оставшиеся карточки занимают освободившееся место без пропусков.</li>
-      <li><strong>Ручные индексы:</strong> открывает дополнительное поле ввода для каждой карточки с индексом в сетке. Индексы начинаются с 0 и заканчиваются на <code>кол-во строк * кол-во столбцов - 1</code>, слева направо сверху вниз. Дополнительно можно указать индекс -1, тогда карточка рисоваться не будет.</li>
+      <li>
+        <strong>{t('Keep in place')}:</strong>{' '}
+        {t('missing cards stay in their cells, while hidden cards are not drawn and leave empty space in their places.')}
+      </li>
+      <li>
+        <strong>{t('Move to end')}:</strong>{' '}
+        {t('moves missing and hidden cards after the filled ones, as happens in the game. Hidden cards are not drawn and do not create gaps.')}
+      </li>
+      <li>
+        <strong>{t('Hide missing')}:</strong>{' '}
+        {t('does not draw missing and hidden cards; the remaining cards fill the freed space without gaps.')}
+      </li>
+      <li>
+        <strong>{t('Manual indexes')}:</strong>{' '}
+        {t('opens an additional input for each card with its index in the grid. Indexes start at 0 and end at {range}, left to right, top to bottom. You can also set index -1, then the card is not drawn.', {
+          range: t('row count * column count - 1'),
+        })}
+      </li>
     </ul>
-    <p>В режимах «На месте», «В конец» и «Не показывать» можно включить переключатель «Добавить скрытие» — тогда под каждой карточкой появится кнопка «Скрыть/Показать». Скрытая карточка затемняется в редакторе, чтобы её можно было вернуть, но на итоговой картинке она не отображается. Если выбрать «Убрать скрытие», все карточки временно показываются, а их отметки сохраняются для следующего включения.</p>
-  </>
-);
+  );
+};
+
+const GridHelp: React.FC = () => {
+  const { t } = useI18n();
+
+  return (
+    <>
+      <p><strong>{t('Grid and card order:')}</strong></p>
+      <p>
+        {t('On each tab you can configure the grid of the final card. The grid size can be automatic or manual. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for equipment and artifacts), then rows are added. Manual size shows row and column counters. The “Manual indexes” mode always uses manual size.')}
+      </p>
+      <p>
+        {t('Cards fill the grid from left to right, top to bottom. The “Missing” option controls what happens to missing and manually hidden cards:')}
+      </p>
+      <MissingModesHelp />
+      <p>
+        {t('In “Keep in place”, “Move to end”, and “Hide missing” modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored, but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.')}
+      </p>
+    </>
+  );
+};
 
 const HelpContent: React.FC = () => (
   <>
-    <GameHelp />
-    <hr className={styles.divider} />
+    <GeneralHelp />
+    <PreferencesHelp />
+    <Divider />
+    <EquipmentHelp />
+    <Divider />
+    <SlimesHelp />
+    <Divider />
+    <RelicsHelp />
+    <Divider />
+    <ArtifactsHelp />
+    <Divider />
+    <BuffsHelp />
+    <Divider />
     <GridHelp />
   </>
 );
 
-export const HelpModal: React.FC<HelpModalProps> = ({ open, onClose }) => (
-  <Modal open={open} onClose={onClose} className={styles.dialog}>
-    <div className={styles.header}>
-      <h3>Справка</h3>
-    </div>
+export const HelpModal: React.FC<HelpModalProps> = ({ open, onClose }) => {
+  const { t } = useI18n();
 
-    <div className={styles.body}>
-      <HelpContent />
-    </div>
+  return (
+    <Modal open={open} onClose={onClose} className={styles.dialog}>
+      <div className={styles.header}>
+        <h3>{t('Help')}</h3>
+      </div>
 
-    <button
-      type="button"
-      className={cx(modalStyles.actionBtn, modalStyles.primaryBtn, styles.closeBtn)}
-      onClick={onClose}
-    >
-      Закрыть
-    </button>
-  </Modal>
-);
+      <div className={styles.body}>
+        <HelpContent />
+      </div>
+
+      <button
+        type="button"
+        className={cx(modalStyles.actionBtn, modalStyles.primaryBtn, styles.closeBtn)}
+        onClick={onClose}
+      >
+        {t('Close')}
+      </button>
+    </Modal>
+  );
+};
