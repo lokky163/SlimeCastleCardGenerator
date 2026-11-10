@@ -7,6 +7,7 @@ import {
 } from '../../services/Language';
 import { MenuOption } from '../ui/MenuOption/MenuOption';
 import { PopupMenu } from '../ui/PopupMenu/PopupMenu';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 import styles from './LanguageToggle.module.css';
 
 const RussianFlag: React.FC<{ className?: string }> = ({ className }) => (
@@ -52,6 +53,7 @@ export const LanguageToggle: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const current = getLanguage(language);
+  const label = t('Change language');
 
   const handleSelect = (next: (typeof LANGUAGES)[number]) => {
     setLanguage(next.id);
@@ -60,17 +62,18 @@ export const LanguageToggle: React.FC = () => {
 
   return (
     <div className={styles.wrap} ref={anchorRef}>
-      <button
-        type="button"
-        className={styles.toggle}
-        aria-label={t('Change language')}
-        title={t('Change language')}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
-      >
-        <Flag flag={current.flag} className={styles.flag} />
-      </button>
+      <Tooltip label={label} placement="bottom">
+        <button
+          type="button"
+          className={styles.toggle}
+          aria-label={label}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <Flag flag={current.flag} className={styles.flag} />
+        </button>
+      </Tooltip>
 
       <PopupMenu
         open={isOpen}

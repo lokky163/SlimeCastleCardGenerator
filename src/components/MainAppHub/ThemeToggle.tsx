@@ -1,6 +1,7 @@
 import { useTheme } from '../../hooks/useTheme';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { ThemeIconName } from '../../services/Theme';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 import styles from './ThemeToggle.module.css';
 
 const SunIcon: React.FC = () => (
@@ -43,14 +44,15 @@ export const ThemeToggle: React.FC = () => {
   const label = t(nextTheme.toggleLabelKey);
 
   return (
-    <button
-      type="button"
-      className={styles.toggle}
-      aria-label={label}
-      title={label}
-      onClick={toggleTheme}
-    >
-      <ThemeIcon name={nextTheme.icon} />
-    </button>
+    <Tooltip label={label} placement="bottom">
+      <button
+        type="button"
+        className={styles.toggle}
+        aria-label={label}
+        onClick={toggleTheme}
+      >
+        <ThemeIcon name={nextTheme.icon} />
+      </button>
+    </Tooltip>
   );
 };

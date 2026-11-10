@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { cx } from '../../utils/classNames';
 import type { CardProfile } from '../../hooks/useCardProfile';
 import { useI18n } from '../../i18n/I18nProvider';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 import { HeaderActions } from './HeaderActions';
 import { LanguageToggle } from './LanguageToggle';
 import { TabMenu } from './TabMenu';
@@ -108,24 +109,28 @@ const HeaderControls: React.FC<HeaderControlsProps> = ({
   onRequestReset,
 }) => {
   const { t } = useI18n();
+  const profilesLabel = t(
+    isProfilesOpen ? 'Close profiles menu' : 'Open profiles menu',
+  );
 
   return (
     <div className={styles.leftGroup}>
-      <button
-        type="button"
-        className={cx(styles.tabBtn, styles.profilesBtn, isProfilesOpen && styles.profilesBtnOpen)}
-        aria-label={t(isProfilesOpen ? 'Close profiles menu' : 'Open profiles menu')}
-        aria-expanded={isProfilesOpen}
-        aria-controls="profiles-drawer"
-        title={t('Profiles')}
-        onClick={onToggleProfiles}
-      >
-        <span className={styles.burgerIcon} aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </span>
-      </button>
+      <Tooltip label={profilesLabel} placement="bottom" align="start">
+        <button
+          type="button"
+          className={cx(styles.tabBtn, styles.profilesBtn, isProfilesOpen && styles.profilesBtnOpen)}
+          aria-label={profilesLabel}
+          aria-expanded={isProfilesOpen}
+          aria-controls="profiles-drawer"
+          onClick={onToggleProfiles}
+        >
+          <span className={styles.burgerIcon} aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+      </Tooltip>
 
       <TabMenu activeTab={activeTab} onTabChange={onTabChange} />
 

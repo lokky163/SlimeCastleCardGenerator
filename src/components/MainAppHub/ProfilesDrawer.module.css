@@ -28,7 +28,7 @@
   background-color: var(--color-panel-3);
   border: 1px solid var(--color-border-soft);
   border-radius: 6px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .profileRowActive {
@@ -46,6 +46,7 @@
   padding: 9px 10px;
   background: transparent;
   border: none;
+  border-radius: 5px 0 0 5px;
   color: var(--color-text);
   font-family: var(--font-ui);
   text-align: left;
@@ -81,6 +82,7 @@
 
 .moveBtn {
   width: 30px;
+  height: 100%;
   padding: 0;
   display: flex;
   align-items: center;
@@ -91,7 +93,7 @@
   cursor: pointer;
 }
 
-.moveBtn + .moveBtn {
+.reorderBtns > * + * .moveBtn {
   border-left: 1px solid var(--color-border-soft);
 }
 
@@ -103,6 +105,7 @@
 .deleteBtn {
   flex-shrink: 0;
   width: 38px;
+  height: 100%;
   padding: 0;
   display: flex;
   align-items: center;
@@ -110,6 +113,7 @@
   background: transparent;
   border: none;
   border-left: 1px solid var(--color-border-soft);
+  border-radius: 0 5px 5px 0;
   color: var(--color-text-muted);
   cursor: pointer;
 }

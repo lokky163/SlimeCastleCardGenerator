@@ -3,6 +3,7 @@ import type { ProfilesMoveDirection } from '../../hooks/useProfiles';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 import styles from './ProfilesDrawer.module.css';
 
 interface ProfilesDrawerProps {
@@ -99,27 +100,29 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
   return (
     <div className={styles.reorderBtns}>
       {canMoveUp && (
-        <button
-          type="button"
-          className={styles.moveBtn}
-          aria-label={upLabel}
-          title={upLabel}
-          onClick={() => onMove(index, 'up')}
-        >
-          <MoveIcon direction="up" />
-        </button>
+        <Tooltip label={upLabel} placement="bottom">
+          <button
+            type="button"
+            className={styles.moveBtn}
+            aria-label={upLabel}
+            onClick={() => onMove(index, 'up')}
+          >
+            <MoveIcon direction="up" />
+          </button>
+        </Tooltip>
       )}
 
       {canMoveDown && (
-        <button
-          type="button"
-          className={styles.moveBtn}
-          aria-label={downLabel}
-          title={downLabel}
-          onClick={() => onMove(index, 'down')}
-        >
-          <MoveIcon direction="down" />
-        </button>
+        <Tooltip label={downLabel} placement="bottom">
+          <button
+            type="button"
+            className={styles.moveBtn}
+            aria-label={downLabel}
+            onClick={() => onMove(index, 'down')}
+          >
+            <MoveIcon direction="down" />
+          </button>
+        </Tooltip>
       )}
     </div>
   );
@@ -161,15 +164,16 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
         onMove={onMove}
       />
 
-      <button
-        type="button"
-        className={styles.deleteBtn}
-        aria-label={deleteLabel}
-        title={deleteLabel}
-        onClick={() => onDelete(index)}
-      >
-        <TrashIcon />
-      </button>
+      <Tooltip label={deleteLabel} placement="bottom" align="end">
+        <button
+          type="button"
+          className={styles.deleteBtn}
+          aria-label={deleteLabel}
+          onClick={() => onDelete(index)}
+        >
+          <TrashIcon />
+        </button>
+      </Tooltip>
     </div>
   );
 };

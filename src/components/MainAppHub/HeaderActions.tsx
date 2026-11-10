@@ -1,5 +1,6 @@
 import { cx } from '../../utils/classNames';
 import { useI18n } from '../../i18n/I18nProvider';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 import { BgColorPicker } from './BgColorPicker';
 import styles from './HubHeader.module.css';
 
@@ -23,21 +24,22 @@ const CollapseButton: React.FC<CollapseButtonProps> = ({ isCollapsed, onToggle }
   const label = t(isCollapsed ? 'Expand top panel' : 'Collapse top panel');
 
   return (
-    <button
-      type="button"
-      className={cx(styles.actionBtn, styles.collapseBtn)}
-      aria-expanded={!isCollapsed}
-      aria-label={label}
-      title={label}
-      onClick={onToggle}
-    >
-      <span
-        className={cx(
-          styles.collapseIcon,
-          isCollapsed && styles.collapseIconDown,
-        )}
-      />
-    </button>
+    <Tooltip label={label} placement="bottom" align="end">
+      <button
+        type="button"
+        className={cx(styles.actionBtn, styles.collapseBtn)}
+        aria-expanded={!isCollapsed}
+        aria-label={label}
+        onClick={onToggle}
+      >
+        <span
+          className={cx(
+            styles.collapseIcon,
+            isCollapsed && styles.collapseIconDown,
+          )}
+        />
+      </button>
+    </Tooltip>
   );
 };
 
