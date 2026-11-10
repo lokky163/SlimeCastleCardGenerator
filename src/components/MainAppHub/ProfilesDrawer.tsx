@@ -100,7 +100,7 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
   return (
     <div className={styles.reorderBtns}>
       {canMoveUp && (
-        <Tooltip label={upLabel} placement="bottom">
+        <Tooltip label={upLabel} placement="bottom" align="end">
           <button
             type="button"
             className={styles.moveBtn}
@@ -113,7 +113,7 @@ const ProfileMoveButtons: React.FC<ProfileMoveButtonsProps> = ({
       )}
 
       {canMoveDown && (
-        <Tooltip label={downLabel} placement="bottom">
+        <Tooltip label={downLabel} placement="bottom" align="end">
           <button
             type="button"
             className={styles.moveBtn}
