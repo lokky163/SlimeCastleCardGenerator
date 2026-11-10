@@ -85,8 +85,23 @@
   border-right: none;
 }
 
-.wrap:hover .bubble,
-.wrap:has(:focus-visible) .bubble {
+@media (hover: hover) {
+  .wrap:hover .bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(0);
+  }
+}
+
+@media (pointer: fine) {
+  .wrap:has(:focus-visible) .bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(0);
+  }
+}
+
+.wrapLongPress .bubble {
   opacity: 1;
   visibility: visible;
   transform: translateX(calc(var(--tooltip-shift) + var(--tooltip-nudge))) translateY(0);

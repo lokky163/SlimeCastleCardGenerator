@@ -1,4 +1,12 @@
-import { useLayoutEffect, useRef, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from 'react';
 import { cx } from '../../../utils/classNames';
 import styles from './Tooltip.module.css';
 
@@ -20,10 +28,13 @@ const ALIGN_CLASS: Record<TooltipAlign, string> = {
 };
 
 const VIEWPORT_MARGIN_PX = 8;
+const LONG_PRESS_MS = 500;
+const LONG_PRESS_MOVE_TOLERANCE_PX = 10;
 
 /**
  * Стилизованная подсказка вместо нативного `title`.
- * Показывается при наведении и при фокусе на вложенном элементе.
+ * На устройствах с курсором показывается при наведении и фокусе,
+ * а на сенсорных экранах — только при долгом нажатии.
  *
  * Подсказка сдвигается по горизонтали, если упирается в край экрана:
  * на узких экранах это не даёт ей обрезаться.
@@ -36,6 +47,26 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
 }) => {
   const bubbleRef = useRef<HTMLSpanElement>(null);
+  const pressTimerRef = useRef<number | null>(null);
+  const pressStartRef = useRef<{ x: number; y: number } | null>(null);
+  const longPressRef = useRef(false);
+  const [isLongPressVisible, setIsLongPressVisible] = useState(false);
+
+  const clearPressTimer = () => {
+    if (pressTimerRef.current !== null) {
+      window.clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+  };
+
+  useEffect(
+    () => () => {
+      if (pressTimerRef.current !== null) {
+        window.clearTimeout(pressTimerRef.current);
+      }
+    },
+    [],
+  );
 
   useLayoutEffect(() => {
     const bubble = bubbleRef.current;
@@ -78,8 +109,86 @@ export const Tooltip: React.FC<TooltipProps> = ({
     };
   }, [label]);
 
+  const handlePointerDown = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType !== 'touch') return;
+
+    longPressRef.current = false;
+    pressStartRef.current = { x: event.clientX, y: event.clientY };
+    clearPressTimer();
+
+    pressTimerRef.current = window.setTimeout(() => {
+      pressTimerRef.current = null;
+      longPressRef.current = true;
+      setIsLongPressVisible(true);
+    }, LONG_PRESS_MS);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType !== 'touch' || !pressStartRef.current) return;
+
+    const dx = event.clientX - pressStartRef.current.x;
+    const dy = event.clientY - pressStartRef.current.y;
+    if (Math.hypot(dx, dy) > LONG_PRESS_MOVE_TOLERANCE_PX) {
+      clearPressTimer();
+      setIsLongPressVisible(false);
+    }
+  };
+
+  const handlePointerEnd = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType !== 'touch') return;
+
+    clearPressTimer();
+    pressStartRef.current = null;
+    setIsLongPressVisible(false);
+
+    // Let the click that follows the release run through the capture handler
+    // first, then clear the flag even if no click was produced.
+    if (longPressRef.current) {
+      window.setTimeout(() => {
+        longPressRef.current = false;
+      }, 0);
+    }
+  };
+
+  const handlePointerCancel = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType !== 'touch') return;
+
+    clearPressTimer();
+    pressStartRef.current = null;
+    longPressRef.current = false;
+    setIsLongPressVisible(false);
+  };
+
+  const handleClickCapture = (event: ReactMouseEvent<HTMLSpanElement>) => {
+    if (!longPressRef.current) return;
+
+    // A long press is used only to read the hint; do not trigger the control.
+    event.preventDefault();
+    event.stopPropagation();
+    longPressRef.current = false;
+  };
+
+  const handleContextMenu = (event: ReactMouseEvent<HTMLSpanElement>) => {
+    if (longPressRef.current) event.preventDefault();
+  };
+
   return (
-    <span className={cx(styles.wrap, styles[placement], ALIGN_CLASS[align], className)}>
+    <span
+      className={cx(
+        styles.wrap,
+        styles[placement],
+        ALIGN_CLASS[align],
+        isLongPressVisible && styles.wrapLongPress,
+        className,
+      )}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerCancel}
+      onPointerLeave={handlePointerEnd}
+      onClickCapture={handleClickCapture}
+      onContextMenu={handleContextMenu}
+    >
       {children}
       <span ref={bubbleRef} className={styles.bubble} role="tooltip">
         {label}
