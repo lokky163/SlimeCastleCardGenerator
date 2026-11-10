@@ -42,6 +42,8 @@ export const translations: TranslationTree = {
     'Select all': { ru: 'Выбрать всё' },
     'Clear all': { ru: 'Снять всё' },
     'Download PNG': { ru: 'Скачать PNG' },
+    Download: { ru: 'Скачать' },
+    Share: { ru: 'Поделиться' },
     'Permanent buffs': { ru: 'Перманентные бафы' },
     Custom: { ru: 'Свой' },
     Auto: { ru: 'Автоматический' },
@@ -110,10 +112,12 @@ export const translations: TranslationTree = {
   },
   imagePreview: {
     'Image is ready!': { ru: 'Изображение готово!' },
-    'Press and hold the image below and choose': {
-      ru: 'Зажмите палец на картинке ниже и выберите',
+    'Download the image or share it with other apps.': {
+      ru: 'Скачайте изображение или поделитесь им в других приложениях.',
     },
-    '“Save to Photos”': { ru: '«Сохранить в Фото»' },
+    'Sharing is not supported in this browser': {
+      ru: 'Отправка не поддерживается этим браузером',
+    },
     'Image preview': { ru: 'Предпросмотр изображения' },
   },
   export: {
@@ -191,8 +195,8 @@ export const translations: TranslationTree = {
       {
         ru: 'Кнопка с флагом в шапке меняет язык интерфейса. Выбранный язык запоминается и применяется при следующем запуске.',
       },
-    'The “Save image” button downloads the finished player card.': {
-      ru: 'Кнопка “Сохранить изображение” скачивает готовую карточку игрока.',
+    'The “Save image” button opens a window with the finished player card, where it can be downloaded or shared with other apps.': {
+      ru: 'Кнопка “Сохранить изображение” открывает окно с готовой карточкой игрока, где её можно скачать или отправить в другие приложения.',
     },
     'Equipment:': { ru: 'Снаряжение:' },
     'Clicking an equipment image opens the rarity menu from epic to fantasy 2.':

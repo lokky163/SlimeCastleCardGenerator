@@ -47,7 +47,7 @@ const PreferencesHelp: React.FC = () => {
       <p>
         {t('The flag button in the header changes the interface language. The selected language is remembered and applied on the next launch.')}
       </p>
-      <p>{t('The “Save image” button downloads the finished player card.')}</p>
+      <p>{t('The “Save image” button opens a window with the finished player card, where it can be downloaded or shared with other apps.')}</p>
     </>
   );
 };

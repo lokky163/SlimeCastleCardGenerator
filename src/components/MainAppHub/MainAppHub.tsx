@@ -32,14 +32,12 @@ function useHubController() {
   const boardRef = useRef<HTMLDivElement>(null);
   const [dropChance, setDropChance] =
     useState<DropChanceSelection>(DEFAULT_DROP_CHANCE);
-  const { previewImage, closePreview, shareLayout } = useShareLayout(
-    boardRef,
-    profile.playerName,
-  );
+  const { previewImage, canShare, closePreview, downloadImage, shareImage, exportImage } =
+    useShareLayout(boardRef, profile.playerName);
   const exportSettings = useExportSettings(
     profile.exportSelection,
     profile.setExportSelection,
-    shareLayout,
+    exportImage,
   );
   const buffsProgress = getBuffsProgress(profile.buffs);
 
@@ -47,7 +45,10 @@ function useHubController() {
     profile,
     boardRef,
     previewImage,
+    canShare,
     closePreview,
+    downloadImage,
+    shareImage,
     exportSettings,
     phaseInfo: buffsProgress.active,
     buffsProgress,
@@ -216,7 +217,13 @@ export const MainAppHub: React.FC = () => {
 
   return (
     <div className={styles.hubContainer}>
-      <ImagePreviewModal image={hub.previewImage} onClose={hub.closePreview} />
+      <ImagePreviewModal
+        image={hub.previewImage}
+        canShare={hub.canShare}
+        onClose={hub.closePreview}
+        onDownload={hub.downloadImage}
+        onShare={hub.shareImage}
+      />
       <HelpModal open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <ExportOptionsModal settings={exportSettings} />
       <ProfileModals menu={menu} reset={reset} />
