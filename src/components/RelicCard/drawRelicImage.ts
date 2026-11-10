@@ -97,10 +97,15 @@ interface FittedName {
   lineWidth: number;
 }
 
+/** Обводка как у названий слаймов: ~0.16em от размера шрифта. */
+function nameLineWidth(fontSize: number): number {
+  return Math.max(3, Math.round(fontSize * 0.16));
+}
+
 function fitName(ctx: CanvasRenderingContext2D, text: string): FittedName {
   for (let fontSize = 28; fontSize >= 14; fontSize -= 1) {
     ctx.font = `800 ${fontSize}px "Nunito"`;
-    const lineWidth = Math.max(4, fontSize * 0.2);
+    const lineWidth = nameLineWidth(fontSize);
     const maxTextWidth = NAME_WIDTH - lineWidth;
     const lines = wrapName(ctx, text, maxTextWidth);
     const widest = Math.max(...lines.map((line) => ctx.measureText(line).width));
@@ -119,7 +124,7 @@ function fitName(ctx: CanvasRenderingContext2D, text: string): FittedName {
     lines: wrapName(ctx, text, NAME_WIDTH - 4),
     fontSize: 14,
     lineHeight: 15.4,
-    lineWidth: 4,
+    lineWidth: nameLineWidth(14),
   };
 }
 
@@ -136,8 +141,8 @@ function drawName(ctx: CanvasRenderingContext2D, text: string): void {
   ctx.textBaseline = 'middle';
   ctx.lineJoin = 'round';
   ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = '#4A2A12';
-  ctx.fillStyle = '#FFF6DE';
+  ctx.strokeStyle = '#63402C';
+  ctx.fillStyle = '#FFFFFF';
 
   lines.forEach((line, index) => {
     const y = centerY + (index - (lines.length - 1) / 2) * lineHeight;
