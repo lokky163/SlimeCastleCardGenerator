@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { SccProfile } from '../../services/ProfilesSchema';
 import { cx } from '../../utils/classNames';
@@ -20,10 +20,11 @@ interface ProfilesDrawerProps {
 interface ProfileRowProps {
   profile: SccProfile;
   index: number;
+  displayIndex: number;
+  position: number;
   total: number;
   active: boolean;
   dragging: boolean;
-  dropTarget: boolean;
   onSelect: (index: number) => void;
   onDelete: (index: number) => void;
   onReorder: (from: number, to: number) => void;
@@ -40,11 +41,19 @@ interface ProfilesFooterProps {
 }
 
 interface DragState {
-  from: number;
-  over: number;
+  /** Original profile indexes in the order they are shown while dragging. */
+  order: number[];
+  /** Position of the dragged profile inside `order`. */
+  position: number;
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+  startLeft: number;
+  startTop: number;
 }
 
-const LONG_PRESS_MS = 400;
+const LONG_PRESS_MS = 180;
 const MOVE_TOLERANCE_PX = 10;
 
 const TrashIcon: React.FC = () => (
@@ -74,10 +83,11 @@ function profileName(profile: SccProfile, emptyLabel: string): string {
 const ProfileRow: React.FC<ProfileRowProps> = ({
   profile,
   index,
+  displayIndex,
+  position,
   total,
   active,
   dragging,
-  dropTarget,
   onSelect,
   onDelete,
   onReorder,
@@ -88,7 +98,7 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
   onPointerLeave,
 }) => {
   const { t } = useI18n();
-  const deleteLabel = t('Delete profile {index}', { index: index + 1 });
+  const deleteLabel = t('Delete profile {index}', { index: displayIndex + 1 });
 
   return (
     <div
@@ -96,9 +106,9 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
         styles.profileRow,
         active && styles.profileRowActive,
         dragging && styles.profileRowDragging,
-        dropTarget && styles.profileRowDropTarget,
       )}
-      data-profile-index={index}
+      data-profile-uid={profile.uid}
+      data-profile-position={position}
       onPointerDown={(event) => onPointerDown(event, index)}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -123,7 +133,7 @@ const ProfileRow: React.FC<ProfileRowProps> = ({
         }}
       >
         <span className={styles.profileTitle}>
-          {t('Profile {index}:', { index: index + 1 })}
+          {t('Profile {index}:', { index: displayIndex + 1 })}
         </span>
         <span className={styles.profileName}>
           {profileName(profile, t('No name'))}
@@ -195,9 +205,14 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
   const { t } = useI18n();
   const [drag, setDrag] = useState<DragState | null>(null);
   const dragRef = useRef<DragState | null>(null);
+  const profilesRef = useRef(profiles);
+  profilesRef.current = profiles;
+  const listRef = useRef<HTMLDivElement>(null);
+  const ghostRef = useRef<HTMLDivElement>(null);
   const pressRef = useRef<{ x: number; y: number; index: number } | null>(null);
   const timerRef = useRef<number | null>(null);
   const justDraggedRef = useRef(false);
+  const prevTopsRef = useRef(new Map<string, number>());
 
   const clearPressTimer = () => {
     if (timerRef.current !== null) {
@@ -208,6 +223,42 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
 
   useEffect(() => () => clearPressTimer(), []);
 
+  /**
+   * FLIP animation: after the visible order changes, every row is moved back
+   * to its previous position and then released, so the other rows slide to
+   * their new places instead of jumping.
+   */
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const nextTops = new Map<string, number>();
+    const rows = list.querySelectorAll<HTMLElement>('[data-profile-uid]');
+
+    rows.forEach((row) => {
+      const uid = row.dataset.profileUid;
+      if (!uid) return;
+
+      // offsetTop ignores the animation transform applied below.
+      const top = row.offsetTop;
+      nextTops.set(uid, top);
+
+      const previous = prevTopsRef.current.get(uid);
+      if (!dragRef.current || previous === undefined) return;
+
+      const deltaY = previous - top;
+      if (Math.abs(deltaY) < 1) return;
+
+      row.style.transition = 'none';
+      row.style.transform = `translateY(${deltaY}px)`;
+      void row.offsetHeight;
+      row.style.transition = '';
+      row.style.transform = '';
+    });
+
+    prevTopsRef.current = nextTops;
+  });
+
   const beginPress = (
     event: React.PointerEvent<HTMLDivElement>,
     index: number,
@@ -215,6 +266,7 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
     if (event.button !== 0) return;
     if ((event.target as HTMLElement).closest('[data-no-drag]')) return;
 
+    const row = event.currentTarget;
     justDraggedRef.current = false;
     pressRef.current = { x: event.clientX, y: event.clientY, index };
     clearPressTimer();
@@ -224,8 +276,20 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
       const press = pressRef.current;
       if (!press) return;
 
+      const rect = row.getBoundingClientRect();
+      const order = profilesRef.current.map((_, orderIndex) => orderIndex);
+      const next: DragState = {
+        order,
+        position: press.index,
+        width: rect.width,
+        height: rect.height,
+        offsetX: press.x - rect.left,
+        offsetY: press.y - rect.top,
+        startLeft: rect.left,
+        startTop: rect.top,
+      };
+
       justDraggedRef.current = true;
-      const next = { from: press.index, over: press.index };
       dragRef.current = next;
       setDrag(next);
     }, LONG_PRESS_MS);
@@ -248,41 +312,109 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
     pressRef.current = null;
   };
 
+  const isDragging = drag !== null;
+
+  // The ghost position is updated imperatively on pointer move, so it must be
+  // placed once on mount instead of being reset by every re-render.
+  useLayoutEffect(() => {
+    if (!isDragging) return;
+
+    const ghost = ghostRef.current;
+    const current = dragRef.current;
+    if (!ghost || !current) return;
+
+    ghost.style.transform = `translate3d(${current.startLeft}px, ${
+      current.startTop
+    }px, 0) scale(1.03)`;
+  }, [isDragging]);
+
   useEffect(() => {
     if (!drag) return;
 
-    const updateTarget = (x: number, y: number) => {
-      const element = document.elementFromPoint(x, y);
-      const row = element?.closest<HTMLElement>('[data-profile-index]');
-      if (!row) return;
+    /**
+     * The target position is the first row whose middle the pointer has
+     * crossed, measured with `offsetTop` so the running FLIP transform does
+     * not affect the calculation.
+     */
+    const findTarget = (y: number): number | null => {
+      const list = listRef.current;
+      if (!list) return null;
 
-      const over = Number(row.dataset.profileIndex);
+      const rows = list.querySelectorAll<HTMLElement>('[data-profile-position]');
+      if (rows.length === 0) return null;
+
+      const pointer = y - list.getBoundingClientRect().top + list.scrollTop;
+      let target = rows.length - 1;
+
+      for (let position = 0; position < rows.length; position += 1) {
+        const row = rows[position];
+        const middle = row.offsetTop + row.offsetHeight / 2;
+        if (pointer < middle) {
+          target = position;
+          break;
+        }
+      }
+
+      return target;
+    };
+
+    const moveGhost = (x: number, y: number) => {
       const current = dragRef.current;
-      if (!current || !Number.isFinite(over) || over === current.over) return;
+      const ghost = ghostRef.current;
+      if (!current || !ghost) return;
 
-      const next = { ...current, over };
+      ghost.style.transform = `translate3d(${x - current.offsetX}px, ${
+        y - current.offsetY
+      }px, 0) scale(1.03)`;
+    };
+
+    /** Keeps the list scrolling when the pointer is held near its edges. */
+    const autoScroll = (y: number) => {
+      const list = listRef.current;
+      if (!list) return;
+
+      const rect = list.getBoundingClientRect();
+      const edge = 40;
+
+      if (y < rect.top + edge) {
+        list.scrollTop -= Math.ceil((rect.top + edge - y) / 4);
+      } else if (y > rect.bottom - edge) {
+        list.scrollTop += Math.ceil((y - (rect.bottom - edge)) / 4);
+      }
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      moveGhost(event.clientX, event.clientY);
+      autoScroll(event.clientY);
+
+      const current = dragRef.current;
+      if (!current) return;
+
+      const target = findTarget(event.clientY);
+      if (target === null || target === current.position) return;
+
+      const order = [...current.order];
+      const [moved] = order.splice(current.position, 1);
+      order.splice(target, 0, moved);
+
+      const next: DragState = { ...current, order, position: target };
       dragRef.current = next;
       setDrag(next);
     };
 
-    const finish = (apply: boolean) => {
+    const finish = (commit: boolean) => {
       const current = dragRef.current;
       dragRef.current = null;
       pressRef.current = null;
       setDrag(null);
 
-      if (apply && current && current.from !== current.over) {
-        onReorderProfile(current.from, current.over);
+      if (commit && current) {
+        const from = current.order[current.position];
+        const to = current.position;
+        if (from !== to) onReorderProfile(from, to);
       }
-
-      window.setTimeout(() => {
-        justDraggedRef.current = false;
-      }, 0);
     };
 
-    const handlePointerMove = (event: PointerEvent) => {
-      updateTarget(event.clientX, event.clientY);
-    };
     const handlePointerUp = () => finish(true);
     const handlePointerCancel = () => finish(false);
     const handleTouchMove = (event: TouchEvent) => {
@@ -304,11 +436,17 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
 
   if (!open) return null;
 
+  const order = drag ? drag.order : profiles.map((_, index) => index);
+  const ghostProfile = drag ? profiles[drag.order[drag.position]] : null;
+
   return (
     <aside
       id="profiles-drawer"
-      className={styles.drawer}
+      className={cx(styles.drawer, isDragging && styles.drawerDragging)}
       aria-label={t('Profiles')}
+      onPointerDownCapture={() => {
+        justDraggedRef.current = false;
+      }}
       onClickCapture={(event) => {
         if (!justDraggedRef.current) return;
         event.preventDefault();
@@ -319,28 +457,34 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
         if (dragRef.current) event.preventDefault();
       }}
     >
-      <div className={styles.list}>
-        {profiles.map((profile, index) => (
-          <ProfileRow
-            key={profile.uid}
-            profile={profile}
-            index={index}
-            total={profiles.length}
-            active={index === activeProfileIndex}
-            dragging={drag?.from === index}
-            dropTarget={drag !== null && drag.over === index && drag.from !== index}
-            onSelect={onSelect}
-            onDelete={onRequestDelete}
-            onReorder={onReorderProfile}
-            onPointerDown={beginPress}
-            onPointerMove={trackPress}
-            onPointerUp={endPress}
-            onPointerCancel={endPress}
-            onPointerLeave={() => {
-              if (!dragRef.current) endPress();
-            }}
-          />
-        ))}
+      <div className={styles.list} ref={listRef}>
+        {order.map((profileIndex, position) => {
+          const profile = profiles[profileIndex];
+          if (!profile) return null;
+
+          return (
+            <ProfileRow
+              key={profile.uid}
+              profile={profile}
+              index={profileIndex}
+              displayIndex={position}
+              position={position}
+              total={profiles.length}
+              active={profileIndex === activeProfileIndex}
+              dragging={drag !== null && drag.position === position}
+              onSelect={onSelect}
+              onDelete={onRequestDelete}
+              onReorder={onReorderProfile}
+              onPointerDown={beginPress}
+              onPointerMove={trackPress}
+              onPointerUp={endPress}
+              onPointerCancel={endPress}
+              onPointerLeave={() => {
+                if (!dragRef.current) endPress();
+              }}
+            />
+          );
+        })}
 
         <button type="button" className={styles.addBtn} onClick={onAdd}>
           {t('+ Add profile')}
@@ -351,6 +495,25 @@ export const ProfilesDrawer: React.FC<ProfilesDrawerProps> = ({
         onExportAll={onExportAll}
         onImportFile={onImportFile}
       />
+
+      {drag && ghostProfile && (
+        <div
+          ref={ghostRef}
+          className={styles.dragGhost}
+          aria-hidden="true"
+          style={{
+            width: drag.width,
+            height: drag.height,
+          }}
+        >
+          <span className={styles.profileTitle}>
+            {t('Profile {index}:', { index: drag.position + 1 })}
+          </span>
+          <span className={styles.profileName}>
+            {profileName(ghostProfile, t('No name'))}
+          </span>
+        </div>
+      )}
     </aside>
   );
 };
