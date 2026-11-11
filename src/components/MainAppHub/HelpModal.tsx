@@ -136,11 +136,11 @@ const MissingModesHelp: React.FC = () => {
   return (
     <ul>
       <li>
-        <strong>{t('Keep in place')}:</strong>{' '}
+        <strong>{t('Missing in place')}:</strong>{' '}
         {t('missing cards stay in their cells, while hidden cards are not drawn and leave empty space in their places.')}
       </li>
       <li>
-        <strong>{t('Move to end')}:</strong>{' '}
+        <strong>{t('Missing to end')}:</strong>{' '}
         {t('moves missing and hidden cards after the filled ones, as happens in the game. Hidden cards are not drawn and do not create gaps.')}
       </li>
       <li>
@@ -148,10 +148,8 @@ const MissingModesHelp: React.FC = () => {
         {t('does not draw missing and hidden cards; the remaining cards fill the freed space without gaps.')}
       </li>
       <li>
-        <strong>{t('Manual indexes')}:</strong>{' '}
-        {t('opens an additional input for each card with its index in the grid. Indexes start at 0 and end at {range}, left to right, top to bottom. You can also set index -1, then the card is not drawn.', {
-          range: t('row count * column count - 1'),
-        })}
+        <strong>{t('Custom order')}:</strong>{' '}
+        {t('shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size is chosen automatically.')}
       </li>
     </ul>
   );
@@ -164,14 +162,14 @@ const GridHelp: React.FC = () => {
     <>
       <p><strong>{t('Grid and card order:')}</strong></p>
       <p>
-        {t('On each tab you can configure the grid of the final card. The grid size can be automatic or manual. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for equipment and artifacts), then rows are added. Manual size shows row and column counters. The “Manual indexes” mode always uses manual size.')}
+        {t('On each tab you can configure the grid of the final card. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for artifacts), then rows are added. Manual size shows row and column counters. The “Custom order” mode always uses automatic size, and hidden cards at the end do not increase the grid. Equipment always shows all 12 cards in 3 rows of 4 and has no layout modes.')}
       </p>
       <p>
-        {t('Cards fill the grid from left to right, top to bottom. The “Missing” option controls what happens to missing and manually hidden cards:')}
+        {t('Cards fill the grid from left to right, top to bottom. The “Layout” option controls what happens to missing and manually hidden cards:')}
       </p>
       <MissingModesHelp />
       <p>
-        {t('In “Keep in place”, “Move to end”, and “Hide missing” modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored, but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.')}
+        {t('In all modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored (and dragged in custom order), but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.')}
       </p>
     </>
   );

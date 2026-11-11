@@ -1,4 +1,5 @@
 .grid {
+  position: relative;
   display: grid;
   gap: 16px;
   background: var(--color-bg);
@@ -25,6 +26,19 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  transition: transform 180ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.dragging {
+  opacity: 0;
+}
+
+.card img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .active {

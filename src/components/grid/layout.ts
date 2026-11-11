@@ -28,11 +28,19 @@ export type SlotLayoutBase = Omit<SlotLayoutState, 'entries' | 'hiddenKeys'> & {
 
 export type SlotLayoutInput = SlotLayoutBase & { entries: SlotEntry[] };
 
-export const LAYOUT_MODES: Array<{ value: LayoutMode; label: string }> = [
-  { value: 'default', label: 'Keep in place' },
-  { value: 'to-end', label: 'Move to end' },
-  { value: 'hidden', label: 'Hide missing' },
-  { value: 'manual', label: 'Manual indexes' },
+export interface LayoutModeOption {
+  value: LayoutMode;
+  /** Full name shown in the expanded list. */
+  label: string;
+  /** Short name shown in the closed dropdown. */
+  shortLabel: string;
+}
+
+export const LAYOUT_MODES: LayoutModeOption[] = [
+  { value: 'default', label: 'Missing in place', shortLabel: 'In place' },
+  { value: 'to-end', label: 'Missing to end', shortLabel: 'To end' },
+  { value: 'hidden', label: 'Hide missing', shortLabel: 'Hide' },
+  { value: 'manual', label: 'Custom order', shortLabel: 'Custom' },
 ];
 
 function buildEntries<T extends LayoutItem>(
@@ -53,6 +61,39 @@ function buildEntries<T extends LayoutItem>(
       index: occupiesSlot ? slot++ : -1,
       visible,
       hidden,
+    };
+  });
+
+  return entries;
+}
+
+/**
+ * Custom order stores one grid position per card. Old saved layouts may contain
+ * gaps, duplicate indexes or -1, so the entries are rebuilt as a dense sequence
+ * while preserving their relative order. Cards without an index go to the end.
+ */
+export function normalizeCustomEntries<T extends LayoutItem>(
+  items: T[],
+  current: SlotEntry[],
+  hiddenKeys: Set<string>,
+): SlotEntry[] {
+  const order = items
+    .map((_, index) => index)
+    .sort((left, right) => {
+      const leftIndex = current[left]?.index ?? -1;
+      const rightIndex = current[right]?.index ?? -1;
+      const leftOrder = leftIndex >= 0 ? leftIndex : Number.MAX_SAFE_INTEGER;
+      const rightOrder = rightIndex >= 0 ? rightIndex : Number.MAX_SAFE_INTEGER;
+
+      return leftOrder - rightOrder || left - right;
+    });
+
+  const entries = new Array<SlotEntry>(items.length);
+  order.forEach((itemIndex, position) => {
+    entries[itemIndex] = {
+      index: position,
+      visible: true,
+      hidden: hiddenKeys.has(items[itemIndex].key),
     };
   });
 
@@ -82,9 +123,12 @@ export function calculateSlotEntries<T extends LayoutItem>(
   hiddenKeys: string[] = [],
   hideEnabled = true,
 ): SlotEntry[] {
-  if (mode === 'manual' && current.length === items.length) return current;
-
   const hiddenSet = new Set(hideEnabled ? hiddenKeys : []);
+
+  if (mode === 'manual') {
+    return normalizeCustomEntries(items, current, hiddenSet);
+  }
+
   const ordered = orderItems(items, mode, hiddenSet);
   return buildEntries(items, ordered, mode, hiddenSet);
 }
@@ -93,8 +137,14 @@ export function calculateAutoSize(
   entries: SlotEntry[],
   maxCols: number,
 ): { rows: number; cols: number } {
-  const occupied = entries.filter((entry) => entry.index >= 0).length;
-  const total = Math.max(1, occupied);
+  const lastShownSlot = entries.reduce(
+    (last, entry) =>
+      entry.visible && !entry.hidden && entry.index >= 0
+        ? Math.max(last, entry.index)
+        : last,
+    -1,
+  );
+  const total = Math.max(1, lastShownSlot + 1);
   const cols = Math.min(Math.max(1, maxCols), total);
   return { rows: Math.ceil(total / cols), cols };
 }

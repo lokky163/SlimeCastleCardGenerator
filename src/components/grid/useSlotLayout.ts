@@ -16,8 +16,7 @@ export interface SlotLayoutController extends SlotLayoutState {
   setMode: (mode: LayoutMode) => void;
   setAutoSize: (autoSize: boolean) => void;
   setHideEnabled: (hideEnabled: boolean) => void;
-  setSlotIndex: (itemIndex: number, slotIndex: number) => void;
-  setSlotVisible: (itemIndex: number, visible: boolean) => void;
+  moveItem: (itemIndex: number, position: number) => void;
   setItemHidden: (key: string, hidden: boolean) => void;
   applyLayout: (layout: SlotLayoutInput) => void;
   resetLayout: () => void;
@@ -29,15 +28,15 @@ type LayoutAction =
   | { type: 'setMode'; mode: LayoutMode }
   | { type: 'setAutoSize'; autoSize: boolean }
   | { type: 'setHideEnabled'; hideEnabled: boolean }
-  | { type: 'setSlotIndex'; itemIndex: number; slotIndex: number }
-  | { type: 'setSlotVisible'; itemIndex: number; visible: boolean }
+  | { type: 'moveItem'; itemIndex: number; position: number }
   | { type: 'setItemHidden'; key: string; hidden: boolean }
   | { type: 'apply'; layout: SlotLayoutInput }
   | { type: 'reset'; initial: SlotLayoutBase }
   | { type: 'sync' };
 
 function applyAutoSize(state: SlotLayoutState, maxCols: number): SlotLayoutState {
-  if (!state.autoSize || state.mode === 'manual') return state;
+  // Custom order always uses an automatic grid.
+  if (state.mode !== 'manual' && !state.autoSize) return state;
 
   const { rows, cols } = calculateAutoSize(state.entries, maxCols);
   if (state.rows === rows && state.cols === cols) return state;
@@ -61,26 +60,13 @@ function createState(
 ): SlotLayoutState {
   const hiddenKeys = initial.hiddenKeys ?? [];
   const hideEnabled = initial.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = initial.mode === 'manual' ? false : (initial.autoSize ?? true);
+  const autoSize = initial.mode === 'manual' ? true : (initial.autoSize ?? true);
   const entries = makeEntries(items, initial.mode, [], hiddenKeys, hideEnabled);
 
   return applyAutoSize(
     { ...initial, hiddenKeys, hideEnabled, autoSize, entries },
     maxCols,
   );
-}
-
-function updateEntry(
-  state: SlotLayoutState,
-  itemIndex: number,
-  changes: Partial<SlotEntry>,
-): SlotLayoutState {
-  return {
-    ...state,
-    entries: state.entries.map((entry, index) =>
-      index === itemIndex ? { ...entry, ...changes } : entry,
-    ),
-  };
 }
 
 function applyHiddenFlags(
@@ -104,13 +90,14 @@ function changeMode(
   maxCols: number,
 ): SlotLayoutState {
   if (mode === 'manual') {
-    const entries = applyHiddenFlags(
-      state.entries,
+    const entries = makeEntries(
       items,
+      mode,
+      state.entries,
       state.hiddenKeys,
       state.hideEnabled,
     );
-    return { ...state, mode, autoSize: false, entries };
+    return applyAutoSize({ ...state, mode, autoSize: true, entries }, maxCols);
   }
 
   const entries = makeEntries(
@@ -130,22 +117,15 @@ function applyState(
 ): SlotLayoutState {
   const hiddenKeys = layout.hiddenKeys ?? [];
   const hideEnabled = layout.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = layout.mode === 'manual' ? false : (layout.autoSize ?? true);
+  const autoSize = layout.mode === 'manual' ? true : (layout.autoSize ?? true);
 
-  if (layout.mode === 'manual') {
-    const entries = applyHiddenFlags(
-      layout.entries,
-      items,
-      hiddenKeys,
-      hideEnabled,
-    );
-    return applyAutoSize(
-      { ...layout, hiddenKeys, hideEnabled, autoSize, entries },
-      maxCols,
-    );
-  }
-
-  const entries = makeEntries(items, layout.mode, layout.entries, hiddenKeys, hideEnabled);
+  const entries = makeEntries(
+    items,
+    layout.mode,
+    layout.entries,
+    hiddenKeys,
+    hideEnabled,
+  );
   return applyAutoSize(
     { ...layout, hiddenKeys, hideEnabled, autoSize, entries },
     maxCols,
@@ -170,7 +150,7 @@ function changeHidden(
       hiddenKeys,
       state.hideEnabled,
     );
-    return { ...state, hiddenKeys, entries };
+    return applyAutoSize({ ...state, hiddenKeys, entries }, maxCols);
   }
 
   const entries = makeEntries(
@@ -201,8 +181,42 @@ function changeAutoSize(
   autoSize: boolean,
   maxCols: number,
 ): SlotLayoutState {
-  if (state.mode === 'manual') return { ...state, autoSize: false };
+  if (state.mode === 'manual') {
+    return applyAutoSize({ ...state, autoSize: true }, maxCols);
+  }
   return applyAutoSize({ ...state, autoSize }, maxCols);
+}
+
+function moveItem(
+  state: SlotLayoutState,
+  itemIndex: number,
+  position: number,
+  maxCols: number,
+): SlotLayoutState {
+  if (state.mode !== 'manual') return state;
+
+  const order = state.entries
+    .map((entry, index) => ({ index, position: entry.index }))
+    .sort((left, right) => left.position - right.position || left.index - right.index)
+    .map((item) => item.index);
+
+  const from = order.indexOf(itemIndex);
+  if (from < 0) return state;
+
+  const target = Math.max(0, Math.min(position, order.length - 1));
+  if (from === target) return state;
+
+  const [moved] = order.splice(from, 1);
+  order.splice(target, 0, moved);
+
+  const positionByItem = new Map(order.map((index, orderIndex) => [index, orderIndex]));
+  const entries = state.entries.map((entry, index) => ({
+    ...entry,
+    index: positionByItem.get(index) ?? index,
+    visible: true,
+  }));
+
+  return applyAutoSize({ ...state, entries }, maxCols);
 }
 
 function syncState(
@@ -210,7 +224,18 @@ function syncState(
   items: LayoutItem[],
   maxCols: number,
 ): SlotLayoutState {
-  if (state.mode === 'manual') return state;
+  if (state.mode === 'manual') {
+    if (state.entries.length === items.length) return state;
+
+    const entries = makeEntries(
+      items,
+      state.mode,
+      state.entries,
+      state.hiddenKeys,
+      state.hideEnabled,
+    );
+    return applyAutoSize({ ...state, autoSize: true, entries }, maxCols);
+  }
 
   const entries = makeEntries(
     items,
@@ -239,13 +264,8 @@ function reduceLayout(
       return changeHideEnabled(state, action.hideEnabled, items, maxCols);
     case 'setMode':
       return changeMode(state, action.mode, items, maxCols);
-    case 'setSlotIndex':
-      return updateEntry(state, action.itemIndex, {
-        index: action.slotIndex,
-        visible: action.slotIndex >= 0,
-      });
-    case 'setSlotVisible':
-      return updateEntry(state, action.itemIndex, { visible: action.visible });
+    case 'moveItem':
+      return moveItem(state, action.itemIndex, action.position, maxCols);
     case 'setItemHidden':
       return changeHidden(state, action.key, action.hidden, items, maxCols);
     case 'apply':
@@ -281,10 +301,8 @@ export function useSlotLayout<T extends LayoutItem>(
     setAutoSize: (autoSize) => dispatch({ type: 'setAutoSize', autoSize }),
     setHideEnabled: (hideEnabled) =>
       dispatch({ type: 'setHideEnabled', hideEnabled }),
-    setSlotIndex: (itemIndex, slotIndex) =>
-      dispatch({ type: 'setSlotIndex', itemIndex, slotIndex }),
-    setSlotVisible: (itemIndex, visible) =>
-      dispatch({ type: 'setSlotVisible', itemIndex, visible }),
+    moveItem: (itemIndex, position) =>
+      dispatch({ type: 'moveItem', itemIndex, position }),
     setItemHidden: (key, hidden) => dispatch({ type: 'setItemHidden', key, hidden }),
     applyLayout: (layout) => dispatch({ type: 'apply', layout }),
     resetLayout: () => dispatch({ type: 'reset', initial }),

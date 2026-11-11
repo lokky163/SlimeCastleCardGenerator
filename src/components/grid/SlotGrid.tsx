@@ -1,77 +1,90 @@
-import { useI18n } from '../../i18n/I18nProvider';
+import { useMemo } from 'react';
 import { CardGrid, CardGridItem, type CardGridVariant } from './CardGrid';
 import { EDITOR_GRID_CONFIG } from './editorGridConfig';
 import { ScaledCard } from './ScaledCard';
+import { useCardDrag } from './useCardDrag';
 import { useEditorGrid } from './useEditorGrid';
 import { VisibilityToggle } from './VisibilityToggle';
-import type { LayoutItem } from './layout';
+import type { LayoutItem, SlotEntry } from './layout';
 import type { SlotLayoutController } from './useSlotLayout';
-import styles from './SlotGrid.module.css';
 
 interface SlotGridProps<T extends LayoutItem> {
   items: T[];
   layout: SlotLayoutController;
   variant: CardGridVariant;
   renderCard: (item: T, itemIndex: number, baseWidth: number) => React.ReactNode;
+  /** Equipment always shows every card and has no layout controls. */
+  fixed?: boolean;
 }
 
-interface SlotIndexInputProps {
-  value: number;
-  max: number;
-  onChange: (value: number) => void;
+const EMPTY_ENTRY: SlotEntry = { index: -1, visible: false, hidden: false };
+
+function resolveBaseOrder<T extends LayoutItem>(
+  items: T[],
+  entries: SlotEntry[],
+  reorderable: boolean,
+): number[] {
+  const order = items.map((_, index) => index);
+  if (!reorderable) return order;
+
+  return order.sort((left, right) => {
+    const leftIndex = entries[left]?.index ?? left;
+    const rightIndex = entries[right]?.index ?? right;
+    return leftIndex - rightIndex || left - right;
+  });
 }
-
-const SlotIndexInput: React.FC<SlotIndexInputProps> = ({ value, max, onChange }) => {
-  const { t } = useI18n();
-
-  return (
-    <div className={styles.manualInput}>
-      <span>{t('Slot:')}</span>
-      <input
-        type="number"
-        min={-1}
-        max={max}
-        value={value}
-        className={styles.indexInput}
-        onChange={(event) => {
-          const parsed = parseInt(event.target.value, 10);
-          onChange(Number.isNaN(parsed) ? -1 : parsed);
-        }}
-      />
-    </div>
-  );
-};
 
 export function SlotGrid<T extends LayoutItem>({
   items,
   layout,
   variant,
   renderCard,
+  fixed = false,
 }: SlotGridProps<T>) {
-  const { entries, mode, hiddenKeys, hideEnabled, rows, cols } = layout;
-  const slotCount = rows * cols;
+  const { entries, mode, hiddenKeys, hideEnabled } = layout;
   const config = EDITOR_GRID_CONFIG[variant];
   const { gridRef, columns, cardWidth } = useEditorGrid(variant, items.length);
 
+  const reorderable = !fixed && mode === 'manual';
+  const baseOrder = useMemo(
+    () => resolveBaseOrder(items, entries, reorderable),
+    [items, entries, reorderable],
+  );
+
+  const drag = useCardDrag({
+    gridRef,
+    enabled: reorderable,
+    order: baseOrder,
+    moveItem: layout.moveItem,
+  });
+
   return (
-    <CardGrid variant={variant} columns={columns} gridRef={gridRef}>
-      {items.map((item, itemIndex) => {
-        const entry = entries[itemIndex] ?? { index: -1, visible: false, hidden: false };
-        const isHidden = hiddenKeys.includes(item.key);
+    <CardGrid
+      variant={variant}
+      columns={columns}
+      gridRef={gridRef}
+      {...(reorderable ? drag.handlers : {})}
+    >
+      {drag.order.map((itemIndex, position) => {
+        const item = items[itemIndex];
+        if (!item) return null;
+
+        const entry = fixed
+          ? { index: itemIndex, visible: true, hidden: false }
+          : (entries[itemIndex] ?? EMPTY_ENTRY);
+        const isHidden = !fixed && hiddenKeys.includes(item.key);
+        const showToggle = !fixed && hideEnabled;
 
         return (
           <CardGridItem
             key={item.key}
-            active={entry.visible && !entry.hidden && entry.index >= 0}
-            dimmed={entry.hidden}
+            active={fixed || (entry.visible && !entry.hidden && entry.index >= 0)}
+            dimmed={!fixed && entry.hidden}
+            itemIndex={itemIndex}
+            position={position}
+            dragging={fixed ? false : drag.draggingItemIndex === itemIndex}
             footer={
-              mode === 'manual' ? (
-                <SlotIndexInput
-                  value={entry.index}
-                  max={slotCount - 1}
-                  onChange={(slotIndex) => layout.setSlotIndex(itemIndex, slotIndex)}
-                />
-              ) : hideEnabled ? (
+              showToggle ? (
                 <VisibilityToggle
                   hidden={isHidden}
                   onToggle={() => layout.setItemHidden(item.key, !isHidden)}

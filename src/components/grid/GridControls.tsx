@@ -68,7 +68,7 @@ const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange 
 
   return (
     <div className={styles.modeBlock}>
-      <span className={styles.modeLabel}>{t('Missing:')}</span>
+      <span className={styles.modeLabel}>{t('Layout:')}</span>
 
       <div className={styles.modeDropdown} ref={anchorRef}>
         <button
@@ -76,9 +76,10 @@ const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange 
           className={cx(styles.modeToggle, isOpen && styles.modeToggleOpen)}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
+          title={t(current.label)}
           onClick={() => setIsOpen((open) => !open)}
         >
-          <span className={styles.modeValue}>{t(current.label)}</span>
+          <span className={styles.modeValue}>{t(current.shortLabel)}</span>
           <span className={cx(styles.modeArrow, isOpen && styles.modeArrowUp)} />
         </button>
 
@@ -111,38 +112,41 @@ const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange 
 
 export const GridControls: React.FC<GridControlsProps> = ({ layout, children }) => {
   const { t } = useI18n();
+  const customOrder = layout.mode === 'manual';
 
   return (
     <div className={styles.controls}>
-      <GridToggle
-        label={t('Grid size')}
-        checked={layout.autoSize}
-        onLabel={t('Auto')}
-        offLabel={t('Manual')}
-        disabled={layout.mode === 'manual'}
-        onChange={layout.setAutoSize}
-      />
+      {!customOrder && (
+        <>
+          <GridToggle
+            label={t('Grid size')}
+            checked={layout.autoSize}
+            onLabel={t('Auto')}
+            offLabel={t('Manual')}
+            disabled={layout.mode === 'manual'}
+            onChange={layout.setAutoSize}
+          />
 
-      {!layout.autoSize && (
-        <ManualSizeCounters
-          rows={layout.rows}
-          cols={layout.cols}
-          onRowsChange={layout.setRows}
-          onColsChange={layout.setCols}
-        />
+          {!layout.autoSize && (
+            <ManualSizeCounters
+              rows={layout.rows}
+              cols={layout.cols}
+              onRowsChange={layout.setRows}
+              onColsChange={layout.setCols}
+            />
+          )}
+        </>
       )}
 
       <LayoutModeSelect mode={layout.mode} onModeChange={layout.setMode} />
 
-      {layout.mode !== 'manual' && (
-        <GridToggle
-          label={t('Card hiding')}
-          checked={layout.hideEnabled}
-          onLabel={t('Disable hiding')}
-          offLabel={t('Enable hiding')}
-          onChange={layout.setHideEnabled}
-        />
-      )}
+      <GridToggle
+        label={t('Card hiding')}
+        checked={layout.hideEnabled}
+        onLabel={t('Disable hiding')}
+        offLabel={t('Enable hiding')}
+        onChange={layout.setHideEnabled}
+      />
 
       {children}
     </div>

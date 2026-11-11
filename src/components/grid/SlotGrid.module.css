@@ -1,24 +1,14 @@
-.manualInput {
+.dragGhost {
+  background: var(--color-panel-2);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 14px 30px var(--color-shadow),
+    inset 0 0 0 1px var(--color-accent);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-}
-
-.indexInput {
-  width: 44px;
-  background: var(--color-panel-3);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.indexInput:focus {
-  outline: none;
-  border-color: var(--color-accent);
+  overflow: hidden;
+  cursor: grabbing;
 }

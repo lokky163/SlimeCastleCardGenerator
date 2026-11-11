@@ -159,11 +159,15 @@ export const translations: TranslationTree = {
   grid: {
     'Rows in image': { ru: 'Строк на изображении' },
     'Columns in image': { ru: 'Столбцов на изображении' },
-    'Missing:': { ru: 'Отсутствующие:' },
-    'Keep in place': { ru: 'На месте' },
-    'Move to end': { ru: 'В конец' },
-    'Hide missing': { ru: 'Не показывать' },
-    'Manual indexes': { ru: 'Ручные индексы' },
+    'Layout:': { ru: 'Расположение' },
+    'Missing in place': { ru: 'Отсутствующие на месте' },
+    'Missing to end': { ru: 'Отсутствующие в конец' },
+    'Hide missing': { ru: 'Скрыть отсутствующие' },
+    'Custom order': { ru: 'Пользовательский порядок' },
+    'In place': { ru: 'На месте' },
+    'To end': { ru: 'В конец' },
+    Hide: { ru: 'Скрыть' },
+    Custom: { ru: 'Пользовательский' },
     'Grid size': { ru: 'Размер сетки' },
     'Card hiding': { ru: 'Скрытие карточек' },
     'Disable hiding': { ru: 'Убрать скрытие' },
@@ -260,13 +264,13 @@ export const translations: TranslationTree = {
         ru: 'Ниже можно выбрать шанс выпадения пермача: 4.5%, 9% (с бафом x2) или ввести свой. Калькулятор учитывает гарант на 30-м ролле: если пермач выпал раньше, счётчик гаранта сбрасывается. Среднее число капель на один пермач считается по формуле (1 − (1 − p)^30) / p, где p — шанс выпадения. Для 4.5% это ≈16.64, для 9% — ≈10.46. Итоговые капли показываются отдельно для 1 и 2 фазы.',
       },
     'Grid and card order:': { ru: 'Сетка и порядок на карточке:' },
-    'On each tab you can configure the grid of the final card. The grid size can be automatic or manual. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for equipment and artifacts), then rows are added. Manual size shows row and column counters. The “Manual indexes” mode always uses manual size.':
+    'On each tab you can configure the grid of the final card. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for artifacts), then rows are added. Manual size shows row and column counters. The “Custom order” mode always uses automatic size, and hidden cards at the end do not increase the grid. Equipment always shows all 12 cards in 3 rows of 4 and has no layout modes.':
       {
-        ru: 'На каждой вкладке можно настроить сетку итоговой карточки. Размер сетки бывает автоматическим и ручным. Автоматический размер подбирает строки и столбцы по числу показанных карточек: сначала заполняется ширина (до 6 столбцов для слаймов, реликвий и баффов и до 4 для снаряжения и артефактов), затем добавляются строки. Ручной размер показывает счётчики строк и столбцов. Режим «Ручные индексы» всегда использует ручной размер.',
+        ru: 'На каждой вкладке можно настроить сетку итоговой карточки. Автоматический размер подбирает строки и столбцы по числу показанных карточек: сначала заполняется ширина (до 6 столбцов для слаймов, реликвий и баффов и до 4 для артефактов), затем добавляются строки. Ручной размер показывает счётчики строк и столбцов. Режим «Пользовательский порядок» всегда использует автоматический размер, а скрытые карточки в конце не увеличивают сетку. Снаряжение всегда показывает все 12 карточек по 4 в ряд (3 ряда) и не имеет режимов расположения.',
       },
-    'Cards fill the grid from left to right, top to bottom. The “Missing” option controls what happens to missing and manually hidden cards:':
+    'Cards fill the grid from left to right, top to bottom. The “Layout” option controls what happens to missing and manually hidden cards:':
       {
-        ru: 'Карточки заполняют сетку слева направо сверху вниз. Параметр «Отсутствующие» отвечает за то, что делать с отсутствующими и вручную скрытыми карточками:',
+        ru: 'Карточки заполняют сетку слева направо сверху вниз. Параметр «Расположение» отвечает за то, что делать с отсутствующими и вручную скрытыми карточками:',
       },
     'missing cards stay in their cells, while hidden cards are not drawn and leave empty space in their places.':
       {
@@ -280,13 +284,13 @@ export const translations: TranslationTree = {
       {
         ru: 'не рисует отсутствующие и скрытые карточки; оставшиеся карточки занимают освободившееся место без пропусков.',
       },
-    'opens an additional input for each card with its index in the grid. Indexes start at 0 and end at {range}, left to right, top to bottom. You can also set index -1, then the card is not drawn.':
+    'shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size is chosen automatically.':
       {
-        ru: 'открывает дополнительное поле ввода для каждой карточки с индексом в сетке. Индексы начинаются с 0 и заканчиваются на {range}, слева направо сверху вниз. Дополнительно можно указать индекс -1, тогда карточка рисоваться не будет.',
+        ru: 'показывает все карточки в заданной вручную последовательности. Зажмите карточку на мгновение и перетащите её на нужное место: остальные карточки сдвигаются, как иконки на домашнем экране iOS. Скрытые карточки не рисуются и оставляют на своих местах пустоту; скрытые карточки в конце не увеличивают сетку. Размер сетки подбирается автоматически.',
       },
-    'In “Keep in place”, “Move to end”, and “Hide missing” modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored, but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.':
+    'In all modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored (and dragged in custom order), but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.':
       {
-        ru: 'В режимах «На месте», «В конец» и «Не показывать» можно включить переключатель «Добавить скрытие» — тогда под каждой карточкой появится кнопка «Скрыть/Показать». Скрытая карточка затемняется в редакторе, чтобы её можно было вернуть, но на итоговой картинке она не отображается. Если выбрать «Убрать скрытие», все карточки временно показываются, а их отметки сохраняются для следующего включения.',
+        ru: 'Во всех режимах можно включить переключатель «Добавить скрытие» — тогда под каждой карточкой появится кнопка «Скрыть/Показать». Скрытая карточка затемняется в редакторе, чтобы её можно было вернуть (и перетащить в пользовательском порядке), но на итоговой картинке она не отображается. Если выбрать «Убрать скрытие», все карточки временно показываются, а их отметки сохраняются для следующего включения.',
       },
     'row count * column count - 1': { ru: 'кол-во строк * кол-во столбцов - 1' },
   },
