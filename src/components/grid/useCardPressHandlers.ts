@@ -88,11 +88,16 @@ export function useCardPressHandlers({
     const press = pressRef.current;
     if (!press || dragRef.current) return;
 
-    const distance = Math.hypot(
-      event.clientX - press.x,
-      event.clientY - press.y,
-    );
-    if (distance > MOVE_TOLERANCE_PX) endPress();
+    // A moving finger is most likely scrolling the page, so it cancels the
+    // long press. A mouse or pen usually starts moving right away; the press
+    // must survive so the card is still picked up after the long-press delay.
+    if (event.pointerType === 'touch') {
+      const distance = Math.hypot(
+        event.clientX - press.x,
+        event.clientY - press.y,
+      );
+      if (distance > MOVE_TOLERANCE_PX) endPress();
+    }
   };
 
   const onPointerLeave: PointerEventHandler<HTMLDivElement> = () => {
