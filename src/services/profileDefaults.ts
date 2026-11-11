@@ -18,7 +18,7 @@ export const createArtifacts = () =>
   ARTIFACT_NAMES.map((name) => new ArtifactData(name, 'no', 1, 0));
 
 function createDefaultLayout(base: SlotLayoutBase): SlotLayoutState {
-  return { ...base, hiddenKeys: [], entries: [] };
+  return { ...base, hiddenKeys: [], entries: [], customEntries: [] };
 }
 
 export function createEmptyProfile(): SccProfile {

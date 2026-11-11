@@ -149,7 +149,7 @@ const MissingModesHelp: React.FC = () => {
       </li>
       <li>
         <strong>{t('Custom order')}:</strong>{' '}
-        {t('shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size is chosen automatically.')}
+        {t('shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size can be automatic or manual. The custom order is remembered when you switch to another layout mode and is applied again when you come back.')}
       </li>
     </ul>
   );
@@ -162,7 +162,7 @@ const GridHelp: React.FC = () => {
     <>
       <p><strong>{t('Grid and card order:')}</strong></p>
       <p>
-        {t('On each tab you can configure the grid of the final card. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for artifacts), then rows are added. Manual size shows row and column counters. The “Custom order” mode always uses automatic size, and hidden cards at the end do not increase the grid. Equipment always shows all 12 cards in 3 rows of 4 and has no layout modes.')}
+        {t('On each tab you can configure the grid of the final card. Automatic size picks rows and columns based on the number of shown cards: width is filled first (up to 6 columns for slimes, relics, and buffs, and up to 4 for artifacts), then rows are added. Manual size shows row and column counters. The “Custom order” mode also supports both sizes; if a manual grid is too small, a warning appears and some cards are left out of the final image. Hidden cards at the end do not increase the grid. Equipment always shows all 12 cards in 3 rows of 4 and has no layout modes.')}
       </p>
       <p>
         {t('Cards fill the grid from left to right, top to bottom. The “Layout” option controls what happens to missing and manually hidden cards:')}

@@ -288,9 +288,9 @@ export const translations: TranslationTree = {
       {
         ru: 'не рисует отсутствующие и скрытые карточки; оставшиеся карточки занимают освободившееся место без пропусков.',
       },
-    'shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size can be automatic or manual.':
+    'shows all cards in a custom sequence. Hold a card for a moment and drag it to the desired place: the other cards shift like icons on an iOS home screen. Hidden cards are not drawn and leave empty space in their places; hidden cards at the end do not increase the grid. The grid size can be automatic or manual. The custom order is remembered when you switch to another layout mode and is applied again when you come back.':
       {
-        ru: 'показывает все карточки в заданной вручную последовательности. Зажмите карточку на мгновение и перетащите её на нужное место: остальные карточки сдвигаются, как иконки на домашнем экране iOS. Скрытые карточки не рисуются и оставляют на своих местах пустоту; скрытые карточки в конце не увеличивают сетку. Размер сетки можно выбрать автоматическим или ручным.',
+        ru: 'показывает все карточки в заданной вручную последовательности. Зажмите карточку на мгновение и перетащите её на нужное место: остальные карточки сдвигаются, как иконки на домашнем экране iOS. Скрытые карточки не рисуются и оставляют на своих местах пустоту; скрытые карточки в конце не увеличивают сетку. Размер сетки можно выбрать автоматическим или ручным. Пользовательский порядок запоминается при переключении на другой режим расположения и снова применяется при возврате.',
       },
     'In all modes you can enable the “Enable hiding” switch — then a “Hide/Show” button appears under each card. A hidden card is dimmed in the editor so it can be restored (and dragged in custom order), but it is not displayed in the final image. If you choose “Disable hiding”, all cards are temporarily shown, and their marks are kept for the next time you enable hiding.':
       {

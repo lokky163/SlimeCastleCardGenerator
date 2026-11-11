@@ -1,4 +1,8 @@
-import type { LayoutItem, SlotLayoutState } from '../components/grid/layout';
+import {
+  hasCustomOrder,
+  type LayoutItem,
+  type SlotLayoutState,
+} from '../components/grid/layout';
 import type { ArtifactData } from '../models/artifact';
 import type { BuffData } from '../models/buff';
 import type { EquipmentData } from '../models/equipment';
@@ -27,6 +31,25 @@ export interface ProfileSerializationSource {
   artifactLayout: SlotLayoutState;
 }
 
+/**
+ * The custom order is saved even while another mode is active, so switching
+ * modes back and forth never loses it. Old readers only use `slotIndex` in the
+ * manual mode, so the files stay backward compatible.
+ */
+function serializeSlot(layout: SlotLayoutState, index: number): SlotJson {
+  const writeOrder =
+    layout.mode === 'manual' || hasCustomOrder(layout.customEntries);
+  if (!writeOrder) return {};
+
+  const entry = layout.customEntries[index];
+  return {
+    slotIndex: entry?.index ?? -1,
+    ...(layout.mode === 'manual'
+      ? { visible: entry?.visible ?? true }
+      : {}),
+  };
+}
+
 function serializeSlots<T extends LayoutItem, J extends object>(
   items: T[],
   layout: SlotLayoutState,
@@ -35,15 +58,9 @@ function serializeSlots<T extends LayoutItem, J extends object>(
   const hiddenKeys = new Set(layout.hiddenKeys);
 
   return items.map((item, index) => {
-    const entry = layout.entries[index];
-    const slot =
-      layout.mode === 'manual'
-        ? { slotIndex: entry?.index ?? -1, visible: entry?.visible ?? true }
-        : {};
-
     return {
       ...toJson(item),
-      ...slot,
+      ...serializeSlot(layout, index),
       ...(hiddenKeys.has(item.key) ? { hidden: true } : {}),
     };
   });

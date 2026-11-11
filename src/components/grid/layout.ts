@@ -19,10 +19,19 @@ export interface SlotLayoutState {
   autoSize: boolean;
   hideEnabled: boolean;
   entries: SlotEntry[];
+  /**
+   * Positions of the custom order. They are kept while another mode is active
+   * and are used again as soon as the user returns to the custom order.
+   */
+  customEntries: SlotEntry[];
   hiddenKeys: string[];
 }
 
-export type SlotLayoutBase = Omit<SlotLayoutState, 'entries' | 'hiddenKeys'> & {
+export type SlotLayoutBase = Omit<
+  SlotLayoutState,
+  'entries' | 'customEntries' | 'hiddenKeys'
+> & {
+  customEntries?: SlotEntry[];
   hiddenKeys?: string[];
 };
 
@@ -119,18 +128,23 @@ function orderItems<T extends LayoutItem>(
 export function calculateSlotEntries<T extends LayoutItem>(
   items: T[],
   mode: LayoutMode,
-  current: SlotEntry[],
+  customEntries: SlotEntry[],
   hiddenKeys: string[] = [],
   hideEnabled = true,
 ): SlotEntry[] {
   const hiddenSet = new Set(hideEnabled ? hiddenKeys : []);
 
   if (mode === 'manual') {
-    return normalizeCustomEntries(items, current, hiddenSet);
+    return normalizeCustomEntries(items, customEntries, hiddenSet);
   }
 
   const ordered = orderItems(items, mode, hiddenSet);
   return buildEntries(items, ordered, mode, hiddenSet);
+}
+
+/** True when the saved custom order differs from the natural item order. */
+export function hasCustomOrder(entries: SlotEntry[]): boolean {
+  return entries.some((entry, index) => entry.index !== index);
 }
 
 export function calculateAutoSize(

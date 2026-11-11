@@ -24,6 +24,7 @@ function toSlotLayout(layout: ImportedModuleLayout): SlotLayoutState {
     autoSize: layout.autoSize,
     hideEnabled: layout.hideEnabled,
     entries: layout.entries,
+    customEntries: layout.customEntries,
     hiddenKeys: layout.hiddenKeys,
   };
 }

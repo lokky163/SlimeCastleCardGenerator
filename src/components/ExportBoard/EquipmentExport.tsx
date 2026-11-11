@@ -11,6 +11,12 @@ interface EquipmentExportProps {
 
 /** Equipment never hides cards or changes order: all 12 items are always drawn. */
 function createEquipmentLayout(equipment: EquipmentData[]): SlotLayoutState {
+  const entries = equipment.map((_, index) => ({
+    index,
+    visible: true,
+    hidden: false,
+  }));
+
   return {
     rows: Math.max(1, Math.ceil(equipment.length / EQUIPMENT_COLUMNS)),
     cols: EQUIPMENT_COLUMNS,
@@ -18,11 +24,8 @@ function createEquipmentLayout(equipment: EquipmentData[]): SlotLayoutState {
     autoSize: true,
     hideEnabled: false,
     hiddenKeys: [],
-    entries: equipment.map((_, index) => ({
-      index,
-      visible: true,
-      hidden: false,
-    })),
+    entries,
+    customEntries: entries,
   };
 }
 

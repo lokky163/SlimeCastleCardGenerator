@@ -1,5 +1,6 @@
 import {
   calculateSlotEntries,
+  normalizeCustomEntries,
   type LayoutItem,
   type LayoutMode,
   type SlotEntry,
@@ -33,6 +34,7 @@ export interface ImportedModuleLayout {
   autoSize: boolean;
   hideEnabled: boolean;
   entries: SlotEntry[];
+  customEntries: SlotEntry[];
   hiddenKeys: string[];
 }
 
@@ -135,16 +137,35 @@ function buildLayout<T extends LayoutItem>(
   const hideEnabled = module.hideEnabled ?? hiddenKeys.length > 0;
   const autoSize = module.autoSize ?? true;
 
-  const entries =
-    mode === 'manual'
-      ? items.map((item, index) => ({
-          index: flags[index]?.slotIndex ?? -1,
-          visible: flags[index]?.visible ?? true,
-          hidden: hideEnabled && hiddenKeys.includes(item.key),
-        }))
-      : calculateSlotEntries(items, mode, [], hiddenKeys, hideEnabled);
+  // Old files only wrote `slotIndex` while the manual mode was active, so a
+  // missing index falls back to the natural item order.
+  const customEntries = normalizeCustomEntries(
+    items,
+    items.map((_, index) => ({
+      index: flags[index]?.slotIndex ?? -1,
+      visible: true,
+      hidden: false,
+    })),
+    new Set(),
+  );
+  const entries = calculateSlotEntries(
+    items,
+    mode,
+    customEntries,
+    hiddenKeys,
+    hideEnabled,
+  );
 
-  return { rows, cols, layoutMode: mode, autoSize, hideEnabled, entries, hiddenKeys };
+  return {
+    rows,
+    cols,
+    layoutMode: mode,
+    autoSize,
+    hideEnabled,
+    entries,
+    customEntries,
+    hiddenKeys,
+  };
 }
 
 function importRelics(module: NormalizedModule | null): ImportedModule<RelicData> | null {
@@ -210,6 +231,11 @@ function importEquipment(
       autoSize: true,
       hideEnabled: false,
       entries: list.map((_, index) => ({ index, visible: true, hidden: false })),
+      customEntries: list.map((_, index) => ({
+        index,
+        visible: true,
+        hidden: false,
+      })),
       hiddenKeys: [],
     },
   };
