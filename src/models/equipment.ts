@@ -7,6 +7,10 @@ export type EquipmentType = 'sword' | 'helmet' | 'chestplate' | 'ring';
 export type EquipmentSet = 'astral' | 'egida' | 'abyss';
 
 const EQUIPMENT_TYPE_ORDER: EquipmentType[] = ['sword', 'helmet', 'chestplate', 'ring'];
+const EQUIPMENT_SET_ORDER: EquipmentSet[] = ['astral', 'egida', 'abyss'];
+
+/** The equipment card always contains the full set: 3 rows of 4 items. */
+export const EQUIPMENT_COLUMNS = 4;
 
 export class EquipmentData {
   public name: string;        // Уникальный ID, например "1-AstralSword"
@@ -26,7 +30,8 @@ export class EquipmentData {
   }
 
   public get order(): number {
-    const setOffset = this.set === 'astral' ? 0 : EQUIPMENT_TYPE_ORDER.length;
+    const setOffset =
+      EQUIPMENT_SET_ORDER.indexOf(this.set) * EQUIPMENT_TYPE_ORDER.length;
     return setOffset + EQUIPMENT_TYPE_ORDER.indexOf(this.type);
   }
 
@@ -98,7 +103,7 @@ export const EQUIPMENT_GRADE_LABELS: Record<EquipmentGrade, string> = {
   fantasy2: 'Fantasy 2',
 };
 
-// Функция сборки начального статичного списка предметов (8 штук — по 4 предмета на 2 сета)
+// Функция сборки начального статичного списка предметов (12 штук — по 4 предмета на 3 сета)
 export function createInitialEquipment(): EquipmentData[] {
   const items: EquipmentData[] = [];
   const types: EquipmentType[] = ['sword', 'helmet', 'chestplate', 'ring'];
@@ -115,7 +120,7 @@ export function createInitialEquipment(): EquipmentData[] {
     items.push(new EquipmentData(formatName, type, 'egida', 'no'));
   });
 
-  // Сет Abyss (номера 5-8)
+  // Сет Abyss (номера 9-12)
   types.forEach((type) => {
     const formatName = `Abyss${type.charAt(0).toUpperCase() + type.slice(1)}`;
     items.push(new EquipmentData(formatName, type, 'abyss', 'no'));

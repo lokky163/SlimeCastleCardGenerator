@@ -24,7 +24,6 @@ export const HubExportBoard: React.FC<HubExportBoardProps> = ({
     bgColor={bgColor}
     totalSlimeBonus={profile.totalSlimeBonus}
     equipment={profile.equipment}
-    equipmentLayout={profile.equipmentLayout}
     relics={profile.relics}
     relicLayout={profile.relicLayout}
     slimes={profile.slimes}

@@ -1,7 +1,6 @@
 import React from 'react';
 import { EquipmentCard } from '../EquipmentCard/EquipmentCard';
 import { type EquipmentData, type EquipmentGrade } from '../../models/equipment';
-import { GridControls } from '../grid/GridControls';
 import { SlotGrid } from '../grid/SlotGrid';
 import type { SlotLayoutController } from '../grid/useSlotLayout';
 import { ModulePanel } from '../ui/ModulePanel/ModulePanel';
@@ -27,12 +26,11 @@ export const EquipmentModule: React.FC<EquipmentModuleProps> = ({
 
   return (
     <ModulePanel>
-      <GridControls layout={layout} />
-
       <SlotGrid
         items={equipment}
         layout={layout}
         variant="equipment"
+        fixed
         renderCard={(item, _itemIndex, width) => (
           <EquipmentCard
             equipment={item}

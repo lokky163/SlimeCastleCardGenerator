@@ -14,6 +14,7 @@ import {
 import { BUFFS, BuffData, type BuffType } from '../models/buff';
 import {
   createInitialEquipment,
+  EQUIPMENT_COLUMNS,
   type EquipmentData,
   type EquipmentGrade,
 } from '../models/equipment';
@@ -132,7 +133,7 @@ function buildLayout<T extends LayoutItem>(
     .filter((item, index) => flags[index]?.hidden === true)
     .map((item) => item.key);
   const hideEnabled = module.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = mode === 'manual' ? false : (module.autoSize ?? true);
+  const autoSize = mode === 'manual' ? true : (module.autoSize ?? true);
 
   const entries =
     mode === 'manual'
@@ -190,16 +191,28 @@ function importEquipment(
 ): ImportedModule<EquipmentData> | null {
   if (!module) return null;
 
-  const flags: SlotJson[] = [];
   const list = createInitialEquipment().map((defaultItem) => {
     const found = module.list.find((item) => item.name === defaultItem.name);
-    flags.push(toSlotJson(found));
     return found
       ? defaultItem.clone({ grade: readString(found.grade, 'no') as EquipmentGrade })
       : defaultItem;
   });
 
-  return { list, layout: buildLayout(list, flags, module) };
+  // Equipment has no layout controls any more: all cards are always shown in a
+  // fixed 4-column grid, so old grids and hidden marks from saved profiles are
+  // ignored.
+  return {
+    list,
+    layout: {
+      rows: Math.max(1, Math.ceil(list.length / EQUIPMENT_COLUMNS)),
+      cols: EQUIPMENT_COLUMNS,
+      layoutMode: 'default',
+      autoSize: true,
+      hideEnabled: false,
+      entries: list.map((_, index) => ({ index, visible: true, hidden: false })),
+      hiddenKeys: [],
+    },
+  };
 }
 
 function importBuffs(module: NormalizedModule | null): ImportedModule<BuffData> | null {

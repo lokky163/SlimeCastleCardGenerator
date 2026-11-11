@@ -2,7 +2,7 @@ import type { SlotLayoutBase } from './layout';
 
 export const DEFAULT_LAYOUTS = {
   equipment: {
-    rows: 2,
+    rows: 3,
     cols: 4,
     mode: 'default',
     autoSize: true,

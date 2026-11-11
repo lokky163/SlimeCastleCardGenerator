@@ -20,7 +20,6 @@ interface ExportBoardProps {
   bgColor: string;
   totalSlimeBonus: number;
   equipment: EquipmentData[];
-  equipmentLayout: SlotLayoutState;
   relics: RelicData[];
   relicLayout: SlotLayoutState;
   slimes: SlimeData[];
@@ -39,7 +38,6 @@ export const ExportBoard: React.FC<ExportBoardProps> = ({
   bgColor,
   totalSlimeBonus,
   equipment,
-  equipmentLayout,
   relics,
   relicLayout,
   slimes,
@@ -67,9 +65,7 @@ export const ExportBoard: React.FC<ExportBoardProps> = ({
         </div>
       )}
 
-      {selection.equipment && (
-        <EquipmentExport equipment={equipment} layout={equipmentLayout} />
-      )}
+      {selection.equipment && <EquipmentExport equipment={equipment} />}
       {selection.relics && <RelicExport relics={relics} layout={relicLayout} />}
       {selection.slimes && <SlimeExport slimes={slimes} layout={slimeLayout} />}
       {selection.buffs && (
