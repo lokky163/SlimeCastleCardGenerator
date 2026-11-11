@@ -35,8 +35,7 @@ type LayoutAction =
   | { type: 'sync' };
 
 function applyAutoSize(state: SlotLayoutState, maxCols: number): SlotLayoutState {
-  // Custom order always uses an automatic grid.
-  if (state.mode !== 'manual' && !state.autoSize) return state;
+  if (!state.autoSize) return state;
 
   const { rows, cols } = calculateAutoSize(state.entries, maxCols);
   if (state.rows === rows && state.cols === cols) return state;
@@ -60,7 +59,7 @@ function createState(
 ): SlotLayoutState {
   const hiddenKeys = initial.hiddenKeys ?? [];
   const hideEnabled = initial.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = initial.mode === 'manual' ? true : (initial.autoSize ?? true);
+  const autoSize = initial.autoSize ?? true;
   const entries = makeEntries(items, initial.mode, [], hiddenKeys, hideEnabled);
 
   return applyAutoSize(
@@ -89,17 +88,6 @@ function changeMode(
   items: LayoutItem[],
   maxCols: number,
 ): SlotLayoutState {
-  if (mode === 'manual') {
-    const entries = makeEntries(
-      items,
-      mode,
-      state.entries,
-      state.hiddenKeys,
-      state.hideEnabled,
-    );
-    return applyAutoSize({ ...state, mode, autoSize: true, entries }, maxCols);
-  }
-
   const entries = makeEntries(
     items,
     mode,
@@ -117,7 +105,7 @@ function applyState(
 ): SlotLayoutState {
   const hiddenKeys = layout.hiddenKeys ?? [];
   const hideEnabled = layout.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = layout.mode === 'manual' ? true : (layout.autoSize ?? true);
+  const autoSize = layout.autoSize ?? true;
 
   const entries = makeEntries(
     items,
@@ -181,9 +169,6 @@ function changeAutoSize(
   autoSize: boolean,
   maxCols: number,
 ): SlotLayoutState {
-  if (state.mode === 'manual') {
-    return applyAutoSize({ ...state, autoSize: true }, maxCols);
-  }
   return applyAutoSize({ ...state, autoSize }, maxCols);
 }
 
@@ -234,7 +219,7 @@ function syncState(
       state.hiddenKeys,
       state.hideEnabled,
     );
-    return applyAutoSize({ ...state, autoSize: true, entries }, maxCols);
+    return applyAutoSize({ ...state, entries }, maxCols);
   }
 
   const entries = makeEntries(

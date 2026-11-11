@@ -149,6 +149,16 @@ export function calculateAutoSize(
   return { rows: Math.ceil(total / cols), cols };
 }
 
+/** True when a manually sized grid drops at least one card that should be drawn. */
+export function hasGridOverflow(layout: SlotLayoutState): boolean {
+  if (layout.autoSize) return false;
+
+  const capacity = layout.rows * layout.cols;
+  return layout.entries.some(
+    (entry) => entry.visible && !entry.hidden && entry.index >= capacity,
+  );
+}
+
 export interface FilledSlot<T> {
   item: T;
 }

@@ -133,7 +133,7 @@ function buildLayout<T extends LayoutItem>(
     .filter((item, index) => flags[index]?.hidden === true)
     .map((item) => item.key);
   const hideEnabled = module.hideEnabled ?? hiddenKeys.length > 0;
-  const autoSize = mode === 'manual' ? true : (module.autoSize ?? true);
+  const autoSize = module.autoSize ?? true;
 
   const entries =
     mode === 'manual'

@@ -4,7 +4,7 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { MenuOption } from '../ui/MenuOption/MenuOption';
 import { PopupMenu } from '../ui/PopupMenu/PopupMenu';
 import type { LayoutMode } from './layout';
-import { LAYOUT_MODES } from './layout';
+import { hasGridOverflow, LAYOUT_MODES } from './layout';
 import type { SlotLayoutController } from './useSlotLayout';
 import { CounterLabel } from '../CounterLabel';
 import { GridToggle } from './GridToggle';
@@ -112,30 +112,25 @@ const LayoutModeSelect: React.FC<LayoutModeSelectProps> = ({ mode, onModeChange 
 
 export const GridControls: React.FC<GridControlsProps> = ({ layout, children }) => {
   const { t } = useI18n();
-  const customOrder = layout.mode === 'manual';
+  const overflow = hasGridOverflow(layout);
 
   return (
     <div className={styles.controls}>
-      {!customOrder && (
-        <>
-          <GridToggle
-            label={t('Grid size')}
-            checked={layout.autoSize}
-            onLabel={t('Auto')}
-            offLabel={t('Manual')}
-            disabled={layout.mode === 'manual'}
-            onChange={layout.setAutoSize}
-          />
+      <GridToggle
+        label={t('Grid size')}
+        checked={layout.autoSize}
+        onLabel={t('Auto')}
+        offLabel={t('Manual')}
+        onChange={layout.setAutoSize}
+      />
 
-          {!layout.autoSize && (
-            <ManualSizeCounters
-              rows={layout.rows}
-              cols={layout.cols}
-              onRowsChange={layout.setRows}
-              onColsChange={layout.setCols}
-            />
-          )}
-        </>
+      {!layout.autoSize && (
+        <ManualSizeCounters
+          rows={layout.rows}
+          cols={layout.cols}
+          onRowsChange={layout.setRows}
+          onColsChange={layout.setCols}
+        />
       )}
 
       <LayoutModeSelect mode={layout.mode} onModeChange={layout.setMode} />
@@ -149,6 +144,12 @@ export const GridControls: React.FC<GridControlsProps> = ({ layout, children }) 
       />
 
       {children}
+
+      {overflow && (
+        <p className={styles.warning}>
+          {t('With this grid size, not all elements will fit on the final card.')}
+        </p>
+      )}
     </div>
   );
 };

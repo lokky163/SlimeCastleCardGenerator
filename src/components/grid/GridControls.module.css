@@ -92,3 +92,11 @@
   color: var(--color-on-accent);
   font-weight: 700;
 }
+
+.warning {
+  flex-basis: 100%;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
